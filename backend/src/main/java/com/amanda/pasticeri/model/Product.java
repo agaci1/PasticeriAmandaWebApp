@@ -13,13 +13,21 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(nullable = false)
+    private String category;
+
+    @Column(length = 1000)
     private String description;
 
     @Column(nullable = false)
-    private double price;
+    private double basePrice;
 
-    // --- Getters & Setters ---
+    @Column(nullable = false)
+    private double pricePerPerson;
+
+    private String imageUrl;
+
+    // Getters and Setters
 
     public Long getId() {
         return id;
@@ -37,6 +45,14 @@ public class Product {
         this.name = name;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -45,11 +61,27 @@ public class Product {
         this.description = description;
     }
 
-    public double getPrice() {
-        return price;
+    public double getBasePrice() {
+        return basePrice;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public void setBasePrice(double basePrice) {
+        this.basePrice = basePrice;
+    }
+
+    public double getPricePerPerson() {
+        return pricePerPerson;
+    }
+
+    public void setPricePerPerson(double pricePerPerson) {
+        this.pricePerPerson = pricePerPerson;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

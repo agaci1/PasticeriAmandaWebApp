@@ -18,18 +18,28 @@ public class Order {
     private String customerEmail;
 
     @Column(nullable = false)
+    private String customerPhone;
+
+    @Column(nullable = true)
     private String productName;
 
     @Column(nullable = false)
-    private int quantity;
+    private int numberOfPersons;
 
-    @Column(nullable = false)
-    private double totalPrice;
+    @Column(columnDefinition = "TEXT")
+    private String customNote;
+
+    @Column(nullable = true)
+    private Double totalPrice; // ✅ Nullable now, so admin sets later
 
     @Column(nullable = false)
     private LocalDate orderDate;
 
-    // --- Getters & Setters ---
+    @Column(nullable = false)
+    private String status = "pending-quote"; // ✅ New status field
+
+    @Column(name = "image_url")
+    private String imageUrl;
 
     public Long getId() {
         return id;
@@ -55,6 +65,14 @@ public class Order {
         this.customerEmail = customerEmail;
     }
 
+    public String getCustomerPhone() {
+        return customerPhone;
+    }
+
+    public void setCustomerPhone(String customerPhone) {
+        this.customerPhone = customerPhone;
+    }
+
     public String getProductName() {
         return productName;
     }
@@ -63,19 +81,27 @@ public class Order {
         this.productName = productName;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public int getNumberOfPersons() {
+        return numberOfPersons;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setNumberOfPersons(int numberOfPersons) {
+        this.numberOfPersons = numberOfPersons;
     }
 
-    public double getTotalPrice() {
+    public String getCustomNote() {
+        return customNote;
+    }
+
+    public void setCustomNote(String customNote) {
+        this.customNote = customNote;
+    }
+
+    public Double getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(double totalPrice) {
+    public void setTotalPrice(Double totalPrice) {
         this.totalPrice = totalPrice;
     }
 
@@ -85,5 +111,21 @@ public class Order {
 
     public void setOrderDate(LocalDate orderDate) {
         this.orderDate = orderDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

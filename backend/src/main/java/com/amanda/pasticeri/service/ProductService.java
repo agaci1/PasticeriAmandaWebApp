@@ -6,16 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductService {
 
-    private final ProductRepository repository;
-
     @Autowired
-    public ProductService(ProductRepository repository) {
-        this.repository = repository;
-    }
+    private ProductRepository repository;
 
     public List<Product> getAll() {
         return repository.findAll();
@@ -23,5 +20,27 @@ public class ProductService {
 
     public Product save(Product product) {
         return repository.save(product);
+    }
+
+    public Product update(Long id, Product updated) {
+        Optional<Product> optional = repository.findById(id);
+        if (optional.isEmpty()) throw new RuntimeException("Product not found");
+
+        Product existing = optional.get();
+        existing.setName(updated.getName());
+        existing.setCategory(updated.getCategory());
+        existing.setDescription(updated.getDescription());
+        existing.setBasePrice(updated.getBasePrice());
+        existing.setPricePerPerson(updated.getPricePerPerson());
+        existing.setImageUrl(updated.getImageUrl());
+        return repository.save(existing);
+    }
+
+    public void delete(Long id) {
+        repository.deleteById(id);
+    }
+
+    public Product getById(Long id) {
+        return repository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
     }
 }
