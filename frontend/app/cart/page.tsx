@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation"
 import { Lock } from "lucide-react"
 import { saveCartData, getFormData, clearFormData } from "@/lib/form-persistence"
 import { useAuth } from "@/hooks/use-auth"
+import { useTranslation } from "@/contexts/TranslationContext"
 
 // Force dynamic rendering to avoid localStorage issues during build
 export const dynamic = 'force-dynamic'
@@ -29,6 +30,7 @@ export default function CartPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
+  const { t } = useTranslation()
 
   useEffect(() => {
     const stored = localStorage.getItem("cart");
@@ -117,12 +119,12 @@ export default function CartPage() {
         }),
       })
       if (!res.ok) throw new Error("Failed to place order.")
-      alert("Order confirmed! You will receive a confirmation email.")
+      alert(t("orderPlaced") + " " + t("thankYou"))
       setCart([])
       localStorage.removeItem("cart")
       setShowInfoModal(false)
     } catch (err) {
-      setInfoError("Failed to place order. Please try again.")
+      setInfoError(t("orderError") + " " + t("orderErrorMessage"))
     } finally {
       setIsSubmitting(false)
     }
@@ -144,20 +146,20 @@ export default function CartPage() {
   return (
     <div className="container mx-auto py-12 px-4 md:px-6 min-h-[calc(100vh-4rem)]">
       <div className="text-center mb-12">
-        <h1 className="text-4xl lg:text-5xl font-bold text-royal-purple mb-4">🛒 Your Cart</h1>
-        <p className="text-royal-blue text-xl">Review your delicious selections</p>
+        <h1 className="text-4xl lg:text-5xl font-bold text-royal-purple mb-4">🛒 {t("shoppingCart")}</h1>
+        <p className="text-royal-blue text-xl">{t("reviewSelections")}</p>
       </div>
       
       {cart.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-8xl mb-6">🛒</div>
-          <h2 className="text-2xl font-bold text-royal-purple mb-4">Your cart is empty</h2>
-          <p className="text-royal-blue text-lg mb-8">Add some delicious treats to get started!</p>
+          <h2 className="text-2xl font-bold text-royal-purple mb-4">{t("cartEmpty")}</h2>
+          <p className="text-royal-blue text-lg mb-8">{t("addDeliciousTreats")}</p>
           <Button 
             onClick={() => window.location.href = "/menu"} 
             className="bg-gradient-to-r from-royal-purple to-royal-blue text-white hover:from-royal-blue hover:to-royal-purple text-lg px-8 py-3 rounded-full"
           >
-            🍰 Browse Menu
+            🍰 {t("browseMenu")}
           </Button>
         </div>
       ) : (
@@ -166,7 +168,7 @@ export default function CartPage() {
           <div className="lg:col-span-2">
             <Card className="bg-white/80 backdrop-blur-sm border-gold shadow-lg">
               <CardHeader>
-                <CardTitle className="text-royal-purple">Cart Items</CardTitle>
+                <CardTitle className="text-royal-purple">{t("cartItems")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {cart.map((item) => (
@@ -178,7 +180,7 @@ export default function CartPage() {
                     />
                     <div className="flex-1">
                       <h3 className="font-semibold text-royal-blue">{item.name}</h3>
-                      <p className="text-sm text-gray-600">ALL{item.price} per {item.priceType}</p>
+                      <p className="text-sm text-gray-600">ALL{item.price}{item.priceType && item.priceType !== "Total" ? item.priceType : ""}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Button
@@ -207,7 +209,7 @@ export default function CartPage() {
                         onClick={() => removeItem(item.id)}
                         className="text-red-600 hover:text-red-800 hover:bg-red-50"
                       >
-                        Remove
+                        {t("remove")}
                       </Button>
                     </div>
                   </div>
@@ -220,7 +222,7 @@ export default function CartPage() {
           <div>
             <Card className="bg-white/80 backdrop-blur-sm border-gold shadow-lg">
               <CardHeader>
-                <CardTitle className="text-royal-purple">Order Summary</CardTitle>
+                <CardTitle className="text-royal-purple">{t("orderSummary")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -233,7 +235,7 @@ export default function CartPage() {
                 </div>
                 <div className="border-t pt-4">
                   <div className="flex justify-between font-semibold text-lg">
-                    <span>Total:</span>
+                    <span></span>
                     <span className="text-royal-purple">ALL{total.toFixed(2)}</span>
                   </div>
                 </div>
@@ -245,10 +247,10 @@ export default function CartPage() {
                   {!isAuthenticated ? (
                     <>
                       <Lock className="mr-2 h-5 w-5" />
-                      Login to Checkout
+                      {t("login")} {t("toCheckout")}
                     </>
                   ) : (
-                    "Proceed to Checkout"
+                    t("proceedToCheckout")
                   )}
                 </Button>
               </CardContent>
@@ -261,12 +263,12 @@ export default function CartPage() {
       <Dialog open={showInfoModal} onOpenChange={setShowInfoModal}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-royal-purple">Checkout Information</DialogTitle>
+            <DialogTitle className="text-royal-purple">{t("checkoutInformation")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-royal-blue mb-1">Name</label>
+                <label className="block text-sm font-medium text-royal-blue mb-1">{t("firstName")}</label>
                 <Input
                   name="name"
                   value={checkoutInfo.name}
@@ -276,7 +278,7 @@ export default function CartPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-royal-blue mb-1">Surname</label>
+                <label className="block text-sm font-medium text-royal-blue mb-1">{t("lastName")}</label>
                 <Input
                   name="surname"
                   value={checkoutInfo.surname}
@@ -287,7 +289,7 @@ export default function CartPage() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-royal-blue mb-1">Phone</label>
+              <label className="block text-sm font-medium text-royal-blue mb-1">{t("phone")}</label>
               <Input
                 name="phone"
                 value={checkoutInfo.phone}
@@ -297,7 +299,7 @@ export default function CartPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-royal-blue mb-1">Email</label>
+              <label className="block text-sm font-medium text-royal-blue mb-1">{t("email")}</label>
               <Input
                 name="email"
                 type="email"
@@ -317,14 +319,14 @@ export default function CartPage() {
               onClick={() => setShowInfoModal(false)}
               disabled={isSubmitting}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               onClick={handleConfirm}
               disabled={isSubmitting}
               className="bg-royal-purple hover:bg-royal-blue"
             >
-              {isSubmitting ? "Processing..." : "Confirm Order"}
+              {isSubmitting ? t("processing") : t("confirmOrder")}
             </Button>
           </DialogFooter>
         </DialogContent>

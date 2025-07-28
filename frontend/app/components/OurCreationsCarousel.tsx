@@ -107,7 +107,7 @@ export default function OurCreationsCarousel() {
     const totalImages = cakeImages.length;
     
     // Show 5 images on mobile, 7 on desktop: 2 before, 1 current, 2 after (mobile) or 3 before, 1 current, 3 after (desktop)
-    const range = window.innerWidth < 768 ? 2 : 3;
+    const range = typeof window !== 'undefined' && window.innerWidth < 768 ? 2 : 3;
     for (let i = -range; i <= range; i++) {
       const index = (currentIndex + i + totalImages) % totalImages;
       visible.push({
@@ -169,7 +169,7 @@ export default function OurCreationsCarousel() {
             }
             
             // Calculate horizontal position (smaller on mobile)
-            const translateX = position * (window.innerWidth < 768 ? 120 : 200);
+            const translateX = position * (typeof window !== 'undefined' && window.innerWidth < 768 ? 120 : 200);
             
             return (
               <div

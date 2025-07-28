@@ -20,6 +20,7 @@ import { GradientText } from "@/components/ui/gradient-text"
 import { saveCustomOrderData, getFormData, clearFormData } from "@/lib/form-persistence"
 import { useAuth } from "@/hooks/use-auth"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { useTranslation } from "@/contexts/TranslationContext"
 
 export default function OrderPage() {
   const [customOrderDate, setCustomOrderDate] = useState<Date | undefined>(undefined)
@@ -31,26 +32,27 @@ export default function OrderPage() {
   const formRef = useRef<HTMLFormElement>(null)
   const router = useRouter()
   const { isAuthenticated, isLoading } = useAuth()
+  const { t } = useTranslation()
 
   const FLAVOURS = [
-    "No Preference",
-    "Chocolate",
-    "Vanilla",
-    "Snickers",
-    "Oreo",
-    "Berries",
-    "Strawberry",
-    "Caramel",
-    "Velvet",
-    "Kinder Bueno",
-    "Lacta",
-    "Rafaelo",
-    "Tiramisu",
-    "Scandal",
-    "Kiss",
-    "Pistachio",
-    "Dubai",
-    "Other"
+    t("noPreference"),
+    t("chocolate"),
+    t("vanilla"),
+    t("snickers"),
+    t("oreo"),
+    t("berries"),
+    t("strawberry"),
+    t("caramel"),
+    t("velvet"),
+    t("kinderBueno"),
+    t("lacta"),
+    t("rafaelo"),
+    t("tiramisu"),
+    t("scandal"),
+    t("kiss"),
+    t("pistachio"),
+    t("dubai"),
+    t("other")
   ]
 
   const [flavour, setFlavour] = useState("No Preference")
@@ -90,8 +92,8 @@ export default function OrderPage() {
         // But we can show a message to the user
         if (savedData.uploadedImages && savedData.uploadedImages.length > 0) {
           toast({
-            title: "Images Need to be Re-uploaded",
-            description: "Please re-upload your images as they couldn't be preserved during login.",
+            title: t("imagesNeedReupload"),
+            description: t("imagesReuploadMessage"),
             variant: "destructive",
           })
         }
@@ -199,8 +201,8 @@ export default function OrderPage() {
     } catch (error: any) {
       console.error("Failed to submit custom order:", error)
       toast({
-        title: "Order Submission Failed",
-        description: error.message || "There was an error submitting your order.",
+        title: t("orderError"),
+        description: error.message || t("orderErrorMessage"),
         variant: "destructive",
       })
     } finally {
@@ -221,64 +223,64 @@ export default function OrderPage() {
 
   return (
     <div className="container mx-auto py-12 px-4 md:px-6 min-h-[calc(100vh-4rem)]">
-      <GradientText className="text-4xl md:text-5xl font-extrabold text-center mb-12">Custom Order Request</GradientText>
+      <GradientText className="text-4xl md:text-5xl font-extrabold text-center mb-12">{t("orderTitle")}</GradientText>
 
       <div className="max-w-3xl mx-auto space-y-8 text-royal-blue">
         <Card className="bg-white/80 backdrop-blur-sm border-gold shadow-lg">
           <CardHeader>
-            <CardTitle className="text-royal-purple">Custom Order Request</CardTitle>
+            <CardTitle className="text-royal-purple">{t("customOrder")}</CardTitle>
             <CardDescription className="text-royal-blue">
-              Describe your dream cake or pastry, add pictures, and select a desired date.
+              {t("orderSubtitle")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form ref={formRef} onSubmit={handleSubmitCustomOrder} className="grid gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="customerNameCustom">Your Name</Label>
+                  <Label htmlFor="customerNameCustom">{t("customerName")}</Label>
                   <Input
                     id="customerNameCustom"
                     name="customerName"
-                    placeholder="John Doe"
+                    placeholder={t("customerName")}
                     required
                     className="bg-white border-royal-blue text-royal-blue"
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="customerEmailCustom">Your Email</Label>
+                  <Label htmlFor="customerEmailCustom">{t("customerEmail")}</Label>
                   <Input
                     id="customerEmailCustom"
                     name="customerEmail"
                     type="email"
-                    placeholder="john.doe@example.com"
+                    placeholder={t("customerEmail")}
                     required
                     className="bg-white border-royal-blue text-royal-blue"
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="customerPhoneCustom">Your Phone</Label>
+                  <Label htmlFor="customerPhoneCustom">{t("customerPhone")}</Label>
                   <Input
                     id="customerPhoneCustom"
                     name="customerPhone"
-                    placeholder="+355 69 123 4567"
+                    placeholder={t("customerPhone")}
                     required
                     className="bg-white border-royal-blue text-royal-blue"
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="customNote">Description</Label>
+                  <Label htmlFor="customNote">{t("description")}</Label>
                   <Textarea
                     id="customNote"
                     name="customNote"
-                    placeholder="Describe your dream cake or pastry in detail..."
+                    placeholder={t("description")}
                     className="bg-white border-royal-blue text-royal-blue min-h-[100px]"
                     required
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="flavour">Flavour Preference</Label>
+                  <Label htmlFor="flavour">{t("flavour")}</Label>
                   <Select value={flavour} onValueChange={setFlavour}>
                     <SelectTrigger className="bg-white border-royal-blue text-royal-blue">
-                      <SelectValue placeholder="Select a flavour" />
+                      <SelectValue placeholder={t("flavour")} />
                     </SelectTrigger>
                     <SelectContent>
                       {FLAVOURS.map((flavourOption) => (
@@ -291,19 +293,19 @@ export default function OrderPage() {
                 </div>
                 {flavour === "Other" && (
                   <div className="grid gap-2">
-                    <Label htmlFor="customFlavour">Custom Flavour</Label>
-                    <Input
-                      id="customFlavour"
-                      value={customFlavour}
-                      onChange={(e) => setCustomFlavour(e.target.value)}
-                      placeholder="Enter your custom flavour"
+                                      <Label htmlFor="customFlavour">{t("customFlavour")}</Label>
+                  <Input
+                    id="customFlavour"
+                    value={customFlavour}
+                    onChange={(e) => setCustomFlavour(e.target.value)}
+                    placeholder={t("customFlavour")}
                       className="bg-white border-royal-blue text-royal-blue"
                       required
                     />
                   </div>
                 )}
                 <div className="grid gap-2">
-                  <Label>Desired Date</Label>
+                  <Label>{t("orderDate")}</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -311,7 +313,7 @@ export default function OrderPage() {
                         className="bg-white border-royal-blue text-royal-blue justify-start text-left font-normal"
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {customOrderDate ? format(customOrderDate, "PPP") : "Pick a date"}
+                        {customOrderDate ? format(customOrderDate, "PPP") : t("selectDate")}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -326,7 +328,7 @@ export default function OrderPage() {
                   </Popover>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="images">Upload Images (Optional)</Label>
+                  <Label htmlFor="images">{t("uploadImages")}</Label>
                   <div className="border-2 border-dashed border-royal-blue rounded-lg p-6 text-center">
                     <UploadCloud className="mx-auto h-12 w-12 text-royal-blue mb-4" />
                     <input
@@ -338,7 +340,7 @@ export default function OrderPage() {
                       className="hidden"
                     />
                     <label htmlFor="images" className="cursor-pointer">
-                      <span className="text-royal-blue font-semibold">Click to upload images</span>
+                      <span className="text-royal-blue font-semibold">{t("dragAndDrop")}</span>
                       <p className="text-sm text-gray-500 mt-1">PNG, JPG, GIF up to 10MB each</p>
                     </label>
                   </div>
@@ -360,7 +362,7 @@ export default function OrderPage() {
                             ×
                           </button>
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 rounded-lg flex items-center justify-center">
-                            <span className="text-white opacity-0 group-hover:opacity-100 font-semibold text-sm">Click to enlarge</span>
+                            <span className="text-white opacity-0 group-hover:opacity-100 font-semibold text-sm">{t("clickToEnlarge")}</span>
                           </div>
                         </div>
                       ))}
@@ -375,12 +377,12 @@ export default function OrderPage() {
                   {!isAuthenticated ? (
                     <>
                       <Lock className="mr-2 h-5 w-5" />
-                      Login to Submit Order
+                      {t("login")} {t("toSubmitOrder")}
                     </>
                   ) : loading ? (
-                    "Submitting Order..."
+                    t("submittingOrder")
                   ) : (
-                    "Submit Custom Order"
+                    t("submitOrder")
                   )}
                 </Button>
             </form>

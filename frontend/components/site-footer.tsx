@@ -1,24 +1,29 @@
+"use client"
+
 import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Crown } from "lucide-react"
 import Link from "next/link"
 import { GradientText } from "./ui/gradient-text"
+import { useTranslation } from "@/contexts/TranslationContext"
 
 export function SiteFooter() {
+  const { t } = useTranslation()
+  
   return (
     <footer className="relative z-20 bg-gradient-to-r from-footer-gradient-light-start to-footer-gradient-light-end py-8 md:py-12 border-t border-gold">
       <div className="container grid grid-cols-1 md:grid-cols-3 gap-8 text-dark-royal-blue">
         <div className="space-y-4">
           <div className="flex items-center">
             <Crown className="h-8 w-8 text-gold drop-shadow-sm -ml-2" />
-            <GradientText className="text-3xl md:text-4xl font-bold drop-shadow-lg bg-gradient-to-r from-royal-purple via-dark-royal-purple to-royal-blue">Amanda Pastry Shop</GradientText>
+            <GradientText className="text-3xl md:text-4xl font-bold drop-shadow-lg bg-gradient-to-r from-royal-purple via-dark-royal-purple to-royal-blue">{t("brandName")}</GradientText>
           </div>
-          <p className="text-sm">Delicious custom cakes & pastries made with the finest ingredients.</p>
+          <p className="text-sm">{t("brandDescription")}</p>
         </div>
         <div className="space-y-4">
-          <h3 className="text-xl font-bold text-dark-royal-purple drop-shadow-sm">Contact Us</h3>
+          <h3 className="text-xl font-bold text-dark-royal-purple drop-shadow-sm">{t("contactUs")}</h3>
           <ul className="space-y-2 text-sm">
             <li className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-gold" />
-              Located in the heart of Saranda, Albania
+              {t("locatedIn")}
             </li>
             <li className="flex items-center gap-2">
               <Phone className="h-4 w-4 text-gold" />
@@ -34,12 +39,12 @@ export function SiteFooter() {
             </li>
             <li className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-gold" />
-              Open every day: 8:00 AM – 11:00 PM
+              {t("hours")}
             </li>
           </ul>
         </div>
         <div className="space-y-4">
-          <h3 className="text-xl font-bold text-dark-royal-purple drop-shadow-sm">Follow Us</h3>
+          <h3 className="text-xl font-bold text-dark-royal-purple drop-shadow-sm">{t("followUs")}</h3>
           <div className="flex gap-4">
             <Link
               href="https://www.instagram.com/pasticeri_amanda"

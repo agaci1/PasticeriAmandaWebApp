@@ -1,6 +1,9 @@
+"use client"
+
 import { GradientText } from "@/components/ui/gradient-text"
 import Image from "next/image"
 import OurCreationsCarousel from "@/app/components/OurCreationsCarousel"
+import { useTranslation } from "@/contexts/TranslationContext"
 
 // Add Dancing Script font for fancy titles
 const dancingScript = {
@@ -8,6 +11,8 @@ const dancingScript = {
 }
 
 export default function AboutPage() {
+  const { t } = useTranslation()
+
   return (
     <div className="container mx-auto py-12 px-4 md:px-6 min-h-[calc(100vh-4rem)]">
       <div className="flex justify-center mb-8">
@@ -25,7 +30,7 @@ export default function AboutPage() {
       </div>
       <div className="max-w-4xl mx-auto space-y-8 text-royal-blue">
         <GradientText className="text-4xl md:text-5xl font-extrabold text-center mb-8">
-          About Amanda Pastry Shop
+          {t("aboutAmanda")}
         </GradientText>
 
         {/* Selected Text Section */}
@@ -71,11 +76,10 @@ export default function AboutPage() {
                 textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
               }}
             >
-              Welcome to Amanda Pastry Shop
+              {t("welcomeToAmanda")}
             </h2>
             <p className="text-xl leading-relaxed font-bold text-royal-blue max-w-4xl mx-auto">
-              A place where passion for baking meets the art of confectionery. Nestled in the heart of Saranda, Albania, 
-              our shop was founded with a simple dream: to bring joy and sweetness to every celebration and everyday moment.
+              {t("aboutStory")}
             </p>
           </div>
         </div>
@@ -115,35 +119,19 @@ export default function AboutPage() {
             <div className="absolute bottom-2 right-2 w-8 h-8 border-r-2 border-b-2 border-gold/60 rounded-br-xl"></div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 items-center relative z-10">
-            <div className="relative w-full h-64 md:h-96 rounded-xl overflow-hidden shadow-lg">
-              <Image
-                src="/cupcakespic.jpg"
-                alt="Delicious Cupcakes"
-                fill
-                className="rounded-xl object-cover"
-              />
-            </div>
-            <div className="space-y-6">
-              {/* Title in the middle */}
-              <div className="text-center py-4">
-                <h2 
-                  className="text-3xl font-bold text-white"
-                  style={{
-                    ...dancingScript,
-                    textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
-                  }}
-                >
-                  Our Story
-                </h2>
-              </div>
-              
-              <p className="text-lg leading-relaxed font-bold text-royal-blue">
-                For years, we have dedicated ourselves to perfecting classic recipes and innovating new ones, always using
-                the finest, freshest ingredients. We believe that a truly delicious pastry starts with quality, and ends
-                with a smile.
-              </p>
-            </div>
+          <div className="relative z-10 text-center">
+            <h3 
+              className="text-3xl md:text-4xl font-bold mb-6 text-white"
+              style={{
+                ...dancingScript,
+                textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
+              }}
+            >
+              {t("ourStory")}
+            </h3>
+            <p className="text-lg leading-relaxed text-royal-blue max-w-4xl mx-auto">
+              {t("aboutStory")}
+            </p>
           </div>
         </div>
 
@@ -191,17 +179,13 @@ export default function AboutPage() {
                   textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
                 }}
               >
-                Our Philosophy
+                {t("ourPhilosophy")}
               </h2>
               <p className="text-lg leading-relaxed font-bold text-royal-blue">
-                At Amanda Pastry Shop, we are more than just bakers; we are artists. Each cake, each pastry, is a canvas
-                where we blend flavors, textures, and designs to create edible masterpieces. We pride ourselves on our
-                attention to detail, ensuring that every bite is a delightful experience.
+                {t("philosophyDescription1")}
               </p>
               <p className="text-lg leading-relaxed font-bold text-royal-blue">
-                From elegant wedding cakes to whimsical birthday treats and delicate daily pastries, we pour our heart
-                into every creation. We are committed to sustainability, supporting local suppliers, and fostering a warm,
-                welcoming environment for our community.
+                {t("philosophyDescription2")}
               </p>
             </div>
             <div className="relative w-full h-64 md:h-96 rounded-xl overflow-hidden shadow-lg order-1 md:order-2">
@@ -260,10 +244,10 @@ export default function AboutPage() {
                 textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
               }}
             >
-              Meet Our Team
+              {t("meetOurTeam")}
             </h2>
             <p className="text-lg max-w-2xl mx-auto mb-8 font-bold text-royal-blue">
-              Our talented team of pastry chefs and dedicated staff are the heart of Amanda Pastry Shop. With years of experience and a shared love for baking, they work tirelessly to bring your sweet dreams to life.
+              {t("teamDescription")}
             </p>
             <div className="flex justify-center">
               <div className="text-center">
@@ -278,8 +262,7 @@ export default function AboutPage() {
                 <h3 className="text-2xl font-bold text-royal-purple mb-2">Amanda Gaci</h3>
                 <p className="text-lg text-royal-blue font-semibold">Founder, Head Pastry Chef & Custom Cake Specialist</p>
                 <p className="text-sm text-royal-blue/80 mt-2 max-w-md mx-auto font-bold">
-                  With years of experience in pastry arts and a passion for creating edible masterpieces, 
-                  Amanda leads our team with creativity, precision, and dedication to excellence.
+                  {t("amandaDescription")}
                 </p>
               </div>
             </div>
@@ -308,12 +291,10 @@ export default function AboutPage() {
               textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
             }}
           >
-            Our Creations
+            {t("ourCreations")}
           </h2>
           <p className="text-xl md:text-2xl text-center mb-12 text-royal-blue font-bold max-w-4xl mx-auto px-4">
-            Discover our wide variety of delicious offerings including custom cakes, traditional sweets, modern desserts, 
-            and everything in between. From elegant wedding cakes to whimsical birthday treats, from classic pastries 
-            to innovative creations, we bring your sweetest dreams to life with passion and artistry.
+            {t("creationsDescription")}
           </p>
           <OurCreationsCarousel />
         </div>

@@ -9,6 +9,7 @@ import { GradientText } from "@/components/ui/gradient-text"
 import FeedSection from "@/app/components/FeedSection";
 import API_BASE from "@/lib/api";
 import { Dancing_Script } from "next/font/google"
+import { useTranslation } from "@/contexts/TranslationContext"
 
 const dancingScript = Dancing_Script({ subsets: ["latin"] })
 
@@ -21,57 +22,7 @@ interface CarouselItem {
   menuLink: string;
 }
 
-// Full-screen carousel items
-  const carouselItems: CarouselItem[] = [
-    {
-      id: 1,
-      name: "Cake",
-      description: "Exquisite custom cakes crafted with passion and precision",
-      imageUrl: "/cakespic.WEBP",
-      category: "cakes",
-      menuLink: "/menu?category=cakes"
-    },
-    {
-      id: 2,
-      name: "Pastries",
-      description: "Handcrafted pastries made with the finest ingredients",
-      imageUrl: "/sweetspic.JPG",
-      category: "sweets",
-      menuLink: "/menu?category=sweets"
-    },
-    {
-      id: 3,
-      name: "Traditional",
-      description: "Classic traditional sweets with authentic recipes",
-      imageUrl: "/bakllavapic.jpg",
-      category: "other",
-      menuLink: "/menu?category=other"
-    },
-    {
-      id: 4,
-      name: "Modern",
-      description: "Contemporary desserts with innovative flavors",
-      imageUrl: "/rafaellopic.jpg",
-      category: "other",
-      menuLink: "/menu?category=other"
-    },
-    {
-      id: 5,
-      name: "Ice Cream",
-      description: "Delicious ice cream creations for every taste",
-      imageUrl: "/icecreampic.WEBP",
-      category: "other",
-      menuLink: "/menu?category=other"
-    },
-    {
-      id: 6,
-      name: "Trending",
-      description: "Latest trending desserts that everyone loves",
-      imageUrl: "/dubaipic.jpg",
-      category: "other",
-      menuLink: "/menu?category=other"
-    }
-  ];
+// Full-screen carousel items will be defined inside the component
 
 interface MenuItem {
   id: number;
@@ -90,6 +41,63 @@ export default function HomePage() {
   const [startX, setStartX] = useState(0);
   const [currentX, setCurrentX] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
+  const [isMenuDragging, setIsMenuDragging] = useState(false);
+  const [menuStartX, setMenuStartX] = useState(0);
+  const [menuCurrentX, setMenuCurrentX] = useState(0);
+  const menuCarouselRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
+
+  // Full-screen carousel items
+  const carouselItems: CarouselItem[] = [
+    {
+      id: 1,
+      name: t("cake"),
+      description: t("cakeDescription"),
+      imageUrl: "/cakespic.WEBP",
+      category: "cakes",
+      menuLink: "/menu?category=cakes"
+    },
+    {
+      id: 2,
+      name: t("pastries"),
+      description: t("pastriesDescription"),
+      imageUrl: "/sweetspic.JPG",
+      category: "sweets",
+      menuLink: "/menu?category=sweets"
+    },
+    {
+      id: 3,
+      name: t("traditional"),
+      description: t("traditionalDescription"),
+      imageUrl: "/bakllavapic.jpg",
+      category: "other",
+      menuLink: "/menu?category=other"
+    },
+    {
+      id: 4,
+      name: t("modern"),
+      description: t("modernDescription"),
+      imageUrl: "/rafaellopic.jpg",
+      category: "other",
+      menuLink: "/menu?category=other"
+    },
+    {
+      id: 5,
+      name: t("iceCream"),
+      description: t("iceCreamDescription"),
+      imageUrl: "/icecreampic.WEBP",
+      category: "other",
+      menuLink: "/menu?category=other"
+    },
+    {
+      id: 6,
+      name: t("trending"),
+      description: t("trendingDescription"),
+      imageUrl: "/dubaipic.jpg",
+      category: "other",
+      menuLink: "/menu?category=other"
+    }
+  ];
 
   const [randomMenuItems, setRandomMenuItems] = useState<MenuItem[]>([]);
 
@@ -211,6 +219,62 @@ export default function HomePage() {
     setCurrentMenuIndex((prev) => (prev - 1 + randomMenuItems.length) % randomMenuItems.length);
   };
 
+  const handleMenuTouchStart = (e: React.TouchEvent) => {
+    setIsMenuDragging(true);
+    setMenuStartX(e.touches[0].clientX);
+    setMenuCurrentX(e.touches[0].clientX);
+  };
+
+  const handleMenuTouchMove = (e: React.TouchEvent) => {
+    if (!isMenuDragging) return;
+    setMenuCurrentX(e.touches[0].clientX);
+  };
+
+  const handleMenuTouchEnd = () => {
+    if (!isMenuDragging) return;
+    
+    const diff = menuStartX - menuCurrentX;
+    const threshold = 50;
+    
+    if (Math.abs(diff) > threshold) {
+      if (diff > 0) {
+        nextMenuSlide(); // Swipe left
+      } else {
+        prevMenuSlide(); // Swipe right
+      }
+    }
+    
+    setIsMenuDragging(false);
+  };
+
+  const handleMenuMouseDown = (e: React.MouseEvent) => {
+    setIsMenuDragging(true);
+    setMenuStartX(e.clientX);
+    setMenuCurrentX(e.clientX);
+  };
+
+  const handleMenuMouseMove = (e: React.MouseEvent) => {
+    if (!isMenuDragging) return;
+    setMenuCurrentX(e.clientX);
+  };
+
+  const handleMenuMouseUp = () => {
+    if (!isMenuDragging) return;
+    
+    const diff = menuStartX - menuCurrentX;
+    const threshold = 50;
+    
+    if (Math.abs(diff) > threshold) {
+      if (diff > 0) {
+        nextMenuSlide();
+      } else {
+        prevMenuSlide();
+      }
+    }
+    
+    setIsMenuDragging(false);
+  };
+
   // Auto-slide functionality
   useEffect(() => {
     const interval = setInterval(() => {
@@ -268,27 +332,22 @@ export default function HomePage() {
               {/* Main Content */}
                  <div className="max-w-4xl mx-auto">
                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-4 md:mb-6 drop-shadow-lg text-white" style={{
-                     textShadow: item.name === 'Cake' ? '0 0 10px #fbbf24, 0 0 20px #fbbf24, 0 0 30px #fbbf24' :
-                                   item.name === 'Pastries' ? '0 0 10px #ec4899, 0 0 20px #ec4899, 0 0 30px #ec4899' :
-                                   item.name === 'Traditional' ? '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6' :
-                                   item.name === 'Modern' ? '0 0 10px #06b6d4, 0 0 20px #06b6d4, 0 0 30px #06b6d4' :
-                                   item.name === 'Ice Cream' ? '0 0 10px #f0abfc, 0 0 20px #f0abfc, 0 0 30px #f0abfc' :
+                     textShadow: item.category === 'cakes' ? '0 0 10px #fbbf24, 0 0 20px #fbbf24, 0 0 30px #fbbf24' :
+                                   item.category === 'sweets' ? '0 0 10px #ec4899, 0 0 20px #ec4899, 0 0 30px #ec4899' :
+                                   item.id === 3 ? '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6' :
+                                   item.id === 4 ? '0 0 10px #06b6d4, 0 0 20px #06b6d4, 0 0 30px #06b6d4' :
+                                   item.id === 5 ? '0 0 10px #f0abfc, 0 0 20px #f0abfc, 0 0 30px #f0abfc' :
                                    '0 0 10px #10b981, 0 0 20px #10b981, 0 0 30px #10b981'
                    }}>
-                     {item.name === 'Cake' ? 'Exquisite Cakes' :
-                      item.name === 'Pastries' ? 'Artisan Pastries' :
-                      item.name === 'Traditional' ? 'Traditional Delights' :
-                      item.name === 'Modern' ? 'Modern Creations' :
-                      item.name === 'Ice Cream' ? 'Frozen Delights' :
-                      'Trending Sensations'}
+                     {item.category === 'cakes' ? t('exquisiteCakes') :
+                      item.category === 'sweets' ? t('artisanPastries') :
+                      item.id === 3 ? t('traditionalDelights') :
+                      item.id === 4 ? t('modernCreations') :
+                      item.id === 5 ? t('frozenDelights') :
+                      t('trendingSensations')}
                    </h1>
                    <p className="text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 text-white/90 max-w-2xl mx-auto drop-shadow-md">
-                     {item.name === 'Cake' ? 'Masterfully crafted custom cakes that turn your dreams into edible art' :
-                      item.name === 'Pastries' ? 'Handcrafted pastries made with love and the finest ingredients' :
-                      item.name === 'Traditional' ? 'Authentic traditional sweets that tell stories of heritage' :
-                      item.name === 'Modern' ? 'Innovative desserts that push the boundaries of flavor' :
-                      item.name === 'Ice Cream' ? 'Creamy ice cream creations that delight your senses' :
-                      'Latest trending desserts that everyone is talking about'}
+                     {item.description}
                    </p>
                 
                                    {/* Category Button */}
@@ -296,33 +355,22 @@ export default function HomePage() {
                      asChild
                      className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg text-white transition-colors shadow-lg border-2"
                      style={{
-                       backgroundColor: item.name === 'Cake' ? '#fbbf24' :
-                                       item.name === 'Pastries' ? '#ec4899' :
-                                       item.name === 'Traditional' ? '#8b5cf6' :
-                                       item.name === 'Modern' ? '#06b6d4' :
-                                       item.name === 'Ice Cream' ? '#f0abfc' :
-                                       '#10b981',
-                       borderColor: item.name === 'Cake' ? '#fbbf24' :
-                                   item.name === 'Pastries' ? '#ec4899' :
-                                   item.name === 'Traditional' ? '#8b5cf6' :
-                                   item.name === 'Modern' ? '#06b6d4' :
-                                   item.name === 'Ice Cream' ? '#f0abfc' :
-                                   '#10b981',
-                       boxShadow: item.name === 'Cake' ? '0 0 10px #fbbf24, 0 0 20px #fbbf24' :
-                                   item.name === 'Pastries' ? '0 0 10px #ec4899, 0 0 20px #ec4899' :
-                                   item.name === 'Traditional' ? '0 0 10px #8b5cf6, 0 0 20px #8b5cf6' :
-                                   item.name === 'Modern' ? '0 0 10px #06b6d4, 0 0 20px #06b6d4' :
-                                   item.name === 'Ice Cream' ? '0 0 10px #f0abfc, 0 0 20px #f0abfc' :
-                                   '0 0 10px #10b981, 0 0 20px #10b981'
+                       backgroundColor: item.category === 'cakes' ? '#fbbf24' :
+                                       item.category === 'sweets' ? '#ec4899' :
+                                       '#8b5cf6',
+                       borderColor: item.category === 'cakes' ? '#fbbf24' :
+                                   item.category === 'sweets' ? '#ec4899' :
+                                   '#8b5cf6',
+                       boxShadow: item.category === 'cakes' ? '0 0 10px #fbbf24, 0 0 20px #fbbf24' :
+                                   item.category === 'sweets' ? '0 0 10px #ec4899, 0 0 20px #ec4899' :
+                                   '0 0 10px #8b5cf6, 0 0 20px #8b5cf6'
                      }}
                    >
                      <Link href={item.menuLink}>
-                       {item.name === 'Cake' ? 'View Cakes' : 
-                        item.name === 'Pastries' ? 'View Sweets' : 
-                        item.name === 'Traditional' ? 'View Traditional Desserts' : 
-                        item.name === 'Modern' ? 'View Modern Sweets' : 
-                        item.name === 'Ice Cream' ? 'View Ice Cream' : 
-                        'View Trending Sweets'}
+                       {item.category === 'cakes' ? t('viewCakes') : 
+                        item.category === 'sweets' ? t('viewSweets') : 
+                        item.category === 'other' ? t('viewTraditional') : 
+                        t('viewTrending')}
                      </Link>
                    </Button>
               </div>
@@ -339,19 +387,13 @@ export default function HomePage() {
                       }`}
                       style={{
                         backgroundColor: index === currentSlide ? 
-                          (item.name === 'Cake' ? '#fbbf24' :
-                           item.name === 'Pastries' ? '#ec4899' :
-                           item.name === 'Traditional' ? '#8b5cf6' :
-                           item.name === 'Modern' ? '#06b6d4' :
-                           item.name === 'Ice Cream' ? '#f0abfc' :
-                           '#10b981') : 'rgba(255, 255, 255, 0.3)',
+                          (item.category === 'cakes' ? '#fbbf24' :
+                           item.category === 'sweets' ? '#ec4899' :
+                           '#8b5cf6') : 'rgba(255, 255, 255, 0.3)',
                         boxShadow: index === currentSlide ? 
-                          (item.name === 'Cake' ? '0 0 10px #fbbf24, 0 0 20px #fbbf24' :
-                           item.name === 'Pastries' ? '0 0 10px #ec4899, 0 0 20px #ec4899' :
-                           item.name === 'Traditional' ? '0 0 10px #8b5cf6, 0 0 20px #8b5cf6' :
-                           item.name === 'Modern' ? '0 0 10px #06b6d4, 0 0 20px #06b6d4' :
-                           item.name === 'Ice Cream' ? '0 0 10px #f0abfc, 0 0 20px #f0abfc' :
-                           '0 0 10px #10b981, 0 0 20px #10b981') : 'none'
+                          (item.category === 'cakes' ? '0 0 10px #fbbf24, 0 0 20px #fbbf24' :
+                           item.category === 'sweets' ? '0 0 10px #ec4899, 0 0 20px #ec4899' :
+                           '0 0 10px #8b5cf6, 0 0 20px #8b5cf6') : 'none'
                       }}
                     />
                   ))}
@@ -524,10 +566,20 @@ export default function HomePage() {
           
           <div className="relative z-10">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-royal-purple mb-8 text-center">Featured Menu Items</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-royal-purple mb-8 text-center">{t('featuredMenuItems')}</h2>
             
             {/* Menu Carousel */}
-            <div className="relative h-96 md:h-[500px] flex items-center justify-center perspective-1000 mb-8">
+            <div 
+              ref={menuCarouselRef}
+              className="relative h-96 md:h-[500px] flex items-center justify-center perspective-1000 mb-8 cursor-grab active:cursor-grabbing"
+              onTouchStart={handleMenuTouchStart}
+              onTouchMove={handleMenuTouchMove}
+              onTouchEnd={handleMenuTouchEnd}
+              onMouseDown={handleMenuMouseDown}
+              onMouseMove={handleMenuMouseMove}
+              onMouseUp={handleMenuMouseUp}
+              onMouseLeave={handleMenuMouseUp}
+            >
               {randomMenuItems.map((item, index) => {
                 const offset = index - currentMenuIndex;
                 const absOffset = Math.abs(offset);
@@ -629,22 +681,7 @@ export default function HomePage() {
                 );
               })}
 
-              {/* Navigation Arrows */}
-              <Button
-                onClick={prevMenuSlide}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white text-royal-purple border-2 border-royal-purple rounded-full w-12 h-12 p-0 shadow-lg transition-all duration-200 hover:scale-110 z-20"
-                aria-label="Previous menu item"
-              >
-                <ChevronLeft className="w-6 h-6" />
-              </Button>
 
-              <Button
-                onClick={nextMenuSlide}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white text-royal-purple border-2 border-royal-purple rounded-full w-12 h-12 p-0 shadow-lg transition-all duration-200 hover:scale-110 z-20"
-                aria-label="Next menu item"
-              >
-                <ChevronRight className="w-6 h-6" />
-              </Button>
             </div>
 
             {/* Dots Indicator */}
@@ -685,14 +722,14 @@ export default function HomePage() {
             asChild
             className="px-8 py-3 text-lg bg-royal-purple text-white hover:bg-royal-blue transition-colors shadow-lg"
           >
-            <Link href="/menu">Explore Our Menu</Link>
+            <Link href="/menu">{t('exploreOurMenu')}</Link>
           </Button>
           <Button
             asChild
             variant="outline"
             className="px-8 py-3 text-lg border-royal-purple text-royal-purple hover:bg-royal-purple hover:text-white transition-colors shadow-lg bg-transparent"
           >
-            <Link href="/order">Place a Custom Order</Link>
+            <Link href="/order">{t('placeCustomOrder')}</Link>
           </Button>
         </div>
           </div>
@@ -715,7 +752,7 @@ export default function HomePage() {
             {/* About Us Section */}
             <section className="py-16 px-4">
               <div className="max-w-4xl mx-auto">
-                <h2 className="text-3xl md:text-4xl font-bold text-royal-purple mb-8 text-center">About Us</h2>
+                <h2 className="text-3xl md:text-4xl font-bold text-royal-purple mb-8 text-center">{t('aboutUs')}</h2>
                 
                 <div className="border-2 border-gold rounded-2xl p-8 md:p-12 shadow-lg bg-white/70 relative overflow-hidden">
                   {/* Background Image */}
@@ -730,21 +767,15 @@ export default function HomePage() {
                   <div className="relative z-10">
                   <div className="text-center space-y-6">
                     <p className="text-lg md:text-xl text-royal-blue leading-relaxed font-bold">
-                      Welcome to Amanda Pastry Shop, a place where passion for baking meets the art of confectionery. 
-                      Nestled in the heart of Saranda, Albania, our shop was founded with a simple dream: to bring joy 
-                      and sweetness to every celebration and everyday moment.
+                      {t('aboutStory')}
                     </p>
                     
                     <p className="text-lg md:text-xl text-royal-blue leading-relaxed font-bold">
-                      For years, we have dedicated ourselves to perfecting classic recipes and innovating new ones, 
-                      always using the finest, freshest ingredients. We believe that a truly delicious pastry starts 
-                      with quality, and ends with a smile.
+                      {t('philosophyDescription1')}
                     </p>
                     
                     <p className="text-lg md:text-xl text-royal-blue leading-relaxed font-bold">
-                      Our talented team of pastry chefs and dedicated staff are the heart of Amanda Pastry Shop. 
-                      With years of experience and a shared love for baking, they work tirelessly to bring your 
-                      sweet dreams to life.
+                      {t('teamDescription')}
                     </p>
                     
                     <div className="pt-6">
@@ -752,7 +783,7 @@ export default function HomePage() {
                         asChild
                         className="px-8 py-3 text-lg bg-royal-purple text-white hover:bg-royal-blue transition-colors shadow-lg"
                       >
-                        <Link href="/about">Learn More About Us</Link>
+                        <Link href="/about">{t('learnMoreAboutUs')}</Link>
                       </Button>
             </div>
             </div>

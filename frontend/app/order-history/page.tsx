@@ -250,7 +250,7 @@ export default function OrderHistoryPage() {
                       <div>Product(s): {order.productName}</div>
                       <div>Quantity: {order.numberOfPersons}</div>
                       {order.flavour && <div>Flavour: {order.flavour}</div>}
-                      <div>Total: ALL{order.totalPrice}</div>
+                      <div>ALL{order.totalPrice}</div>
                       <div>Due Date: {formatDate(order.orderDate)}</div>
                       {selectedSection === "active" && canCancelOrder(order) && (
                         <Button 

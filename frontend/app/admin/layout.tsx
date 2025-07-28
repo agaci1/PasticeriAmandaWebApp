@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { isAdmin, isAuthenticated } from "@/lib/auth"
-import { redirect, usePathname, useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { MenuIcon, Package2, Home, Utensils, ListOrdered, CheckCircle, ChevronRight, ChevronDown } from "lucide-react"
@@ -24,11 +24,11 @@ export default function AdminLayout({
 
   useEffect(() => {
     if (!isAuthenticated() || !isAdmin()) {
-      redirect("/auth/login")
+      router.push("/auth/login")
     } else {
       setAuthorized(true)
     }
-  }, [pathname])
+  }, [pathname, router])
 
   if (!authorized) {
     return (

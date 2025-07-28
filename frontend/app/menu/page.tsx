@@ -10,6 +10,7 @@ import { ShoppingCart } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { isAuthenticated } from "@/lib/auth"
+import { useTranslation } from "@/contexts/TranslationContext"
 
 interface MenuItem {
   id: string
@@ -31,6 +32,7 @@ export default function MenuPage() {
   const { toast } = useToast()
   const router = useRouter()
   const loggedIn = isAuthenticated()
+  const { t } = useTranslation()
 
   useEffect(() => {
     const fetchMenu = async () => {
@@ -44,10 +46,10 @@ export default function MenuPage() {
         setMenuItems(data)
       } catch (err) {
         console.error("Failed to fetch menu items:", err)
-        setError("Failed to load menu. Please try again later.")
+        setError(t("failedToLoadMenu"))
         toast({
-          title: "Error",
-          description: "Failed to load menu items.",
+          title: t("error"),
+          description: t("failedToLoadMenuItems"),
           variant: "destructive",
         })
       } finally {
@@ -74,7 +76,7 @@ export default function MenuPage() {
       });
     }
     localStorage.setItem("cart", JSON.stringify(cart));
-    toast({ title: "Item Added!", description: `${item.name} has been added to your cart.` });
+    toast({ title: t("itemAddedToCart"), description: `${item.name} ${t("itemAddedDescription")}` });
   };
 
   // Get category for an item
@@ -127,21 +129,21 @@ export default function MenuPage() {
   const categoryButtons = [
     {
       id: 'cakes' as CategoryFilter,
-      label: 'Cakes',
+      label: t('cakes'),
       color: 'bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900',
       borderColor: 'border-purple-600',
       textColor: 'text-white'
     },
     {
       id: 'sweets' as CategoryFilter,
-      label: 'Sweets',
+      label: t('sweets'),
       color: 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700',
       borderColor: 'border-yellow-500',
       textColor: 'text-white'
     },
     {
       id: 'other' as CategoryFilter,
-      label: 'Other',
+      label: t('other'),
       color: 'bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700',
       borderColor: 'border-pink-500',
       textColor: 'text-white'
@@ -151,7 +153,7 @@ export default function MenuPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] text-royal-blue">
-        <p>Loading menu...</p>
+        <p>{t("loadingMenu")}</p>
       </div>
     )
   }
@@ -166,7 +168,7 @@ export default function MenuPage() {
 
   return (
     <div className="container mx-auto py-12 px-4 md:px-6 min-h-[calc(100vh-4rem)]">
-      <GradientText className="text-4xl md:text-5xl font-extrabold text-center mb-8">Our Delicious Menu</GradientText>
+      <GradientText className="text-4xl md:text-5xl font-extrabold text-center mb-8">{t("ourDeliciousMenu")}</GradientText>
 
       {/* Category Filter Buttons */}
       <div className="flex flex-wrap justify-center gap-4 mb-12">
@@ -188,7 +190,7 @@ export default function MenuPage() {
       {/* Results Count */}
       <div className="text-center mb-8">
         <p className="text-lg text-royal-blue">
-          Showing {filteredItems.length} items in {categoryButtons.find(b => b.id === activeFilter)?.label}
+          {t("showingItems", { count: filteredItems.length, category: categoryButtons.find(b => b.id === activeFilter)?.label || '' })}
         </p>
       </div>
 
@@ -219,14 +221,14 @@ export default function MenuPage() {
                   <p className="text-royal-blue text-base font-medium text-center">{item.description}</p>
                   <div className="flex flex-col items-center gap-3">
                     <span className="bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent text-xl font-bold whitespace-nowrap">
-                      ALL{item.price}{item.priceType && item.priceType !== "Total" ? ` ${item.priceType}` : ""}
+                      ALL{item.price}{item.priceType && item.priceType !== "Total" ? item.priceType : ""}
                     </span>
                     <Button
                       onClick={() => loggedIn ? handleAddToCart(item) : router.push("/auth/login")}
                       className={`${styling.buttonColor} text-white transition-colors`}
                     >
                       <ShoppingCart className="w-4 h-4 mr-2" />
-                      {loggedIn ? "Add to Cart" : "Login"}
+                      {loggedIn ? t("addToCart") : t("login")}
                     </Button>
                   </div>
                 </CardContent>
@@ -236,10 +238,10 @@ export default function MenuPage() {
         ) : (
           <div className="col-span-full text-center py-12">
             <p className="text-royal-blue text-lg mb-4">
-              No items found in {categoryButtons.find(b => b.id === activeFilter)?.label.toLowerCase()}.
+              {t("noItemsFound", { category: categoryButtons.find(b => b.id === activeFilter)?.label || '' })}
             </p>
             <p className="text-royal-blue text-sm">
-              Please try another category or check back later.
+              {t("tryAnotherCategory")}
             </p>
           </div>
         )}

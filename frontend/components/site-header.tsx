@@ -8,6 +8,8 @@ import { usePathname, useRouter } from "next/navigation"
 import { isAuthenticated, isAdmin, clearAuthData } from "@/lib/auth"
 import { useEffect, useState } from "react"
 import { GradientText } from "./ui/gradient-text"
+import { LanguageSelector } from "./LanguageSelector"
+import { useTranslation } from "@/contexts/TranslationContext"
 
 export function SiteHeader() {
   const pathname = usePathname()
@@ -15,6 +17,7 @@ export function SiteHeader() {
   const [loggedIn, setLoggedIn] = useState(false)
   const [userIsAdmin, setUserIsAdmin] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { t } = useTranslation()
 
   useEffect(() => {
     setLoggedIn(isAuthenticated())
@@ -34,32 +37,32 @@ export function SiteHeader() {
   }
 
   const userNavLinks: { name: string; href: string; icon?: any; external?: boolean }[] = [
-    { name: "Home", href: "/", icon: Home },
-    { name: "About", href: "/about", icon: Info },
-    { name: "Menu", href: "/menu", icon: Utensils },
-    { name: "Custom Order", href: "/order", icon: ClipboardList },
+    { name: t("home"), href: "/", icon: Home },
+    { name: t("about"), href: "/about", icon: Info },
+    { name: t("menu"), href: "/menu", icon: Utensils },
+    { name: t("customOrder"), href: "/order", icon: ClipboardList },
   ]
   
   const externalLinks: { name: string; href: string; icon?: any; external?: boolean }[] = [
     {
-      name: "Review",
+      name: t("review"),
       href: "https://www.google.com/search?q=Pasticeri+Amanda+Saranda+Albania+reviews",
       external: true,
       icon: Star,
     },
-    { name: "Find Us", href: "https://www.google.com/maps/search/Pasticeri+Amanda+Saranda+Albania", external: true, icon: MapPin },
+    { name: t("findUs"), href: "https://www.google.com/maps/search/Pasticeri+Amanda+Saranda+Albania", external: true, icon: MapPin },
   ]
 
   const adminNavLinks: { name: string; href: string; icon?: any; external?: boolean }[] = [
-    { name: "Dashboard", href: "/admin/dashboard", icon: Package2 },
-    { name: "New Orders", href: "/admin/orders/new", icon: ClipboardList },
-    { name: "Pending Orders", href: "/admin/orders/pending", icon: ClipboardList },
-    { name: "Completed Orders", href: "/admin/orders/completed", icon: ClipboardList },
-    { name: "Canceled Orders", href: "/admin/orders/canceled", icon: ClipboardList },
-    { name: "Manage Cakes", href: "/admin/menu-management/cakes", icon: Utensils },
-    { name: "Manage Sweets", href: "/admin/menu-management/sweets", icon: Utensils },
-    { name: "Manage Other", href: "/admin/menu-management/other", icon: Utensils },
-    { name: "Manage Feed", href: "/admin/feed", icon: ListOrdered },
+    { name: t("dashboard"), href: "/admin/dashboard", icon: Package2 },
+    { name: t("newOrders"), href: "/admin/orders/new", icon: ClipboardList },
+    { name: t("pendingOrders"), href: "/admin/orders/pending", icon: ClipboardList },
+    { name: t("completedOrders"), href: "/admin/orders/completed", icon: ClipboardList },
+    { name: t("canceledOrders"), href: "/admin/orders/canceled", icon: ClipboardList },
+    { name: t("manageCakes"), href: "/admin/menu-management/cakes", icon: Utensils },
+    { name: t("manageSweets"), href: "/admin/menu-management/sweets", icon: Utensils },
+    { name: t("manageOther"), href: "/admin/menu-management/other", icon: Utensils },
+    { name: t("manageFeed"), href: "/admin/feed", icon: ListOrdered },
   ]
 
   return (
@@ -68,11 +71,11 @@ export function SiteHeader() {
         <Link href="/" className="flex items-center gap-2 font-semibold text-royal-blue hover:text-royal-purple">
           <Crown className="h-6 w-6 text-gold" />
           <span className="sr-only">Pasticeri Amanda</span>
-          <GradientText className="text-xl font-bold">Amanda Pastry Shop</GradientText>
+          <GradientText className="text-lg md:text-xl font-bold leading-tight">{t("brandName")}</GradientText>
         </Link>
         <nav className="ml-auto hidden lg:flex gap-6 text-sm font-medium items-center">
           {/* Main navigation links */}
-          {(userIsAdmin ? adminNavLinks : loggedIn ? [...userNavLinks, { name: "Cart", href: "/cart", icon: ShoppingCart }, { name: "Purchase History", href: "/order-history", icon: History }] : userNavLinks).map((link) => (
+          {(userIsAdmin ? adminNavLinks : loggedIn ? [...userNavLinks, { name: t("cart"), href: "/cart", icon: ShoppingCart }, { name: t("purchaseHistory"), href: "/order-history", icon: History }] : userNavLinks).map((link) => (
             <Link
               key={link.name}
               href={link.href}
@@ -103,10 +106,13 @@ export function SiteHeader() {
             </Link>
           ))}
           
+          {/* Language Selector */}
+          <LanguageSelector />
+          
           {/* Login/Logout */}
           {loggedIn && (
             <Button onClick={handleLogout} variant="ghost" className="text-royal-blue hover:text-royal-purple">
-              Logout
+              {t("logout")}
             </Button>
           )}
           {!loggedIn && (
@@ -118,7 +124,7 @@ export function SiteHeader() {
                   : "text-royal-blue"
               }`}
             >
-              Log In
+              {t("login")}
             </Link>
           )}
         </nav>
@@ -132,11 +138,17 @@ export function SiteHeader() {
           <SheetContent side="left" className="bg-gradient-to-br from-white-gold-pink-bg-start to-white-gold-pink-bg-end">
             <Link href="/" className="flex items-center gap-2 font-semibold text-royal-blue" onClick={handleNavigation}>
               <Crown className="h-6 w-6 text-gold" />
-              <GradientText className="text-xl font-bold">Amanda Pastry Shop</GradientText>
+              <GradientText className="text-lg font-bold leading-tight">{t("brandName")}</GradientText>
             </Link>
+            
+            {/* Language Selector for Mobile */}
+            <div className="py-4 border-b border-gold/20">
+              <LanguageSelector variant="mobile" />
+            </div>
+            
             <nav className="grid gap-2 py-6 text-lg font-medium">
               {/* Main navigation links */}
-              {(userIsAdmin ? adminNavLinks : loggedIn ? [...userNavLinks, { name: "Cart", href: "/cart", icon: ShoppingCart }, { name: "Purchase History", href: "/order-history", icon: History }] : userNavLinks).map((link) => (
+              {(userIsAdmin ? adminNavLinks : loggedIn ? [...userNavLinks, { name: t("cart"), href: "/cart", icon: ShoppingCart }, { name: t("purchaseHistory"), href: "/order-history", icon: History }] : userNavLinks).map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
@@ -176,7 +188,7 @@ export function SiteHeader() {
                   variant="ghost"
                   className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-royal-blue hover:text-royal-purple justify-start"
                 >
-                  Logout
+                  {t("logout")}
                 </Button>
               )}
               {!loggedIn && (
@@ -189,7 +201,7 @@ export function SiteHeader() {
                   }`}
                   onClick={handleNavigation}
                 >
-                  Log In
+                  {t("login")}
                 </Link>
               )}
             </nav>

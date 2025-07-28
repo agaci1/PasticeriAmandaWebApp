@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import API_BASE from "@/lib/api";
+import { useTranslation } from "@/contexts/TranslationContext";
 
 const API_URL = `${API_BASE}/api/feed`;
 
@@ -15,6 +16,7 @@ const MAX_HEIGHT = 600; // Maximum height in pixels
 const ASPECT_RATIO = 16 / 9; // Default aspect ratio (16:9)
 
 export default function FeedSection() {
+  const { t } = useTranslation();
   const [feed, setFeed] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +27,7 @@ export default function FeedSection() {
     fetch(API_URL)
       .then((res) => res.json())
       .then((data) => { setFeed(data); setLoading(false); })
-      .catch(() => { setError("Failed to load news feed"); setLoading(false); });
+      .catch(() => { setError(t("failedToLoadNews")); setLoading(false); });
   }, []);
 
   const nextSlide = useCallback(() => {
@@ -153,10 +155,9 @@ export default function FeedSection() {
 
   return (
     <section className="w-full py-12">
-      <h2 className="text-3xl font-bold text-royal-purple mb-4 text-center">News & Updates</h2>
+      <h2 className="text-3xl font-bold text-royal-purple mb-4 text-center">{t('newsSection')}</h2>
       <p className="text-lg text-royal-blue text-center mb-8 max-w-2xl mx-auto leading-relaxed">
-        Stay up to date with our latest news, special offers, and exciting updates from Amanda Pastry Shop. 
-        Here you'll find everything from new menu items to seasonal promotions and behind-the-scenes glimpses of our kitchen.
+        {t('stayUpdated')}
       </p>
       
       {/* Carousel Container */}
