@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
-import { MenuIcon, Crown, ShoppingCart, Home, Info, Utensils, ClipboardList, Star, MapPin, History } from "lucide-react"
+import { MenuIcon, Crown, ShoppingCart, Home, Info, Utensils, ClipboardList, Star, MapPin, History, Package2, ListOrdered } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import { isAuthenticated, isAdmin, clearAuthData } from "@/lib/auth"
 import { useEffect, useState } from "react"
@@ -14,6 +14,7 @@ export function SiteHeader() {
   const router = useRouter()
   const [loggedIn, setLoggedIn] = useState(false)
   const [userIsAdmin, setUserIsAdmin] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     setLoggedIn(isAuthenticated())
@@ -24,7 +25,12 @@ export function SiteHeader() {
     clearAuthData()
     setLoggedIn(false)
     setUserIsAdmin(false)
+    setMobileMenuOpen(false)
     router.push("/auth/login")
+  }
+
+  const handleNavigation = () => {
+    setMobileMenuOpen(false)
   }
 
   const userNavLinks: { name: string; href: string; icon?: any; external?: boolean }[] = [
@@ -43,10 +49,17 @@ export function SiteHeader() {
     },
     { name: "Find Us", href: "https://www.google.com/maps/search/Pasticeri+Amanda+Saranda+Albania", external: true, icon: MapPin },
   ]
+
   const adminNavLinks: { name: string; href: string; icon?: any; external?: boolean }[] = [
-    { name: "Home", href: "/" },
-    { name: "About Us", href: "/about" },
-    { name: "Admin Panel", href: "/admin/dashboard" },
+    { name: "Dashboard", href: "/admin/dashboard", icon: Package2 },
+    { name: "New Orders", href: "/admin/orders/new", icon: ClipboardList },
+    { name: "Pending Orders", href: "/admin/orders/pending", icon: ClipboardList },
+    { name: "Completed Orders", href: "/admin/orders/completed", icon: ClipboardList },
+    { name: "Canceled Orders", href: "/admin/orders/canceled", icon: ClipboardList },
+    { name: "Manage Cakes", href: "/admin/menu-management/cakes", icon: Utensils },
+    { name: "Manage Sweets", href: "/admin/menu-management/sweets", icon: Utensils },
+    { name: "Manage Other", href: "/admin/menu-management/other", icon: Utensils },
+    { name: "Manage Feed", href: "/admin/feed", icon: ListOrdered },
   ]
 
   return (
@@ -109,7 +122,7 @@ export function SiteHeader() {
             </Link>
           )}
         </nav>
-        <Sheet>
+        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="ml-auto lg:hidden">
               <MenuIcon className="h-6 w-6 text-royal-blue" />
@@ -117,7 +130,7 @@ export function SiteHeader() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="bg-gradient-to-br from-white-gold-pink-bg-start to-white-gold-pink-bg-end">
-            <Link href="/" className="flex items-center gap-2 font-semibold text-royal-blue">
+            <Link href="/" className="flex items-center gap-2 font-semibold text-royal-blue" onClick={handleNavigation}>
               <Crown className="h-6 w-6 text-gold" />
               <GradientText className="text-xl font-bold">Amanda Pastry Shop</GradientText>
             </Link>
@@ -132,6 +145,7 @@ export function SiteHeader() {
                   }`}
                   target={link.external ? "_blank" : "_self"}
                   rel={link.external ? "noopener noreferrer" : ""}
+                  onClick={handleNavigation}
                 >
                   {link.icon && <link.icon className="w-5 h-5 mr-1" />}
                   {link.name}
@@ -148,6 +162,7 @@ export function SiteHeader() {
                   }`}
                   target={link.external ? "_blank" : "_self"}
                   rel={link.external ? "noopener noreferrer" : ""}
+                  onClick={handleNavigation}
                 >
                   {link.icon && <link.icon className="w-5 h-5 mr-1" />}
                   {link.name}
@@ -172,6 +187,7 @@ export function SiteHeader() {
                       ? "bg-muted text-royal-purple"
                       : "text-royal-blue hover:text-royal-purple"
                   }`}
+                  onClick={handleNavigation}
                 >
                   Log In
                 </Link>

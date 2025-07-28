@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Instagram } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Instagram } from "lucide-react";
 
 // Cake images array
 const cakeImages = [
@@ -14,6 +13,10 @@ const cakeImages = [
 
 export default function OurCreationsCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [currentX, setCurrentX] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   const nextSlide = () => {
     setCurrentIndex((prevIndex) => 
@@ -31,6 +34,64 @@ export default function OurCreationsCarousel() {
     setCurrentIndex(index);
   };
 
+  // Touch/Swipe handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
+    setStartX(e.touches[0].clientX);
+    setCurrentX(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    setCurrentX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging) return;
+    
+    const diff = startX - currentX;
+    const threshold = 50; // Minimum swipe distance
+    
+    if (Math.abs(diff) > threshold) {
+      if (diff > 0) {
+        nextSlide(); // Swipe left
+      } else {
+        prevSlide(); // Swipe right
+      }
+    }
+    
+    setIsDragging(false);
+  };
+
+  // Mouse drag handlers
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setStartX(e.clientX);
+    setCurrentX(e.clientX);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    setCurrentX(e.clientX);
+  };
+
+  const handleMouseUp = () => {
+    if (!isDragging) return;
+    
+    const diff = startX - currentX;
+    const threshold = 50;
+    
+    if (Math.abs(diff) > threshold) {
+      if (diff > 0) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
+    }
+    
+    setIsDragging(false);
+  };
+
   // Auto-play functionality
   useEffect(() => {
     const interval = setInterval(() => {
@@ -45,8 +106,9 @@ export default function OurCreationsCarousel() {
     const visible = [];
     const totalImages = cakeImages.length;
     
-    // Show 7 images: 3 before, 1 current, 3 after
-    for (let i = -3; i <= 3; i++) {
+    // Show 5 images on mobile, 7 on desktop: 2 before, 1 current, 2 after (mobile) or 3 before, 1 current, 3 after (desktop)
+    const range = window.innerWidth < 768 ? 2 : 3;
+    for (let i = -range; i <= range; i++) {
       const index = (currentIndex + i + totalImages) % totalImages;
       visible.push({
         index,
@@ -63,7 +125,17 @@ export default function OurCreationsCarousel() {
     <div className="w-full py-8">
       {/* 3D Carousel Container */}
       <div className="relative max-w-6xl mx-auto">
-        <div className="relative h-[600px] md:h-[700px] flex items-center justify-center overflow-hidden">
+        <div 
+          ref={carouselRef}
+          className="relative h-[400px] md:h-[600px] lg:h-[700px] flex items-center justify-center overflow-hidden cursor-grab active:cursor-grabbing"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+        >
           {getVisibleImages().map((item, idx) => {
             const isCenter = item.isCenter;
             const position = item.position;
@@ -75,29 +147,29 @@ export default function OurCreationsCarousel() {
             let zIndex = 0;
             
             if (isCenter) {
-              scale = 1.2;
+              scale = 1.1;
               opacity = 1;
               blur = 'blur(0px)';
               zIndex = 10;
             } else if (Math.abs(position) === 1) {
-              scale = 0.9;
+              scale = 0.85;
               opacity = 0.7;
               blur = 'blur(2px)';
               zIndex = 5;
             } else if (Math.abs(position) === 2) {
-              scale = 0.7;
+              scale = 0.65;
               opacity = 0.5;
               blur = 'blur(3px)';
               zIndex = 2;
             } else {
-              scale = 0.5;
+              scale = 0.45;
               opacity = 0.3;
               blur = 'blur(4px)';
               zIndex = 1;
             }
             
-            // Calculate horizontal position
-            const translateX = position * 200;
+            // Calculate horizontal position (smaller on mobile)
+            const translateX = position * (window.innerWidth < 768 ? 120 : 200);
             
             return (
               <div
@@ -111,12 +183,13 @@ export default function OurCreationsCarousel() {
                 }}
                 onClick={() => !isCenter && goToSlide(item.index)}
               >
-                <div className="relative w-80 h-80 md:w-96 md:h-96 rounded-2xl overflow-hidden shadow-2xl border-2 border-gold">
+                <div className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-2xl overflow-hidden shadow-2xl border-2 border-gold">
                   <Image
                     src={item.src}
                     alt={`Cake ${item.index + 1}`}
                     fill
                     className="object-cover"
+                    sizes="(max-width: 768px) 256px, (max-width: 1024px) 320px, 384px"
                   />
                   {/* Glow effect for center image */}
                   {isCenter && (
@@ -127,21 +200,6 @@ export default function OurCreationsCarousel() {
             );
           })}
         </div>
-
-        {/* Navigation Arrows */}
-        <Button
-          onClick={prevSlide}
-          className="absolute left-8 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white text-royal-purple border-2 border-royal-purple rounded-full w-16 h-16 p-0 shadow-lg transition-all duration-200 hover:scale-110 z-20"
-        >
-          <ChevronLeft className="w-8 h-8" />
-        </Button>
-
-        <Button
-          onClick={nextSlide}
-          className="absolute right-8 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white text-royal-purple border-2 border-royal-purple rounded-full w-16 h-16 p-0 shadow-lg transition-all duration-200 hover:scale-110 z-20"
-        >
-          <ChevronRight className="w-8 h-8" />
-        </Button>
 
         {/* Dots Indicator */}
         <div className="flex justify-center mt-8 space-x-2">
@@ -176,4 +234,4 @@ export default function OurCreationsCarousel() {
       </div>
     </div>
   );
-} 
+}  

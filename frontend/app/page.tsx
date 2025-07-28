@@ -3,7 +3,7 @@
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { GradientText } from "@/components/ui/gradient-text"
 import FeedSection from "@/app/components/FeedSection";
@@ -86,6 +86,10 @@ export default function HomePage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loading, setLoading] = useState(true);
   const [currentMenuIndex, setCurrentMenuIndex] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [currentX, setCurrentX] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   const [randomMenuItems, setRandomMenuItems] = useState<MenuItem[]>([]);
 
@@ -141,6 +145,64 @@ export default function HomePage() {
     setCurrentSlide(index);
   };
 
+  // Touch/Swipe handlers for main carousel
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
+    setStartX(e.touches[0].clientX);
+    setCurrentX(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return;
+    setCurrentX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging) return;
+    
+    const diff = startX - currentX;
+    const threshold = 50; // Minimum swipe distance
+    
+    if (Math.abs(diff) > threshold) {
+      if (diff > 0) {
+        nextSlide(); // Swipe left
+      } else {
+        prevSlide(); // Swipe right
+      }
+    }
+    
+    setIsDragging(false);
+  };
+
+  // Mouse drag handlers for main carousel
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setStartX(e.clientX);
+    setCurrentX(e.clientX);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    setCurrentX(e.clientX);
+  };
+
+  const handleMouseUp = () => {
+    if (!isDragging) return;
+    
+    const diff = startX - currentX;
+    const threshold = 50;
+    
+    if (Math.abs(diff) > threshold) {
+      if (diff > 0) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
+    }
+    
+    setIsDragging(false);
+  };
+
   const nextMenuSlide = () => {
     setCurrentMenuIndex((prev) => (prev + 1) % randomMenuItems.length);
   };
@@ -169,7 +231,17 @@ export default function HomePage() {
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* Full-screen carousel */}
-      <div className="relative w-full h-screen">
+      <div 
+        ref={carouselRef}
+        className="relative w-full h-screen cursor-grab active:cursor-grabbing"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
         {carouselItems.map((item, index) => (
           <div
             key={item.id}
@@ -185,6 +257,7 @@ export default function HomePage() {
                 fill
                 className="object-cover"
                 priority={index === currentSlide}
+                sizes="100vw"
               />
               {/* Dark overlay for better text readability */}
               <div className="absolute inset-0 bg-black/40"></div>
@@ -194,7 +267,7 @@ export default function HomePage() {
             <div className="relative z-10 flex flex-col justify-center items-center h-full text-center text-white px-4">
               {/* Main Content */}
                  <div className="max-w-4xl mx-auto">
-                   <h1 className="text-5xl md:text-7xl font-extrabold mb-6 drop-shadow-lg text-white" style={{
+                   <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-4 md:mb-6 drop-shadow-lg text-white" style={{
                      textShadow: item.name === 'Cake' ? '0 0 10px #fbbf24, 0 0 20px #fbbf24, 0 0 30px #fbbf24' :
                                    item.name === 'Pastries' ? '0 0 10px #ec4899, 0 0 20px #ec4899, 0 0 30px #ec4899' :
                                    item.name === 'Traditional' ? '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6' :
@@ -209,7 +282,7 @@ export default function HomePage() {
                       item.name === 'Ice Cream' ? 'Frozen Delights' :
                       'Trending Sensations'}
                    </h1>
-                   <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-2xl mx-auto drop-shadow-md">
+                   <p className="text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 text-white/90 max-w-2xl mx-auto drop-shadow-md">
                      {item.name === 'Cake' ? 'Masterfully crafted custom cakes that turn your dreams into edible art' :
                       item.name === 'Pastries' ? 'Handcrafted pastries made with love and the finest ingredients' :
                       item.name === 'Traditional' ? 'Authentic traditional sweets that tell stories of heritage' :
@@ -221,7 +294,7 @@ export default function HomePage() {
                                    {/* Category Button */}
                    <Button
                      asChild
-                     className="px-8 py-4 text-lg text-white transition-colors shadow-lg border-2"
+                     className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg text-white transition-colors shadow-lg border-2"
                      style={{
                        backgroundColor: item.name === 'Cake' ? '#fbbf24' :
                                        item.name === 'Pastries' ? '#ec4899' :
@@ -288,23 +361,6 @@ export default function HomePage() {
             </div>
           </div>
         ))}
-
-        {/* Navigation Arrows */}
-        <Button
-          onClick={prevSlide}
-          className="absolute left-8 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white border-2 border-white/30 rounded-full w-14 h-14 p-0 shadow-lg transition-all duration-200 hover:scale-110 z-20 backdrop-blur-sm"
-          aria-label="Previous slide"
-        >
-          <ChevronLeft className="w-8 h-8" />
-        </Button>
-
-        <Button
-          onClick={nextSlide}
-          className="absolute right-8 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white border-2 border-white/30 rounded-full w-14 h-14 p-0 shadow-lg transition-all duration-200 hover:scale-110 z-20 backdrop-blur-sm"
-          aria-label="Next slide"
-        >
-          <ChevronRight className="w-8 h-8" />
-        </Button>
       </div>
 
       {/* Rest of the content below the carousel */}
@@ -377,7 +433,7 @@ export default function HomePage() {
             </div>
 
             {/* Main Logo with Gold Light */}
-            <div className="relative flex flex-col items-center">
+            <div className="relative flex flex-col items-center mt-8 md:mt-0">
             <Image
                 src="/logoAmanda.jpg"
                 alt="Pasticeri Amanda Logo"
@@ -390,7 +446,7 @@ export default function HomePage() {
               
               {/* Title below Logo */}
               <div className="mt-6 text-center">
-                <h1 className={`text-5xl md:text-6xl font-bold text-white drop-shadow-lg ${dancingScript.className}`} style={{
+                <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold text-white drop-shadow-lg ${dancingScript.className}`} style={{
                   textShadow: '0 0 8px #fbbf24, 0 0 16px #fbbf24, 0 0 24px #ec4899, 0 0 32px #ec4899, 0 0 40px #fbbf24, 0 0 48px #ec4899, 0 0 56px #fbbf24, 0 0 64px #ec4899'
                 }}>
                   Pasticeri Amanda
