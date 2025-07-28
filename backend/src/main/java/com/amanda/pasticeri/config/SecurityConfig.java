@@ -59,6 +59,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/register").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll() // Allow GET for public access
+                        .requestMatchers(HttpMethod.POST, "/api/products", "/api/products/**").authenticated() // Allow POST for authenticated users
+                        .requestMatchers(HttpMethod.PUT, "/api/products/**").authenticated() // Allow PUT for authenticated users
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").authenticated() // Allow DELETE for authenticated users
+                        .requestMatchers(HttpMethod.GET, "/api/feed", "/api/feed/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()
