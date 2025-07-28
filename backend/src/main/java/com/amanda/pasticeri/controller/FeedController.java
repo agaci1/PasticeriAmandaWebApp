@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/feed")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"https://pasticeriamanda.com", "https://www.pasticeriamanda.com", "http://localhost:3000"}, allowCredentials = "true")
 public class FeedController {
     @Autowired
     private FeedItemRepository feedRepo;
