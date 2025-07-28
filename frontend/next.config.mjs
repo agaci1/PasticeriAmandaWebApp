@@ -22,8 +22,6 @@ const nextConfig = {
       },
     ],
   },
-  // Production optimizations
-  output: 'standalone',
 }
 
 export default nextConfig
