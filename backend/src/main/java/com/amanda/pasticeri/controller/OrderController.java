@@ -2,6 +2,7 @@ package com.amanda.pasticeri.controller;
 
 import com.amanda.pasticeri.dto.MenuOrderDto;
 import com.amanda.pasticeri.dto.OrderRequestDto;
+import com.amanda.pasticeri.dto.CartOrderDto;
 import com.amanda.pasticeri.model.Order;
 import com.amanda.pasticeri.security.JwtTokenProvider;
 import com.amanda.pasticeri.service.OrderService;
@@ -11,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -59,8 +61,10 @@ public class OrderController {
     // ✅ Menu Order (JSON)
     @PostMapping(value = "/menu", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<?> placeMenuOrder(@RequestBody MenuOrderDto menuOrderDto) {
-        orderService.placeMenuOrder(menuOrderDto);
+    public ResponseEntity<?> placeCartOrder(@RequestBody CartOrderDto cartOrderDto, @RequestHeader("Authorization") String tokenHeader) {
+        String token = tokenHeader.replace("Bearer ", "");
+        String email = jwtTokenProvider.getEmailFromToken(token);
+        orderService.placeCartOrder(cartOrderDto, email);
         return ResponseEntity.ok("Menu order placed successfully.");
     }
 
@@ -71,5 +75,32 @@ public class OrderController {
         String token = tokenHeader.replace("Bearer ", "");
         String email = jwtTokenProvider.getEmailFromToken(token);
         return orderService.getOrdersByEmail(email);
+    }
+
+    @PutMapping("/{id}/set-price")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<?> setOrderPrice(@PathVariable Long id, @RequestBody SetPriceRequest request) {
+        orderService.setOrderPrice(id, request.getPrice());
+        return ResponseEntity.ok("Order price set and client notified.");
+    }
+
+    @PutMapping("/{id}/complete")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<?> markOrderComplete(@PathVariable Long id) {
+        orderService.markOrderComplete(id);
+        return ResponseEntity.ok("Order marked as completed.");
+    }
+
+    @PutMapping("/{id}/cancel")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<?> cancelOrder(@PathVariable Long id) {
+        orderService.cancelOrder(id);
+        return ResponseEntity.ok("Order canceled.");
+    }
+
+    public static class SetPriceRequest {
+        private double price;
+        public double getPrice() { return price; }
+        public void setPrice(double price) { this.price = price; }
     }
 }

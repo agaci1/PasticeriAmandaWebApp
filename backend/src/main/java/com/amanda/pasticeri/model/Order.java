@@ -30,6 +30,9 @@ public class Order {
     private String customNote;
 
     @Column(nullable = true)
+    private String flavour; // ✅ New flavor field
+
+    @Column(nullable = true)
     private Double totalPrice; // ✅ Nullable now, so admin sets later
 
     @Column(nullable = false)
@@ -38,8 +41,8 @@ public class Order {
     @Column(nullable = false)
     private String status = "pending-quote"; // ✅ New status field
 
-    @Column(name = "image_url")
-    private String imageUrl;
+    @Column(name = "image_urls", columnDefinition = "TEXT")
+    private String imageUrls; // Comma-separated list of image URLs
 
     public Long getId() {
         return id;
@@ -97,6 +100,14 @@ public class Order {
         this.customNote = customNote;
     }
 
+    public String getFlavour() {
+        return flavour;
+    }
+
+    public void setFlavour(String flavour) {
+        this.flavour = flavour;
+    }
+
     public Double getTotalPrice() {
         return totalPrice;
     }
@@ -121,11 +132,11 @@ public class Order {
         this.status = status;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getImageUrls() {
+        return imageUrls;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImageUrls(String imageUrls) {
+        this.imageUrls = imageUrls;
     }
 }

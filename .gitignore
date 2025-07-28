@@ -44,5 +44,26 @@ next-env.d.ts
 application.properties
 target
 
+# Uploaded files (should not be in git)
+backend/uploads/
+frontend/public/uploads/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+logs/
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
 
 

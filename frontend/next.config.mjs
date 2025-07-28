@@ -8,7 +8,22 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8080',
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'pasticeriamanda-backend-production.up.railway.app',
+        pathname: '/uploads/**',
+      },
+    ],
   },
+  // Production optimizations
+  output: 'standalone',
 }
 
 export default nextConfig

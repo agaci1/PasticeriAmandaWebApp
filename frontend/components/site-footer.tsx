@@ -1,4 +1,4 @@
-import { MapPin, Phone, Mail, Clock, Instagram, Facebook } from "lucide-react"
+import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Crown } from "lucide-react"
 import Link from "next/link"
 import { GradientText } from "./ui/gradient-text"
 
@@ -7,11 +7,14 @@ export function SiteFooter() {
     <footer className="relative z-20 bg-gradient-to-r from-footer-gradient-light-start to-footer-gradient-light-end py-8 md:py-12 border-t border-gold">
       <div className="container grid grid-cols-1 md:grid-cols-3 gap-8 text-dark-royal-blue">
         <div className="space-y-4">
-          <GradientText className="text-2xl font-bold">Amanda Pastry Shop</GradientText>
+          <div className="flex items-center">
+            <Crown className="h-8 w-8 text-gold drop-shadow-sm -ml-2" />
+            <GradientText className="text-3xl md:text-4xl font-bold drop-shadow-lg bg-gradient-to-r from-royal-purple via-dark-royal-purple to-royal-blue">Amanda Pastry Shop</GradientText>
+          </div>
           <p className="text-sm">Delicious custom cakes & pastries made with the finest ingredients.</p>
         </div>
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-dark-royal-purple">Contact Us</h3>
+          <h3 className="text-xl font-bold text-dark-royal-purple drop-shadow-sm">Contact Us</h3>
           <ul className="space-y-2 text-sm">
             <li className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-gold" />
@@ -36,10 +39,10 @@ export function SiteFooter() {
           </ul>
         </div>
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-dark-royal-purple">Follow Us</h3>
+          <h3 className="text-xl font-bold text-dark-royal-purple drop-shadow-sm">Follow Us</h3>
           <div className="flex gap-4">
             <Link
-              href="https://www.instagram.com/pasticeriamanda"
+              href="https://www.instagram.com/pasticeri_amanda"
               target="_blank"
               rel="noopener noreferrer"
               className="text-dark-royal-blue hover:text-gold transition-colors"
@@ -48,7 +51,7 @@ export function SiteFooter() {
               <span className="sr-only">Instagram</span>
             </Link>
             <Link
-              href="https://www.facebook.com/pasticeriamanda"
+              href="https://www.facebook.com/pasticeri_amanda"
               target="_blank"
               rel="noopener noreferrer"
               className="text-dark-royal-blue hover:text-gold transition-colors"
@@ -57,7 +60,14 @@ export function SiteFooter() {
               <span className="sr-only">Facebook</span>
             </Link>
           </div>
-          <p className="text-xs text-dark-royal-blue/80 pt-4">© 2025 Amanda Pastry Shop. All rights reserved.</p>
+          <div className="space-y-2">
+            <p className="text-xs text-dark-royal-blue/80">© 2025 Amanda Pastry Shop. All rights reserved.</p>
+            <p className="text-xs text-dark-royal-blue/70">
+              Designed by{" "}
+              <span className="font-semibold text-dark-royal-purple">Alkeo Gaci</span>
+              {" "}+355 69 685 1089
+            </p>
+          </div>
         </div>
       </div>
     </footer>

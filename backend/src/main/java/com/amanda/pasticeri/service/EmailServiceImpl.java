@@ -8,50 +8,79 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+
 @Service
 public class EmailServiceImpl implements EmailService {
 
     @Autowired
     private JavaMailSender mailSender;
 
+    @Autowired
+    private EmailTemplateService emailTemplateService;
+
     @Override
     public void sendOrderConfirmation(String to, Order order) {
-        String subject = "Your Cake Order Confirmation 🍰";
-        String body = "Dear " + order.getCustomerName() + ",\n\n"
-                + "Thank you for your order!\n\n"
-                + "Details:\n"
-                + "Product: " + order.getProductName() + "\n"
-                + "People: " + order.getNumberOfPersons() + "\n"
-                + "Note: " + order.getCustomNote() + "\n"
-                + "Total: €" + order.getTotalPrice() + "\n\n"
-                + "We will contact you shortly for further steps.\n\n"
-                + "With love,\nPasticeri Amanda ❤️";
+        String subject = "🍰 Your Pasticeri Amanda Order Confirmation";
+        String body = emailTemplateService.getOrderConfirmationTemplate(order);
+        sendHtmlEmailWithLogo(to, subject, body, order);
+    }
 
-        sendEmail(to, subject, body);
+    @Override
+    public void sendOrderConfirmation(String to, String htmlContent) {
+        sendHtmlEmailWithLogo(to, "Pasticeri Amanda - Order Confirmation", htmlContent);
     }
 
     @Override
     public void sendAdminNotification(String to, Order order) {
-        String subject = "🛎️ New Order Received";
-        String body = "New order received:\n\n"
-                + "Customer: " + order.getCustomerName() + " (" + order.getCustomerEmail() + ")\n"
-                + "Phone: " + order.getCustomerPhone() + "\n"
-                + "Product: " + order.getProductName() + "\n"
-                + "People: " + order.getNumberOfPersons() + "\n"
-                + "Note: " + order.getCustomNote() + "\n"
-                + "Total: €" + order.getTotalPrice();
+        String subject = "🛎️ New Order Alert - Pasticeri Amanda";
+        String body = emailTemplateService.getNewOrderNotificationTemplate(order);
+        sendHtmlEmailWithLogo(to, subject, body, order);
+    }
 
-        sendEmail(to, subject, body);
+    @Override
+    public void sendAdminNotification(String to, String htmlContent) {
+        sendHtmlEmailWithLogo(to, "Pasticeri Amanda - New Order", htmlContent);
+    }
+
+    @Override
+    public void sendOrderCancelledEmail(String to, Order order) {
+        String subject = "❌ Order Cancelled - Pasticeri Amanda";
+        String body = emailTemplateService.getOrderCancelledTemplate(order);
+        sendHtmlEmailWithLogo(to, subject, body, order);
+    }
+
+    @Override
+    public void sendPriceSetEmail(String to, Order order) {
+        String subject = "💰 Price Set - Pasticeri Amanda";
+        String body = emailTemplateService.getPriceSetTemplate(order);
+        sendHtmlEmailWithLogo(to, subject, body, order);
     }
 
     @Override
     public void sendPasswordResetEmail(String to, String resetLink) {
-        String subject = "Reset Your Password 🔐";
-        String body = "Hi,\n\nWe received a request to reset your password.\n\n"
-                + "Click the link below to reset it:\n" + resetLink
-                + "\n\nIf you didn’t request this, please ignore this email.\n\n— Pasticeri Amanda";
+        String subject = "🔐 Reset Your Password - Pasticeri Amanda";
+        String body = emailTemplateService.getPasswordResetTemplate(resetLink);
+        sendHtmlEmailWithLogo(to, subject, body);
+    }
 
-        sendEmail(to, subject, body);
+    // Test method for debugging email issues
+    public void sendTestEmail(String to) {
+        System.out.println("🧪 Sending test email to: " + to);
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(to);
+            helper.setSubject("🧪 Test Email - Pasticeri Amanda");
+            helper.setText("This is a test email to verify email functionality is working.", false);
+            
+            System.out.println("📧 Test email created, attempting to send...");
+            mailSender.send(message);
+            System.out.println("✅ Test email sent successfully!");
+        } catch (Exception e) {
+            System.err.println("❌ Test email failed: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void sendEmail(String to, String subject, String body) {
@@ -64,6 +93,88 @@ public class EmailServiceImpl implements EmailService {
             mailSender.send(message);
         } catch (MessagingException e) {
             e.printStackTrace(); // In production, use a logger
+        }
+    }
+
+    private void sendHtmlEmailWithLogo(String to, String subject, String htmlBody) {
+        sendHtmlEmailWithLogo(to, subject, htmlBody, null);
+    }
+
+    private void sendHtmlEmailWithLogo(String to, String subject, String htmlBody, Order order) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(htmlBody, true); // HTML enabled
+
+            // Add logo
+            File logo = new File("src/main/resources/static/logoAmanda.jpg");
+            if (logo.exists()) {
+                helper.addInline("logoAmanda", logo);
+                System.out.println("✅ Logo added to email: " + logo.getAbsolutePath());
+            } else {
+                System.out.println("⚠️ Logo file not found: " + logo.getAbsolutePath());
+            }
+
+            // Add order images if available
+            if (order != null && order.getImageUrls() != null && !order.getImageUrls().trim().isEmpty()) {
+                System.out.println("📸 Processing order images: " + order.getImageUrls());
+                String[] imageUrls = order.getImageUrls().split(",");
+                int imageIndex = 1;
+                for (String imageUrl : imageUrls) {
+                    if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+                        String trimmed = imageUrl.trim();
+                        System.out.println("📸 Processing image URL: " + trimmed);
+                        
+                        if (trimmed.startsWith("/uploads/")) {
+                            // Try multiple possible paths
+                            String currentDir = System.getProperty("user.dir");
+                            String[] possiblePaths = {
+                                currentDir + trimmed,
+                                currentDir + "/backend" + trimmed,
+                                currentDir + "/uploads" + trimmed.substring(8), // Remove /uploads/ prefix
+                                "uploads" + trimmed.substring(8) // Relative path
+                            };
+                            
+                            File imageFile = null;
+                            for (String path : possiblePaths) {
+                                File testFile = new File(path);
+                                System.out.println("🔍 Testing path: " + testFile.getAbsolutePath());
+                                if (testFile.exists()) {
+                                    imageFile = testFile;
+                                    System.out.println("✅ Found image at: " + testFile.getAbsolutePath());
+                                    break;
+                                }
+                            }
+                            
+                            if (imageFile != null && imageFile.exists()) {
+                                try {
+                                    helper.addInline("orderImage" + imageIndex, imageFile);
+                                    System.out.println("✅ Order image " + imageIndex + " added to email: " + imageFile.getAbsolutePath());
+                                    imageIndex++;
+                                } catch (Exception e) {
+                                    System.err.println("❌ Failed to add image " + imageIndex + " to email: " + e.getMessage());
+                                }
+                            } else {
+                                System.err.println("❌ Order image file not found for URL: " + trimmed);
+                                System.err.println("❌ Tried paths: " + String.join(", ", possiblePaths));
+                            }
+                        } else {
+                            System.out.println("⚠️ Skipping non-upload image: " + trimmed);
+                        }
+                    }
+                }
+                System.out.println("📸 Total images processed for email: " + (imageIndex - 1));
+            } else {
+                System.out.println("📸 No images to process for email");
+            }
+
+            mailSender.send(message);
+            System.out.println("✅ Email sent successfully to: " + to);
+        } catch (MessagingException e) {
+            System.err.println("❌ Email sending failed: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

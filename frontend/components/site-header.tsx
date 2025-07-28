@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
-import { MenuIcon, Crown } from "lucide-react"
+import { MenuIcon, Crown, ShoppingCart, Home, Info, Utensils, ClipboardList, Star, MapPin, History } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import { isAuthenticated, isAdmin, clearAuthData } from "@/lib/auth"
 import { useEffect, useState } from "react"
@@ -27,17 +27,26 @@ export function SiteHeader() {
     router.push("/auth/login")
   }
 
-  const navLinks = [
-    { name: "Home", href: "/" },
-    { name: "About", href: "/about" },
-    { name: "Menu", href: "/menu" },
-    { name: "Order", href: "/order" },
+  const userNavLinks: { name: string; href: string; icon?: any; external?: boolean }[] = [
+    { name: "Home", href: "/", icon: Home },
+    { name: "About", href: "/about", icon: Info },
+    { name: "Menu", href: "/menu", icon: Utensils },
+    { name: "Custom Order", href: "/order", icon: ClipboardList },
+  ]
+  
+  const externalLinks: { name: string; href: string; icon?: any; external?: boolean }[] = [
     {
       name: "Review",
       href: "https://www.google.com/search?q=Pasticeri+Amanda+Saranda+Albania+reviews",
       external: true,
+      icon: Star,
     },
-    { name: "Find Us", href: "https://www.google.com/maps/search/Pasticeri+Amanda+Saranda+Albania", external: true },
+    { name: "Find Us", href: "https://www.google.com/maps/search/Pasticeri+Amanda+Saranda+Albania", external: true, icon: MapPin },
+  ]
+  const adminNavLinks: { name: string; href: string; icon?: any; external?: boolean }[] = [
+    { name: "Home", href: "/" },
+    { name: "About Us", href: "/about" },
+    { name: "Admin Panel", href: "/admin/dashboard" },
   ]
 
   return (
@@ -48,46 +57,46 @@ export function SiteHeader() {
           <span className="sr-only">Pasticeri Amanda</span>
           <GradientText className="text-xl font-bold">Amanda Pastry Shop</GradientText>
         </Link>
-        <nav className="ml-auto hidden md:flex gap-6 text-sm font-medium">
-          {navLinks.map((link) => (
+        <nav className="ml-auto hidden lg:flex gap-6 text-sm font-medium items-center">
+          {/* Main navigation links */}
+          {(userIsAdmin ? adminNavLinks : loggedIn ? [...userNavLinks, { name: "Cart", href: "/cart", icon: ShoppingCart }, { name: "Purchase History", href: "/order-history", icon: History }] : userNavLinks).map((link) => (
             <Link
               key={link.name}
               href={link.href}
               className={`transition-colors hover:text-royal-purple ${
                 pathname === link.href ? "text-royal-purple font-bold" : "text-royal-blue"
-              }`}
+              } flex items-center`}
               target={link.external ? "_blank" : "_self"}
               rel={link.external ? "noopener noreferrer" : ""}
             >
+              {link.icon && <link.icon className="w-5 h-5 mr-1" />}
               {link.name}
             </Link>
           ))}
-          {loggedIn ? (
-            <>
-              {userIsAdmin ? (
-                <Link
-                  href="/admin/orders" // Link to the new admin orders index page
-                  className={`transition-colors hover:text-royal-purple ${
-                    pathname.startsWith("/admin/orders") ? "text-royal-purple font-bold" : "text-royal-blue"
-                  }`}
-                >
-                  Orders
-                </Link>
-              ) : (
-                <Link
-                  href="/order-history" // Link for client's purchase history
-                  className={`transition-colors hover:text-royal-purple ${
-                    pathname === "/order-history" ? "text-royal-purple font-bold" : "text-royal-blue"
-                  }`}
-                >
-                  Purchase History
-                </Link>
-              )}
-              <Button onClick={handleLogout} variant="ghost" className="text-royal-blue hover:text-royal-purple">
-                Logout
-              </Button>
-            </>
-          ) : (
+          
+          {/* External links (Review, Find Us) */}
+          {!userIsAdmin && externalLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              className={`transition-colors hover:text-royal-purple ${
+                pathname === link.href ? "text-royal-purple font-bold" : "text-royal-blue"
+              } flex items-center`}
+              target={link.external ? "_blank" : "_self"}
+              rel={link.external ? "noopener noreferrer" : ""}
+            >
+              {link.icon && <link.icon className="w-5 h-5 mr-1" />}
+              {link.name}
+            </Link>
+          ))}
+          
+          {/* Login/Logout */}
+          {loggedIn && (
+            <Button onClick={handleLogout} variant="ghost" className="text-royal-blue hover:text-royal-purple">
+              Logout
+            </Button>
+          )}
+          {!loggedIn && (
             <Link
               href="/auth/login"
               className={`transition-colors hover:text-royal-purple ${
@@ -102,18 +111,19 @@ export function SiteHeader() {
         </nav>
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="ml-auto md:hidden">
+            <Button variant="ghost" size="icon" className="ml-auto lg:hidden">
               <MenuIcon className="h-6 w-6 text-royal-blue" />
               <span className="sr-only">Toggle navigation menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="bg-white-gold-pink-bg-start">
+          <SheetContent side="left" className="bg-gradient-to-br from-white-gold-pink-bg-start to-white-gold-pink-bg-end">
             <Link href="/" className="flex items-center gap-2 font-semibold text-royal-blue">
               <Crown className="h-6 w-6 text-gold" />
               <GradientText className="text-xl font-bold">Amanda Pastry Shop</GradientText>
             </Link>
             <nav className="grid gap-2 py-6 text-lg font-medium">
-              {navLinks.map((link) => (
+              {/* Main navigation links */}
+              {(userIsAdmin ? adminNavLinks : loggedIn ? [...userNavLinks, { name: "Cart", href: "/cart", icon: ShoppingCart }, { name: "Purchase History", href: "/order-history", icon: History }] : userNavLinks).map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
@@ -123,43 +133,38 @@ export function SiteHeader() {
                   target={link.external ? "_blank" : "_self"}
                   rel={link.external ? "noopener noreferrer" : ""}
                 >
+                  {link.icon && <link.icon className="w-5 h-5 mr-1" />}
                   {link.name}
                 </Link>
               ))}
-              {loggedIn ? (
-                <>
-                  {userIsAdmin ? (
-                    <Link
-                      href="/admin/orders" // Link to the new admin orders index page
-                      className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${
-                        pathname.startsWith("/admin/orders")
-                          ? "bg-muted text-royal-purple"
-                          : "text-royal-blue hover:text-royal-purple"
-                      }`}
-                    >
-                      Orders
-                    </Link>
-                  ) : (
-                    <Link
-                      href="/order-history" // Link for client's purchase history
-                      className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${
-                        pathname === "/order-history"
-                          ? "bg-muted text-royal-purple"
-                          : "text-royal-blue hover:text-royal-purple"
-                      }`}
-                    >
-                      Purchase History
-                    </Link>
-                  )}
-                  <Button
-                    onClick={handleLogout}
-                    variant="ghost"
-                    className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-royal-blue hover:text-royal-purple justify-start"
-                  >
-                    Logout
-                  </Button>
-                </>
-              ) : (
+              
+              {/* External links (Review, Find Us) */}
+              {!userIsAdmin && externalLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${
+                    pathname === link.href ? "bg-muted text-royal-purple" : "text-royal-blue hover:text-royal-purple"
+                  }`}
+                  target={link.external ? "_blank" : "_self"}
+                  rel={link.external ? "noopener noreferrer" : ""}
+                >
+                  {link.icon && <link.icon className="w-5 h-5 mr-1" />}
+                  {link.name}
+                </Link>
+              ))}
+              
+              {/* Login/Logout */}
+              {loggedIn && (
+                <Button
+                  onClick={handleLogout}
+                  variant="ghost"
+                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-royal-blue hover:text-royal-purple justify-start"
+                >
+                  Logout
+                </Button>
+              )}
+              {!loggedIn && (
                 <Link
                   href="/auth/login"
                   className={`mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 ${

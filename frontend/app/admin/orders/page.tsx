@@ -12,34 +12,26 @@ import Link from "next/link"
 import { ListOrdered } from "lucide-react"
 
 interface Order {
-  id: string
-  customerName: string
-  customerEmail: string
-  orderType: "MENU_ITEM" | "CUSTOM"
-  description: string
-  status: string // e.g., PENDING, PRICE_SET, COMPLETED
-  price: number | null // Null for custom orders until admin sets it
-  orderDate: string
-  desiredDate?: string // For custom orders
-  imageUrl?: string // For custom orders
+  id: number
+  customer_email: string
+  customer_name: string
+  order_date: string
+  product_name: string
+  number_of_persons: number
+  total_price: number
+  status: string
 }
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [isPriceDialogOpen, setIsPriceDialogOpen] = useState(false)
-  const [currentOrder, setCurrentOrder] = useState<Order | null>(null)
-  const [newPrice, setNewPrice] = useState<number | "">("")
-  const [filterStatus, setFilterStatus] = useState<string>("ALL")
-  const [filterMonth, setFilterMonth] = useState<Date | undefined>(undefined)
-  const [searchTerm, setSearchTerm] = useState<string>("")
   const { toast } = useToast()
 
   const fetchOrders = async () => {
     try {
       setLoading(true)
-      const res = await authenticatedFetch("/api/admin/orders/progress") // Assuming /api/admin/orders/progress
+      const res = await authenticatedFetch("/api/orders")
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`)
       }
@@ -50,7 +42,7 @@ export default function AdminOrdersPage() {
       setError("Failed to load orders. Please try again.")
       toast({
         title: "Error",
-        description: "Failed to load orders in progress.",
+        description: "Failed to load orders.",
         variant: "destructive",
       })
     } finally {
@@ -62,128 +54,47 @@ export default function AdminOrdersPage() {
     fetchOrders()
   }, [])
 
-  const handleSetPrice = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (!currentOrder || newPrice === "") return
-
-    try {
-      const res = await authenticatedFetch(`/api/admin/orders/${currentOrder.id}/set-price`, {
-        method: "PUT",
-        body: JSON.stringify({ price: newPrice }),
-      })
-
-      if (!res.ok) {
-        const errorData = await res.json()
-        throw new Error(errorData.message || `HTTP error! status: ${res.status}`)
-      }
-
-      toast({
-        title: "Price Set!",
-        description: `Price for order ${currentOrder.id.substring(0, 8)}... has been set to $${newPrice.toFixed(2)}.`,
-      })
-      setIsPriceDialogOpen(false)
-      setCurrentOrder(null)
-      setNewPrice("")
-      fetchOrders() // Refresh list
-    } catch (error: any) {
-      console.error("Failed to set price:", error)
-      toast({
-        title: "Operation Failed",
-        description: error.message || "There was an error setting the price. Please try again.",
-        variant: "destructive",
-      })
-    }
-  }
-
-  const handleMarkComplete = async (orderId: string) => {
-    if (!confirm("Are you sure you want to mark this order as completed?")) return
-
-    try {
-      const res = await authenticatedFetch(`/api/admin/orders/${orderId}/complete`, {
-        method: "PUT",
-      })
-
-      if (!res.ok) {
-        const errorData = await res.json()
-        throw new Error(errorData.message || `HTTP error! status: ${res.status}`)
-      }
-
-      toast({
-        title: "Order Completed!",
-        description: `Order ${orderId.substring(0, 8)}... has been moved to completed orders.`,
-      })
-      fetchOrders() // Refresh list
-    } catch (error: any) {
-      console.error("Failed to mark order complete:", error)
-      toast({
-        title: "Operation Failed",
-        description: error.message || "There was an error marking the order complete. Please try again.",
-        variant: "destructive",
-      })
-    }
-  }
-
-  const openPriceDialog = (order: Order) => {
-    setCurrentOrder(order)
-    setNewPrice(order.price || "")
-    setIsPriceDialogOpen(true)
-  }
-
-  const filteredOrders = orders.filter((order) => {
-    const matchesStatus = filterStatus === "ALL" || order.status === filterStatus
-    const matchesMonth =
-      !filterMonth ||
-      (new Date(order.orderDate).getMonth() === filterMonth.getMonth() &&
-        new Date(order.orderDate).getFullYear() === filterMonth.getFullYear())
-    const matchesSearch =
-      searchTerm === "" ||
-      order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.id.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesStatus && matchesMonth && matchesSearch
-  })
-
   return (
     <div className="container mx-auto py-12 px-4 md:px-6 min-h-[calc(100vh-4rem)]">
       <GradientText className="text-4xl md:text-5xl font-extrabold text-center mb-12">Manage Orders</GradientText>
-
-      <div className="max-w-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-        <Card className="bg-white/80 backdrop-blur-sm border-gold shadow-lg text-center">
-          <CardHeader>
-            <CardTitle className="text-royal-purple text-2xl">Orders in Progress</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {loading ? (
-              <p>Loading orders...</p>
-            ) : error ? (
-              <p>{error}</p>
-            ) : (
-              <>
-                <ListOrdered className="h-16 w-16 text-gold mx-auto" />
-                <p className="text-royal-blue">
-                  View and manage all pending and in-progress orders, including custom order pricing.
-                </p>
-                <Button asChild className="bg-royal-purple text-white hover:bg-royal-blue transition-colors">
-                  <Link href="/admin/orders/in-progress">Go to Orders in Progress</Link>
-                </Button>
-              </>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white/80 backdrop-blur-sm border-gold shadow-lg text-center">
-          <CardHeader>
-            <CardTitle className="text-royal-purple text-2xl">Completed Orders</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <CheckCircle className="h-16 w-16 text-gold mx-auto" />
-            <p className="text-royal-blue">Review all orders that have been marked as completed.</p>
-            <Button asChild className="bg-royal-purple text-white hover:bg-royal-blue transition-colors">
-              <Link href="/admin/orders/completed">Go to Completed Orders</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+      {loading ? (
+        <p>Loading orders...</p>
+      ) : error ? (
+        <p>{error}</p>
+      ) : orders.length === 0 ? (
+        <p>No orders found.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+            <thead>
+              <tr>
+                <th className="px-4 py-2">ID</th>
+                <th className="px-4 py-2">Customer</th>
+                <th className="px-4 py-2">Email</th>
+                <th className="px-4 py-2">Product(s)</th>
+                <th className="px-4 py-2">Qty</th>
+                <th className="px-4 py-2">Total (ALL)</th>
+                <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map(order => (
+                <tr key={order.id} className="border-t">
+                  <td className="px-4 py-2">{order.id}</td>
+                  <td className="px-4 py-2">{order.customer_name}</td>
+                  <td className="px-4 py-2">{order.customer_email}</td>
+                  <td className="px-4 py-2">{order.product_name}</td>
+                  <td className="px-4 py-2">{order.number_of_persons}</td>
+                  <td className="px-4 py-2">{order.total_price}</td>
+                  <td className="px-4 py-2">{order.status}</td>
+                  <td className="px-4 py-2">{order.order_date}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   )
 }

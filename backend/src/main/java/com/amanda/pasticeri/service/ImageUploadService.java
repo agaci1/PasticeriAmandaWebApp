@@ -16,14 +16,30 @@ public class ImageUploadService {
     public String saveImage(MultipartFile file) {
         try {
             String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            Path filepath = Paths.get(uploadDir + filename);
-
-            Files.createDirectories(filepath.getParent());
+            
+            // Get the current working directory and create absolute path
+            String currentDir = System.getProperty("user.dir");
+            Path uploadPath = Paths.get(currentDir, uploadDir);
+            Path filepath = uploadPath.resolve(filename);
+            
+            System.out.println("📁 Current directory: " + currentDir);
+            System.out.println("📁 Upload path: " + uploadPath);
+            System.out.println("📁 Full file path: " + filepath);
+            System.out.println("📁 File size: " + file.getSize() + " bytes");
+            
+            // Create directories if they don't exist
+            Files.createDirectories(uploadPath);
+            
+            // Save the file
             file.transferTo(filepath.toFile());
-
-            // In production, return a full URL
+            
+            System.out.println("✅ Image saved successfully: " + filepath);
+            
+            // Return the URL path
             return "/uploads/" + filename;
         } catch (IOException e) {
+            System.err.println("❌ Failed to upload image: " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("Failed to upload image", e);
         }
     }

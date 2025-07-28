@@ -2,6 +2,7 @@ package com.amanda.pasticeri.service;
 
 import com.amanda.pasticeri.dto.MenuOrderDto;
 import com.amanda.pasticeri.dto.OrderRequestDto;
+import com.amanda.pasticeri.dto.CartOrderDto;
 import com.amanda.pasticeri.model.Order;
 import com.amanda.pasticeri.model.Product;
 import com.amanda.pasticeri.repository.OrderRepository;
@@ -55,19 +56,27 @@ public class OrderService {
         Order order = new Order();
         order.setCustomerName(dto.getCustomerName());
         order.setCustomerEmail(dto.getCustomerEmail());
-        order.setCustomerPhone(dto.getCustomerPhoneCustom());
+        order.setCustomerPhone(dto.getCustomerPhone());
         order.setProductName(dto.getProductName());
         order.setNumberOfPersons(dto.getNumberOfPersons());
         order.setCustomNote(dto.getCustomNote());
+        order.setFlavour(dto.getFlavour()); // ✅ Set flavor
 
         if (dto.getOrderDate() != null) {
             order.setOrderDate(LocalDate.parse(dto.getOrderDate()));
         }
 
-        MultipartFile file = dto.getUploadedImage();
-        if (file != null && !file.isEmpty()) {
-            String imageUrl = imageUploadService.saveImage(file);
-            order.setImageUrl(imageUrl);
+        List<MultipartFile> files = dto.getUploadedImages();
+        if (files != null && !files.isEmpty()) {
+            StringBuilder urls = new StringBuilder();
+            for (MultipartFile file : files) {
+                if (file != null && !file.isEmpty()) {
+                    String imageUrl = imageUploadService.saveImage(file);
+                    if (urls.length() > 0) urls.append(",");
+                    urls.append(imageUrl);
+                }
+            }
+            order.setImageUrls(urls.toString());
         }
 
         // No price yet, admin will update later
@@ -80,11 +89,11 @@ public class OrderService {
         // Required fields
         order.setCustomerName(dto.getCustomerName());
         order.setCustomerEmail(email);
-        order.setCustomerPhone(dto.getCustomerPhoneCustom());
+        order.setCustomerPhone(dto.getCustomerPhone());
         order.setProductName(dto.getProductName());
         order.setNumberOfPersons(dto.getNumberOfPersons());
         order.setCustomNote(dto.getCustomNote());
-
+        order.setFlavour(dto.getFlavour()); // ✅ Set flavor
 
         if (dto.getOrderDate() != null && !dto.getOrderDate().isEmpty()) {
             order.setOrderDate(LocalDate.parse(dto.getOrderDate()));
@@ -93,22 +102,54 @@ public class OrderService {
         }
 
         // Optional: image
-        MultipartFile file = dto.getUploadedImage();
-        if (file != null && !file.isEmpty()) {
-            try {
-                String imageUrl = imageUploadService.saveImage(file);
-                order.setImageUrl(imageUrl);
-            } catch (Exception e) {
-                System.out.println("⚠️ Image upload failed: " + e.getMessage());
+        List<MultipartFile> files = dto.getUploadedImages();
+        System.out.println("📸 Processing images: " + (files != null ? files.size() : 0) + " files");
+        if (files != null && !files.isEmpty()) {
+            StringBuilder urls = new StringBuilder();
+            for (MultipartFile file : files) {
+                if (file != null && !file.isEmpty()) {
+                    try {
+                        System.out.println("📸 Processing file: " + file.getOriginalFilename() + " (" + file.getSize() + " bytes)");
+                        String imageUrl = imageUploadService.saveImage(file);
+                        if (urls.length() > 0) urls.append(",");
+                        urls.append(imageUrl);
+                        System.out.println("✅ Image URL added: " + imageUrl);
+                    } catch (Exception e) {
+                        System.out.println("⚠️ Image upload failed: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
             }
+            String finalUrls = urls.toString();
+            order.setImageUrls(finalUrls);
+            System.out.println("📸 Final image URLs: " + finalUrls);
+        } else {
+            System.out.println("📸 No images to process");
         }
 
-        // Mandatory fields (prevent silent failure)
-        order.setStatus("PENDING");
+        order.setStatus("pending-quote");
         order.setTotalPrice(0.0); // Admin sets later
 
         try {
             save(order);
+            System.out.println("✅ Custom order saved successfully, sending emails...");
+            
+            // Send beautiful confirmation email to customer
+            try {
+                emailService.sendOrderConfirmation(email, order);
+                System.out.println("✅ Order confirmation email sent to customer");
+            } catch (Exception e) {
+                System.err.println("⚠️ Failed to send order confirmation email: " + e.getMessage());
+            }
+            
+            // Send beautiful notification email to admin
+            try {
+                emailService.sendAdminNotification("pasticeriamanda@gmail.com", order);
+                System.out.println("✅ Admin notification email sent");
+            } catch (Exception e) {
+                System.err.println("⚠️ Failed to send admin notification email: " + e.getMessage());
+            }
+            
         } catch (Exception e) {
             System.out.println("❌ Failed to save custom order: " + e.getMessage());
             e.printStackTrace();
@@ -119,7 +160,7 @@ public class OrderService {
         Product product = productRepository.findById(dto.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        double totalPrice = product.getPricePerPerson() * dto.getQuantity();
+        double totalPrice = product.getPrice() * dto.getQuantity();
 
         Order order = new Order();
         order.setCustomerName(dto.getCustomerName());
@@ -131,5 +172,142 @@ public class OrderService {
         order.setTotalPrice(totalPrice);
 
         save(order);
+        
+        // Send beautiful confirmation email to customer
+        try {
+            emailService.sendOrderConfirmation(dto.getCustomerEmail(), order);
+            System.out.println("✅ Menu order confirmation email sent to customer");
+        } catch (Exception e) {
+            System.err.println("⚠️ Failed to send menu order confirmation email: " + e.getMessage());
+        }
+        
+        // Send beautiful notification email to admin
+        try {
+            emailService.sendAdminNotification("pasticeriamanda@gmail.com", order);
+            System.out.println("✅ Menu order admin notification email sent");
+        } catch (Exception e) {
+            System.err.println("⚠️ Failed to send menu order admin notification email: " + e.getMessage());
+        }
+    }
+
+    public void placeCartOrder(CartOrderDto cartOrderDto, String authenticatedEmail) {
+        double total = 0;
+        StringBuilder itemsList = new StringBuilder();
+        StringBuilder productNames = new StringBuilder();
+        int totalQuantity = 0;
+        for (CartOrderDto.CartItem item : cartOrderDto.getItems()) {
+            total += item.getPrice() * item.getQuantity();
+            totalQuantity += item.getQuantity();
+            itemsList.append("<li>")
+                .append(item.getName())
+                .append(" x ")
+                .append(item.getQuantity())
+                .append(" - ALL")
+                .append(item.getPrice())
+                .append(item.getPriceType() != null && !item.getPriceType().equals("Total") ? " " + item.getPriceType() : "")
+                .append("</li>");
+            if (productNames.length() > 0) productNames.append(", ");
+            productNames.append(item.getName());
+        }
+        // Save the whole cart as a single Order entity
+        Order order = new Order();
+        order.setCustomerName(cartOrderDto.getName());
+        order.setCustomerEmail(authenticatedEmail);
+        order.setCustomerPhone(cartOrderDto.getPhone());
+        order.setProductName(productNames.toString());
+        order.setNumberOfPersons(totalQuantity);
+        order.setOrderDate(LocalDate.now());
+        order.setTotalPrice(total);
+        order.setStatus("pending");
+        orderRepository.save(order);
+
+        // Use standardized templates for emails
+        emailService.sendOrderConfirmation(authenticatedEmail, order);
+        emailService.sendAdminNotification("pasticeriamanda@gmail.com", order);
+    }
+
+    public void setOrderPrice(Long id, double price) {
+        Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
+        order.setTotalPrice(price);
+        order.setStatus("pending");
+        orderRepository.save(order);
+        // Send beautiful email to client with price
+        emailService.sendPriceSetEmail(order.getCustomerEmail(), order);
+    }
+
+    public void markOrderComplete(Long id) {
+        Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
+        order.setStatus("completed");
+        orderRepository.save(order);
+        // Optionally send email to client or admin
+    }
+
+    public void cancelOrder(Long id) {
+        Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
+        order.setStatus("canceled");
+        orderRepository.save(order);
+        // Optionally send email to client or admin
+    }
+
+    public void cancelMyOrder(Long id, String userEmail) {
+        System.out.println("🔍 Starting cancelMyOrder for ID: " + id + ", User: " + userEmail);
+        
+        Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
+        System.out.println("📋 Found order: ID=" + order.getId() + ", Status=" + order.getStatus() + ", Email=" + order.getCustomerEmail());
+        System.out.println("📸 Image URLs: " + (order.getImageUrls() != null ? order.getImageUrls() : "null"));
+        
+        // Verify the order belongs to the user
+        if (!order.getCustomerEmail().equals(userEmail)) {
+            throw new RuntimeException("You can only cancel your own orders");
+        }
+        
+        // Check if order can be cancelled (24 hours before due date)
+        long orderTime = order.getOrderDate().atStartOfDay().toInstant(java.time.ZoneOffset.UTC).toEpochMilli();
+        long currentTime = System.currentTimeMillis();
+        long twentyFourHours = 24 * 60 * 60 * 1000;
+        
+        System.out.println("⏰ Order time: " + orderTime + ", Current time: " + currentTime + ", Difference: " + (orderTime - currentTime));
+        
+        if (orderTime - currentTime <= twentyFourHours) {
+            throw new RuntimeException("Orders can only be cancelled at least 24 hours before the due date");
+        }
+        
+        // Check if order is not already completed or canceled
+        if ("completed".equals(order.getStatus()) || "canceled".equals(order.getStatus())) {
+            throw new RuntimeException("Cannot cancel this order");
+        }
+        
+        System.out.println("✅ Order can be cancelled, updating status to 'canceled'");
+        
+        // Update the status directly
+        order.setStatus("canceled");
+        
+        System.out.println("💾 Saving updated order...");
+        try {
+            orderRepository.save(order);
+            System.out.println("✅ Order saved successfully");
+        } catch (Exception e) {
+            System.err.println("❌ Database save error: " + e.getMessage());
+            System.err.println("❌ Error type: " + e.getClass().getSimpleName());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to save order: " + e.getMessage());
+        }
+        
+        // Send beautiful cancellation emails (with error handling)
+        try {
+            emailService.sendOrderCancelledEmail(order.getCustomerEmail(), order);
+            System.out.println("✅ Cancellation email sent to customer");
+        } catch (Exception e) {
+            System.err.println("⚠️ Failed to send cancellation email to customer: " + e.getMessage());
+            // Don't throw the error - order cancellation was successful
+        }
+        
+        try {
+            emailService.sendAdminNotification("pasticeriamanda@gmail.com", order);
+            System.out.println("✅ Admin notification email sent");
+        } catch (Exception e) {
+            System.err.println("⚠️ Failed to send admin notification email: " + e.getMessage());
+            // Don't throw the error - order cancellation was successful
+        }
     }
 }

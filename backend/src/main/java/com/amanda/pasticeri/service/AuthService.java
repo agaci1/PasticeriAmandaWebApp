@@ -28,9 +28,11 @@ public class AuthService {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             if (passwordEncoder.matches(password, user.getPassword())) {
-
-                return new JwtResponse(jwtTokenProvider.generateToken(user), user.getRole(), user.getEmail());
-
+                String role = user.getRole();
+                if (role != null && (role.equalsIgnoreCase("ROLE_ADMIN") || role.equalsIgnoreCase("role_admin"))) {
+                    role = "ADMIN";
+                }
+                return new JwtResponse(jwtTokenProvider.generateToken(user), role, user.getEmail());
             }
         }
 

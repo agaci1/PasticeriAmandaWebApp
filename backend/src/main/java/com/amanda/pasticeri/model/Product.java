@@ -20,12 +20,10 @@ public class Product {
     private String description;
 
     @Column(nullable = false)
-    private double basePrice;
-
-    @Column(nullable = false)
-    private double pricePerPerson;
+    private double price;
 
     private String imageUrl;
+    private String priceType; // "per_person", "per_kg", "total"
 
     // Getters and Setters
 
@@ -61,20 +59,11 @@ public class Product {
         this.description = description;
     }
 
-    public double getBasePrice() {
-        return basePrice;
+    public double getPrice() {
+        return price;
     }
-
-    public void setBasePrice(double basePrice) {
-        this.basePrice = basePrice;
-    }
-
-    public double getPricePerPerson() {
-        return pricePerPerson;
-    }
-
-    public void setPricePerPerson(double pricePerPerson) {
-        this.pricePerPerson = pricePerPerson;
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public String getImageUrl() {
@@ -83,5 +72,12 @@ public class Product {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getPriceType() {
+        return priceType;
+    }
+    public void setPriceType(String priceType) {
+        this.priceType = priceType;
     }
 }

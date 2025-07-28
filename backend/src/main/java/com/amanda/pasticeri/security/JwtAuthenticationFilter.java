@@ -15,7 +15,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -30,23 +32,50 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String header = request.getHeader("Authorization");
 
-        if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
-            if (tokenProvider.validateToken(token)) {
-                String email = tokenProvider.getEmailFromJWT(token);
-                String role = tokenProvider.getRoleFromJWT(token); // ✅ get role from token
-                User user = userRepository.findByEmail(email).orElse(null);
+        try {
+            String header = request.getHeader("Authorization");
+            System.out.println("🛡️ JWT Filter triggered for: " + request.getRequestURI());
 
-                if (user != null) {
+            if (header != null && header.startsWith("Bearer ")) {
+                String token = header.substring(7);
+                System.out.println("🔐 Token extracted");
+
+                if (tokenProvider.validateToken(token)) {
+                    System.out.println("✅ Token is valid");
+
+                    String email = tokenProvider.getEmailFromJWT(token);
+                    String roles = tokenProvider.getRoleFromJWT(token);
+                    System.out.println("📧 Processing authentication for email: " + email);
+
+                    User user = userRepository.findByEmail(email)
+                            .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+
+                    // Handle multiple roles
+                    List<SimpleGrantedAuthority> authorities = Arrays.stream(roles.split(","))
+                            .map(role -> new SimpleGrantedAuthority("ROLE_" + role.trim().toUpperCase()))
+                            .collect(Collectors.toList());
+
+                    System.out.println("🔑 Granted authorities: " + authorities);
+
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                            user, null, Collections.singletonList(new SimpleGrantedAuthority(role)) // ✅ attach role
+                            user, null, authorities
                     );
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                    System.out.println("🔓 Security context updated successfully");
+                } else {
+                    System.out.println("❌ Token validation failed");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
                 }
+            } else {
+                System.out.println("⚠️ No valid Authorization header found");
             }
+        } catch (Exception e) {
+            System.out.println("❌ Authentication error: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
 
         filterChain.doFilter(request, response);

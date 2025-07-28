@@ -30,8 +30,8 @@ public class ProductService {
         existing.setName(updated.getName());
         existing.setCategory(updated.getCategory());
         existing.setDescription(updated.getDescription());
-        existing.setBasePrice(updated.getBasePrice());
-        existing.setPricePerPerson(updated.getPricePerPerson());
+        existing.setPrice(updated.getPrice());
+        existing.setPriceType(updated.getPriceType());
         existing.setImageUrl(updated.getImageUrl());
         return repository.save(existing);
     }
