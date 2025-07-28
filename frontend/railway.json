@@ -14,7 +14,8 @@
     "production": {
       "variables": {
         "NODE_ENV": "production",
-        "PORT": "3000"
+        "PORT": "3000",
+        "NEXT_PUBLIC_API_BASE": "https://your-backend-service-url.up.railway.app"
       }
     }
   }
