@@ -23,10 +23,9 @@ public class WebConfig implements WebMvcConfigurer {
                 public void addCorsMappings(CorsRegistry registry) {
                     registry.addMapping("/**")
                             .allowedOrigins(
-                                "http://localhost:3000",
                                 "https://pasticeriamanda.com",
                                 "https://www.pasticeriamanda.com",
-                                "https://pasticeriamanda-frontend-production.up.railway.app"
+                                "http://localhost:3000"
                             )
                             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                             .allowedHeaders("*")
@@ -34,5 +33,4 @@ public class WebConfig implements WebMvcConfigurer {
                 }
             };
         }
-
 }
