@@ -11,9 +11,58 @@ import { MovingShapes } from "@/components/ui/moving-shapes" // Import MovingSha
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Pasticeri Amanda",
-  description: "Delicious custom cakes & pastries made with the finest ingredients.",
-    generator: 'v0.dev'
+  title: "Pasticeri Amanda - Best Pastry Shop in Sarande | Custom Cakes & Pastries",
+  description: "Pasticeri Amanda - The finest pastry shop in Sarande, Albania. Custom cakes, traditional pastries, baklava, and sweet treats made with love and the best ingredients. Order online for delivery or pickup.",
+  keywords: "pasticeri amanda, pastry shop sarande, cakes sarande, baklava albania, custom cakes, pastries sarande, dessert shop, albanian pastries, wedding cakes, birthday cakes",
+  authors: [{ name: "Pasticeri Amanda" }],
+  creator: "Pasticeri Amanda",
+  publisher: "Pasticeri Amanda",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://pasticeriamanda.com'),
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: "Pasticeri Amanda - Best Pastry Shop in Sarande",
+    description: "Delicious custom cakes & pastries made with the finest ingredients in Sarande, Albania.",
+    url: 'https://pasticeriamanda.com',
+    siteName: 'Pasticeri Amanda',
+    locale: 'en_US',
+    type: 'website',
+    images: [
+      {
+        url: '/logoAmanda.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Pasticeri Amanda - Pastry Shop in Sarande',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Pasticeri Amanda - Best Pastry Shop in Sarande",
+    description: "Delicious custom cakes & pastries made with the finest ingredients in Sarande, Albania.",
+    images: ['/logoAmanda.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'your-google-verification-code', // Add this after setting up Google Search Console
+  },
+  generator: 'v0.dev'
 }
 
 export default function RootLayout({
