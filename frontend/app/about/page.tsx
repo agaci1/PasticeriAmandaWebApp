@@ -119,19 +119,29 @@ export default function AboutPage() {
             <div className="absolute bottom-2 right-2 w-8 h-8 border-r-2 border-b-2 border-gold/60 rounded-br-xl"></div>
           </div>
 
-          <div className="relative z-10 text-center">
-            <h3 
-              className="text-3xl md:text-4xl font-bold mb-6 text-white"
-              style={{
-                ...dancingScript,
-                textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
-              }}
-            >
-              {t("ourStory")}
-            </h3>
-            <p className="text-lg leading-relaxed text-royal-blue max-w-4xl mx-auto">
-              {t("aboutStory")}
-            </p>
+          <div className="grid md:grid-cols-2 gap-8 items-center relative z-10">
+            <div className="space-y-6 order-2 md:order-1">
+              <h3 
+                className="text-3xl md:text-4xl font-bold text-white"
+                style={{
+                  ...dancingScript,
+                  textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
+                }}
+              >
+                {t("ourStory")}
+              </h3>
+              <p className="text-lg leading-relaxed font-bold text-royal-blue">
+                {t("ourStoryContent")}
+              </p>
+            </div>
+            <div className="relative w-full h-64 md:h-96 rounded-xl overflow-hidden shadow-lg order-1 md:order-2">
+              <Image
+                src="/cakespic.WEBP"
+                alt="Beautiful Cakes"
+                fill
+                className="rounded-xl object-cover"
+              />
+            </div>
           </div>
         </div>
 
