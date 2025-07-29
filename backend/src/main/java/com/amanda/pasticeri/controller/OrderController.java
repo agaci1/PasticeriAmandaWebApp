@@ -110,6 +110,39 @@ public class OrderController {
         return ResponseEntity.ok("Order canceled.");
     }
 
+    // Client can cancel their own orders
+    @PostMapping("/client/orders/{id}/cancel")
+    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
+    public ResponseEntity<?> clientCancelOrder(@PathVariable Long id, @RequestHeader("Authorization") String tokenHeader) {
+        try {
+            String token = tokenHeader.replace("Bearer ", "");
+            String email = jwtTokenProvider.getEmailFromToken(token);
+            
+            // Verify the order belongs to the client
+            List<Order> clientOrders = orderService.getOrdersByEmail(email);
+            boolean orderBelongsToClient = clientOrders.stream()
+                .anyMatch(order -> order.getId().equals(id));
+            
+            if (!orderBelongsToClient) {
+                return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Order not found or you don't have permission to cancel it."
+                ));
+            }
+            
+            orderService.cancelOrder(id);
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Order canceled successfully."
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "Failed to cancel order: " + e.getMessage()
+            ));
+        }
+    }
+
     public static class SetPriceRequest {
         private double price;
         public double getPrice() { return price; }
