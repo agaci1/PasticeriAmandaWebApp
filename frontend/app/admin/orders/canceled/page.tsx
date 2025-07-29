@@ -56,7 +56,7 @@ export default function CanceledOrdersPage() {
   }
 
   const getFullImageUrl = (url: string) => {
-    return url.startsWith('/uploads/') ? `http://localhost:8080${url}` : url
+    return url.startsWith('/uploads/') ? `http://localhost:8081${url}` : url
   }
 
   return (

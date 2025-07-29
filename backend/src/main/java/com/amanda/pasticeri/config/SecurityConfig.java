@@ -54,9 +54,11 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers.frameOptions().disable()) // Allow H2 console frames
                 .cors(cors -> {}) // uses global cors settings
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/h2-console/**").permitAll() // Allow H2 console for development
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll() // Allow GET for public access
@@ -64,6 +66,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/products/**").authenticated() // Allow PUT for authenticated users
                         .requestMatchers(HttpMethod.DELETE, "/api/products/**").authenticated() // Allow DELETE for authenticated users
                         .requestMatchers(HttpMethod.GET, "/api/feed", "/api/feed/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll() // Allow access to uploaded images
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()

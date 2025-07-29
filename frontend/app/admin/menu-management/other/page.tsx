@@ -68,7 +68,7 @@ export default function AdminOtherMenuPage() {
     formData.append('image', file)
     
     const token = getAuthToken()
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080'}/api/products/upload-image`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8081'}/api/products/upload-image`, {
       method: 'POST',
       headers: {
         ...(token && { Authorization: `Bearer ${token}` }),
@@ -218,7 +218,7 @@ export default function AdminOtherMenuPage() {
                    {imagePreview && (
                     <div className="relative inline-block">
                       <Image
-                        src={imagePreview.startsWith('blob:') ? imagePreview : `http://localhost:8080${imagePreview}`}
+                        src={imagePreview.startsWith('blob:') ? imagePreview : `http://localhost:8081${imagePreview}`}
                         alt="Preview"
                         width={120}
                         height={120}
@@ -287,12 +287,12 @@ export default function AdminOtherMenuPage() {
                 {item.imageUrl && (
                   <div className="flex-shrink-0">
                     <img
-                      src={`http://localhost:8080${item.imageUrl}`}
+                      src={`http://localhost:8081${item.imageUrl}`}
                       alt={item.name}
                       width={120}
                       height={90}
                       className="rounded-lg object-contain border border-gray-200 bg-white cursor-pointer"
-                      onClick={() => setEnlargedImage(`http://localhost:8080${item.imageUrl}`)}
+                      onClick={() => setEnlargedImage(`http://localhost:8081${item.imageUrl}`)}
                     />
                   </div>
                 )}

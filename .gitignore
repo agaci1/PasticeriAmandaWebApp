@@ -48,6 +48,9 @@ target
 backend/uploads/
 frontend/public/uploads/
 
+# H2 Database files (should not be in git)
+backend/data/
+
 # IDE files
 .idea/
 .vscode/

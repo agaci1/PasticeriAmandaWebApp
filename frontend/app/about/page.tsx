@@ -19,7 +19,7 @@ export default function AboutPage() {
         <div className="relative">
           <Image
             src="/logoAmanda.jpg"
-            alt="Pasticeri Amanda Logo"
+            alt="Pastiçeri Amanda Logo"
             width={200}
             height={200}
             className="rounded-full border-4 border-gold shadow-xl relative z-10"
@@ -70,7 +70,7 @@ export default function AboutPage() {
 
           <div className="relative z-10 text-center">
             <h2 
-              className="text-4xl md:text-5xl font-bold mb-6 text-white"
+              className="text-4xl md:text-5xl font-bold mb-6 text-white leading-tight"
               style={{
                 ...dancingScript,
                 textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
@@ -78,7 +78,7 @@ export default function AboutPage() {
             >
               {t("welcomeToAmanda")}
             </h2>
-            <p className="text-xl leading-relaxed font-bold text-royal-blue max-w-4xl mx-auto">
+            <p className="text-xl md:text-2xl leading-relaxed font-semibold text-royal-blue max-w-4xl mx-auto tracking-wide">
               {t("aboutStory")}
             </p>
           </div>
@@ -122,7 +122,7 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 gap-8 items-center relative z-10">
             <div className="space-y-6 order-2 md:order-1">
               <h3 
-                className="text-3xl md:text-4xl font-bold text-white"
+                className="text-3xl md:text-4xl font-bold text-white leading-tight"
                 style={{
                   ...dancingScript,
                   textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
@@ -130,7 +130,7 @@ export default function AboutPage() {
               >
                 {t("ourStory")}
               </h3>
-              <p className="text-lg leading-relaxed font-bold text-royal-blue">
+              <p className="text-lg md:text-xl leading-relaxed font-medium text-royal-blue tracking-wide">
                 {t("ourStoryContent")}
               </p>
             </div>
@@ -183,7 +183,7 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 gap-8 items-center relative z-10">
             <div className="space-y-6 order-2 md:order-1">
               <h2 
-                className="text-3xl font-bold text-white"
+                className="text-3xl font-bold text-white leading-tight"
                 style={{
                   ...dancingScript,
                   textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
@@ -191,12 +191,14 @@ export default function AboutPage() {
               >
                 {t("ourPhilosophy")}
               </h2>
-              <p className="text-lg leading-relaxed font-bold text-royal-blue">
-                {t("philosophyDescription1")}
-              </p>
-              <p className="text-lg leading-relaxed font-bold text-royal-blue">
-                {t("philosophyDescription2")}
-              </p>
+              <div className="space-y-4">
+                <p className="text-lg md:text-xl leading-relaxed font-medium text-royal-blue tracking-wide">
+                  {t("philosophyDescription1")}
+                </p>
+                <p className="text-lg md:text-xl leading-relaxed font-medium text-royal-blue tracking-wide">
+                  {t("philosophyDescription2")}
+                </p>
+              </div>
             </div>
             <div className="relative w-full h-64 md:h-96 rounded-xl overflow-hidden shadow-lg order-1 md:order-2">
               <Image
@@ -208,8 +210,6 @@ export default function AboutPage() {
             </div>
           </div>
         </div>
-
-
 
         {/* Meet Our Team Section with Royal Frame */}
         <div className="relative p-8 md:p-12 bg-gradient-to-br from-white/90 to-white/70 rounded-3xl shadow-2xl border-2 border-gold overflow-hidden">
@@ -248,7 +248,7 @@ export default function AboutPage() {
 
           <div className="relative z-10 text-center">
             <h2 
-              className="text-3xl font-bold text-white mb-6"
+              className="text-3xl font-bold text-white mb-6 leading-tight"
               style={{
                 ...dancingScript,
                 textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
@@ -256,7 +256,7 @@ export default function AboutPage() {
             >
               {t("meetOurTeam")}
             </h2>
-            <p className="text-lg max-w-2xl mx-auto mb-8 font-bold text-royal-blue">
+            <p className="text-lg md:text-xl max-w-2xl mx-auto mb-8 font-medium text-royal-blue tracking-wide leading-relaxed">
               {t("teamDescription")}
             </p>
             <div className="flex justify-center">
@@ -269,9 +269,9 @@ export default function AboutPage() {
                     className="rounded-full object-cover border-6 border-gold shadow-2xl"
                   />
                 </div>
-                <h3 className="text-2xl font-bold text-royal-purple mb-2">Amanda Gaci</h3>
-                <p className="text-lg text-royal-blue font-semibold">Founder, Head Pastry Chef & Custom Cake Specialist</p>
-                <p className="text-sm text-royal-blue/80 mt-2 max-w-md mx-auto font-bold">
+                <h3 className="text-2xl md:text-3xl font-bold text-royal-purple mb-2 leading-tight">Amanda Gaci</h3>
+                <p className="text-lg md:text-xl text-royal-blue font-semibold mb-3 tracking-wide">Founder, Head Pastry Chef & Custom Cake Specialist</p>
+                <p className="text-base md:text-lg text-royal-blue/80 mt-2 max-w-md mx-auto font-medium leading-relaxed tracking-wide">
                   {t("amandaDescription")}
                 </p>
               </div>
@@ -295,7 +295,7 @@ export default function AboutPage() {
         
         <div className="relative z-10">
           <h2 
-            className="text-4xl md:text-5xl font-bold text-center mb-6 text-white"
+            className="text-4xl md:text-5xl font-bold text-center mb-6 text-white leading-tight"
             style={{
               ...dancingScript,
               textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
@@ -303,7 +303,7 @@ export default function AboutPage() {
           >
             {t("ourCreations")}
           </h2>
-          <p className="text-xl md:text-2xl text-center mb-12 text-royal-blue font-bold max-w-4xl mx-auto px-4">
+          <p className="text-xl md:text-2xl text-center mb-12 text-royal-blue font-medium max-w-4xl mx-auto px-4 tracking-wide leading-relaxed">
             {t("creationsDescription")}
           </p>
           <OurCreationsCarousel />

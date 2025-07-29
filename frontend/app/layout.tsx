@@ -6,7 +6,7 @@ import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { cn } from "@/lib/utils"
 import { Toaster } from "@/components/ui/toaster"
-import { MovingShapes } from "@/components/ui/moving-shapes" // Import MovingShapes
+import { ClientBackground } from "@/components/ui/client-background"
 import { TranslationProvider } from "@/contexts/TranslationContext"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -82,7 +82,7 @@ export default function RootLayout({
         <TranslationProvider>
           <div className="relative flex min-h-screen flex-col">
             <SiteHeader />
-            <MovingShapes /> {/* Moved here to be on all pages */}
+            <ClientBackground /> {/* Moved here to be on all pages */}
             <main className="flex-1 relative z-10">{children}</main> {/* Ensure main content is above shapes */}
             <SiteFooter />
           </div>

@@ -1,11 +1,11 @@
 package com.amanda.pasticeri.controller;
 
-import com.amanda.pasticeri.dto.MenuOrderDto;
-import com.amanda.pasticeri.dto.OrderRequestDto;
 import com.amanda.pasticeri.dto.CartOrderDto;
+import com.amanda.pasticeri.dto.OrderRequestDto;
 import com.amanda.pasticeri.model.Order;
 import com.amanda.pasticeri.security.JwtTokenProvider;
 import com.amanda.pasticeri.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -52,10 +52,22 @@ public class OrderController {
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public ResponseEntity<?> placeCustomOrder(@ModelAttribute OrderRequestDto orderDto,
                                               @RequestHeader("Authorization") String tokenHeader) {
-        String token = tokenHeader.replace("Bearer ", "");
-        String email = jwtTokenProvider.getEmailFromToken(token);
-        orderService.placeCustomOrder(orderDto, email);
-        return ResponseEntity.ok("Custom order submitted successfully.");
+        try {
+            String token = tokenHeader.replace("Bearer ", "");
+            String email = jwtTokenProvider.getEmailFromToken(token);
+            orderService.placeCustomOrder(orderDto, email);
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Custom order submitted successfully.",
+                "timestamp", System.currentTimeMillis()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "Failed to submit custom order: " + e.getMessage(),
+                "timestamp", System.currentTimeMillis()
+            ));
+        }
     }
 
     // ✅ Menu Order (JSON)

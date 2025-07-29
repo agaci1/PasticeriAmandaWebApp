@@ -110,7 +110,7 @@ export default function CartPage() {
     setInfoError("")
     setIsSubmitting(true)
     try {
-      const res = await fetch("http://localhost:8080/api/orders/menu", {
+      const res = await fetch("http://localhost:8081/api/orders/menu", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("auth_token")}` },
         body: JSON.stringify({
@@ -174,7 +174,7 @@ export default function CartPage() {
                 {cart.map((item) => (
                   <div key={item.id} className="flex items-center gap-4 p-4 bg-white/50 rounded-lg border border-gold/20">
                     <img
-                      src={item.imageUrl ? `http://localhost:8080${item.imageUrl}` : "/placeholder.svg"}
+                      src={item.imageUrl ? `http://localhost:8081${item.imageUrl}` : "/placeholder.svg"}
                       alt={item.name}
                       className="w-16 h-16 object-cover rounded-lg"
                     />

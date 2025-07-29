@@ -66,7 +66,7 @@ export function SiteFooter() {
             </Link>
           </div>
           <div className="space-y-2">
-            <p className="text-xs text-dark-royal-blue/80">© 2025 Amanda Pastry Shop. All rights reserved.</p>
+            <p className="text-xs text-dark-royal-blue/80">© 2025 {t("brandName")}. All rights reserved.</p>
             <p className="text-xs text-dark-royal-blue/70">
               Designed by{" "}
               <span className="font-semibold text-dark-royal-purple">Alkeo Gaci</span>

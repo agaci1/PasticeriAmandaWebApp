@@ -119,7 +119,7 @@ export default function HomePage() {
           name: item.name || `Menu Item ${index + 1}`,
           description: item.description || "Delicious pastry made with love",
           imageUrl: item.imageUrl || "/placeholder.svg",
-          price: item.price || "1500",
+          price: String(item.price || "1500"),
           originalIndex: index
         }));
         setRandomMenuItems(items);

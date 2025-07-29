@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react"
 import { authenticatedFetch } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { useTranslation } from "@/contexts/TranslationContext"
 
 interface Order {
   id: number
@@ -29,6 +30,33 @@ export default function AdminNewOrdersPage() {
   const [viewOrder, setViewOrder] = useState<Order | null>(null)
   const [actionLoading, setActionLoading] = useState<{ [id: number]: boolean }>({})
   const [enlargedImage, setEnlargedImage] = useState<string | null>(null)
+  const { t } = useTranslation()
+
+  // Function to convert English flavor names to Albanian for display
+  const convertFlavourToAlbanian = (englishFlavour: string): string => {
+    const flavourMap: { [key: string]: string } = {
+      "No Preference": t("noPreference"),
+      "Chocolate": t("chocolate"),
+      "Vanilla": t("vanilla"),
+      "Snickers": t("snickers"),
+      "Oreo": t("oreo"),
+      "Berries": t("berries"),
+      "Strawberry": t("strawberry"),
+      "Caramel": t("caramel"),
+      "Velvet": t("velvet"),
+      "Kinder Bueno": t("kinderBueno"),
+      "Lacta": t("lacta"),
+      "Rafaelo": t("rafaelo"),
+      "Tiramisu": t("tiramisu"),
+      "Scandal": t("scandal"),
+      "Kiss": t("kiss"),
+      "Pistachio": t("pistachio"),
+      "Dubai": t("dubai"),
+      "Other": t("other")
+    }
+    
+    return flavourMap[englishFlavour] || englishFlavour
+  }
 
   const fetchOrders = async () => {
     setLoading(true)
@@ -58,6 +86,8 @@ export default function AdminNewOrdersPage() {
       setPriceInputs(inputs => ({ ...inputs, [id]: "" }))
       setSetPriceId(null)
       fetchOrders()
+    } catch (error) {
+      console.error("Failed to set price:", error)
     } finally {
       setActionLoading(prev => ({ ...prev, [id]: false }))
     }
@@ -78,7 +108,7 @@ export default function AdminNewOrdersPage() {
   }
 
   const getFullImageUrl = (url: string) => {
-    return url.startsWith('/uploads/') ? `http://localhost:8080${url}` : url
+    return url.startsWith('/uploads/') ? `http://localhost:8081${url}` : url
   }
 
   return (
@@ -99,235 +129,211 @@ export default function AdminNewOrdersPage() {
       ) : orders.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">📋</div>
-          <p className="text-royal-blue text-xl">No new orders awaiting pricing</p>
+          <p className="text-royal-blue text-xl">No new orders at the moment</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {orders.map(order => (
             <div key={order.id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gold/20 overflow-hidden">
               {/* Header */}
-              <div className="bg-gradient-to-r from-royal-purple to-royal-blue text-white p-6">
+              <div className="bg-gradient-to-r from-pink-600 to-orange-600 text-white p-6">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-xl font-bold">{order.customerName}</h3>
                   <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-semibold">
                     #{order.id}
                   </span>
                 </div>
-                <p className="text-white/90 text-sm">{order.customerPhone}</p>
+                <p className="text-sm opacity-90">{order.customerEmail}</p>
+                <p className="text-sm opacity-90">{order.customerPhone}</p>
               </div>
-              
+
               {/* Content */}
-              <div className="p-6">
-                <div className="space-y-3 mb-6">
-                  <div className="flex justify-between items-center">
-                    <span className="text-royal-blue font-semibold">Product:</span>
-                    <span className="text-gray-700">{order.productName}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-royal-blue font-semibold">Quantity:</span>
-                    <span className="text-gray-700">{order.numberOfPersons}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-royal-blue font-semibold">Price:</span>
-                    <span className="text-gray-700 font-bold">ALL{order.totalPrice || 'TBD'}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-royal-blue font-semibold">Date:</span>
-                    <span className="text-gray-700">{order.orderDate}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-royal-blue font-semibold">Type:</span>
-                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                      getOrderType(order) === 'Custom' 
-                        ? 'bg-purple-100 text-purple-800' 
-                        : 'bg-blue-100 text-blue-800'
-                    }`}>
-                      {getOrderType(order)}
-                    </span>
-                  </div>
-                  {order.flavour && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-royal-blue font-semibold">Flavour:</span>
-                      <span className="text-gray-700 font-medium">{order.flavour}</span>
-                    </div>
-                  )}
+              <div className="p-6 space-y-4">
+                {/* Order Type Badge */}
+                <div className="flex justify-between items-center">
+                  <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                    getOrderType(order) === "Custom" 
+                      ? "bg-purple-100 text-purple-800" 
+                      : "bg-blue-100 text-blue-800"
+                  }`}>
+                    {getOrderType(order)} Order
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    {new Date(order.orderDate).toLocaleDateString()}
+                  </span>
                 </div>
-                
-                {/* Action Buttons */}
-                <div className="flex gap-2">
+
+                {/* Product Info */}
+                <div>
+                  <h4 className="font-semibold text-gray-800 mb-1">Product:</h4>
+                  <p className="text-gray-600">{order.productName}</p>
+                </div>
+
+                {/* Flavour Info */}
+                {order.flavour && (
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-1">Shija:</h4>
+                    <p className="text-gray-600">{convertFlavourToAlbanian(order.flavour)}</p>
+                  </div>
+                )}
+
+                {/* Custom Note */}
+                {order.customNote && (
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-1">Shënim:</h4>
+                    <p className="text-gray-600 text-sm">{order.customNote}</p>
+                  </div>
+                )}
+
+                {/* Images */}
+                {order.imageUrls && getImageUrls(order.imageUrls).length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2">Imazhe:</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {getImageUrls(order.imageUrls).slice(0, 4).map((url, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={getFullImageUrl(url)}
+                            alt={`Order image ${index + 1}`}
+                            className="w-full h-20 object-cover rounded-lg cursor-pointer"
+                            onClick={() => setEnlargedImage(getFullImageUrl(url))}
+                          />
+                          {getImageUrls(order.imageUrls!).length > 4 && index === 3 && (
+                            <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+                              <span className="text-white text-sm font-bold">
+                                +{getImageUrls(order.imageUrls!).length - 4}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="space-y-3 pt-4 border-t border-gray-200">
+                  {/* Set Price */}
                   {setPriceId === order.id ? (
-                    <>
-                      <Button 
-                        size="sm" 
-                        className="flex-1 bg-green-600 hover:bg-green-700"
-                        disabled={actionLoading[order.id]}
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        placeholder="Çmimi (ALL)"
+                        value={priceInputs[order.id] || ""}
+                        onChange={(e) => setPriceInputs(prev => ({ ...prev, [order.id]: e.target.value }))}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-royal-purple"
+                      />
+                      <Button
                         onClick={() => handleSetPrice(order.id)}
-                      >
-                        {actionLoading[order.id] ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                            Setting...
-                          </>
-                        ) : (
-                          "✅ Set Price"
-                        )}
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
                         disabled={actionLoading[order.id]}
-                        onClick={() => setSetPriceId(null)}
-                        className="flex-1"
+                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
                       >
-                        ❌ Cancel
+                        {actionLoading[order.id] ? "..." : "Vendos"}
                       </Button>
-                    </>
+                      <Button
+                        onClick={() => {
+                          setSetPriceId(null)
+                          setPriceInputs(prev => ({ ...prev, [order.id]: "" }))
+                        }}
+                        className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
+                      >
+                        Anulo
+                      </Button>
+                    </div>
                   ) : (
-                    <>
-                      <Button 
-                        size="sm" 
-                        className="flex-1 bg-green-600 hover:bg-green-700"
-                        disabled={actionLoading[order.id]}
-                        onClick={() => setSetPriceId(order.id)}
-                      >
-                        💰 Set Price
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        disabled={actionLoading[order.id]}
-                        onClick={() => setViewOrder(order)}
-                        className="flex-1"
-                      >
-                        👁️ View Details
-                      </Button>
-                    </>
+                    <Button
+                      onClick={() => setSetPriceId(order.id)}
+                      className="w-full bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      Vendos Çmimin
+                    </Button>
                   )}
+
+                  {/* View Details */}
+                  <Button
+                    onClick={() => setViewOrder(order)}
+                    variant="outline"
+                    className="w-full border-royal-purple text-royal-purple hover:bg-royal-purple hover:text-white"
+                  >
+                    Shiko Detajet
+                  </Button>
                 </div>
               </div>
             </div>
           ))}
         </div>
       )}
-      
-      <Dialog open={!!setPriceId} onOpenChange={open => !open && setSetPriceId(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-royal-purple">Set Price</DialogTitle>
-            <DialogDescription className="text-royal-blue">Enter the price for this order</DialogDescription>
-          </DialogHeader>
-          {setPriceId && (
-            <div className="space-y-4">
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={priceInputs[setPriceId] || ""}
-                onChange={e => setPriceInputs(inputs => ({ ...inputs, [setPriceId]: e.target.value }))}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-royal-purple focus:border-transparent"
-                placeholder="Enter price (ALL)"
-              />
-              <Button 
-                className="w-full bg-royal-purple hover:bg-royal-blue"
-                onClick={() => handleSetPrice(setPriceId)} 
-                disabled={!priceInputs[setPriceId] || actionLoading[setPriceId]}
-              >
-                {actionLoading[setPriceId] ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Setting Price...
-                  </>
-                ) : (
-                  "Set Price"
-                )}
-              </Button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-      
+
       {/* Order Details Dialog */}
       <Dialog open={!!viewOrder} onOpenChange={open => !open && setViewOrder(null)}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-royal-purple">Order Details</DialogTitle>
-            <DialogDescription className="text-royal-blue">Complete information for order #{viewOrder?.id}</DialogDescription>
-          </DialogHeader>
           {viewOrder && (
-            <div className="space-y-6">
-              {/* Customer Information */}
-              <div className="bg-gradient-to-r from-royal-purple to-royal-blue text-white p-6 rounded-lg">
-                <h3 className="text-xl font-bold mb-4">👤 Customer Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div><span className="font-semibold">Name:</span> {viewOrder.customerName}</div>
-                  <div><span className="font-semibold">Email:</span> {viewOrder.customerEmail}</div>
-                  <div><span className="font-semibold">Phone:</span> {viewOrder.customerPhone}</div>
-                  <div><span className="font-semibold">Order ID:</span> #{viewOrder.id}</div>
-                </div>
-              </div>
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-bold text-royal-purple">
+                  Order #{viewOrder.id} - {viewOrder.customerName}
+                </DialogTitle>
+                <DialogDescription className="text-gray-600">
+                  {viewOrder.customerEmail} • {viewOrder.customerPhone}
+                </DialogDescription>
+              </DialogHeader>
               
-              {/* Order Details */}
-              <div className="bg-white border border-gold/20 rounded-lg p-6">
-                <h3 className="text-xl font-bold text-royal-purple mb-4">📋 Order Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div><span className="font-semibold text-royal-blue">Product:</span> {viewOrder.productName}</div>
-                  <div><span className="font-semibold text-royal-blue">Quantity:</span> {viewOrder.numberOfPersons}</div>
-                  <div><span className="font-semibold text-royal-blue">Price:</span> ALL{viewOrder.totalPrice || 'To be confirmed'}</div>
-                  <div><span className="font-semibold text-royal-blue">Date:</span> {viewOrder.orderDate}</div>
-                  <div><span className="font-semibold text-royal-blue">Type:</span> 
-                    <span className={`ml-2 px-3 py-1 rounded-full text-sm font-semibold ${
-                      getOrderType(viewOrder) === 'Custom' 
-                        ? 'bg-purple-100 text-purple-800' 
-                        : 'bg-blue-100 text-blue-800'
-                    }`}>
-                      {getOrderType(viewOrder)}
-                    </span>
+              <div className="space-y-6">
+                {/* Order Info */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Product:</h4>
+                    <p className="text-gray-600">{viewOrder.productName}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Order Date:</h4>
+                    <p className="text-gray-600">{new Date(viewOrder.orderDate).toLocaleDateString()}</p>
                   </div>
                   {viewOrder.flavour && (
-                    <div><span className="font-semibold text-royal-blue">Flavour:</span> 
-                      <span className="ml-2 text-gray-700 font-medium">{viewOrder.flavour}</span>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">Shija:</h4>
+                      <p className="text-gray-600">{convertFlavourToAlbanian(viewOrder.flavour)}</p>
                     </div>
                   )}
-                  <div><span className="font-semibold text-royal-blue">Status:</span> 
-                    <span className={`ml-2 px-3 py-1 rounded-full text-sm font-semibold ${
-                      viewOrder.status === 'pending-quote' 
-                        ? 'bg-yellow-100 text-yellow-800' 
-                        : 'bg-green-100 text-green-800'
-                    }`}>
-                      {viewOrder.status}
-                    </span>
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Status:</h4>
+                    <p className="text-gray-600">{viewOrder.status}</p>
                   </div>
                 </div>
+
+                {/* Custom Note */}
                 {viewOrder.customNote && (
-                  <div className="mt-4">
-                    <span className="font-semibold text-royal-blue">Description:</span>
-                    <p className="mt-2 p-3 bg-gray-50 rounded-lg text-gray-700">{viewOrder.customNote}</p>
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2">Shënim i Personalizuar:</h4>
+                    <p className="text-gray-600 bg-gray-50 p-4 rounded-lg">{viewOrder.customNote}</p>
+                  </div>
+                )}
+
+                {/* Images */}
+                {viewOrder.imageUrls && getImageUrls(viewOrder.imageUrls).length > 0 && (
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-4">Imazhe të Porosisë:</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {getImageUrls(viewOrder.imageUrls).map((url, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={getFullImageUrl(url)}
+                            alt={`Order image ${index + 1}`}
+                            className="w-full h-32 object-cover rounded-lg cursor-pointer"
+                            onClick={() => setEnlargedImage(getFullImageUrl(url))}
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 rounded-lg flex items-center justify-center">
+                            <span className="text-white opacity-0 group-hover:opacity-100 font-semibold text-sm">
+                              Kliko për të zmadhuar
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
-              
-              {/* Images Section */}
-              {viewOrder.imageUrls && getImageUrls(viewOrder.imageUrls).length > 0 && (
-                <div className="bg-white border border-gold/20 rounded-lg p-6">
-                  <h3 className="text-xl font-bold text-royal-purple mb-4">📸 Order Images</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {getImageUrls(viewOrder.imageUrls).map((url, idx) => (
-                      <div key={idx} className="relative group">
-                        <img
-                          src={getFullImageUrl(url)}
-                          alt={`Order Image ${idx + 1}`}
-                          className="w-full h-48 object-cover rounded-lg border-2 border-gold/30 hover:border-royal-purple transition-all duration-300 cursor-pointer"
-                          onClick={() => setEnlargedImage(getFullImageUrl(url))}
-                        />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 rounded-lg flex items-center justify-center">
-                          <span className="text-white opacity-0 group-hover:opacity-100 font-semibold">Click to enlarge</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            </>
           )}
         </DialogContent>
       </Dialog>
@@ -339,7 +345,7 @@ export default function AdminNewOrdersPage() {
             <img
               src={enlargedImage || ''}
               alt="Enlarged Image"
-              className="w-full h-auto max-h-[80vh] object-contain"
+              className="w-full h-auto max-h-[80vh] object-contain bg-white"
             />
             <Button
               onClick={() => setEnlargedImage(null)}

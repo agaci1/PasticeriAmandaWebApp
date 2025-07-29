@@ -5,9 +5,13 @@ import com.amanda.pasticeri.service.ProductService;
 import com.amanda.pasticeri.service.ImageUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,5 +61,36 @@ public class ProductController {
         } catch (Exception e) {
             throw new RuntimeException("Failed to upload image: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/test-uploads")
+    public ResponseEntity<Map<String, Object>> testUploads() {
+        Map<String, Object> response = new HashMap<>();
+        String currentDir = System.getProperty("user.dir");
+        String uploadsPath = currentDir + "/uploads";
+        File uploadsDir = new File(uploadsPath);
+        
+        response.put("currentDirectory", currentDir);
+        response.put("uploadsPath", uploadsPath);
+        response.put("uploadsExists", uploadsDir.exists());
+        response.put("uploadsIsDirectory", uploadsDir.isDirectory());
+        
+        if (uploadsDir.exists() && uploadsDir.isDirectory()) {
+            File[] files = uploadsDir.listFiles();
+            List<Map<String, Object>> fileList = new ArrayList<>();
+            if (files != null) {
+                for (File file : files) {
+                    Map<String, Object> fileInfo = new HashMap<>();
+                    fileInfo.put("name", file.getName());
+                    fileInfo.put("size", file.length());
+                    fileInfo.put("isFile", file.isFile());
+                    fileInfo.put("isDirectory", file.isDirectory());
+                    fileList.add(fileInfo);
+                }
+            }
+            response.put("files", fileList);
+        }
+        
+        return ResponseEntity.ok(response);
     }
 }

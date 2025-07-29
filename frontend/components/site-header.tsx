@@ -69,9 +69,9 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 w-full border-b bg-white-gold-pink-bg-start/80 backdrop-blur-md">
       <div className="container flex h-16 items-center px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2 font-semibold text-royal-blue hover:text-royal-purple">
-          <Crown className="h-6 w-6 text-gold" />
+          <Crown className="h-6 w-6 text-gold animate-pulse drop-shadow-[0_0_8px_rgba(255,215,0,0.8)]" />
           <span className="sr-only">Pasticeri Amanda</span>
-          <GradientText className="text-lg md:text-xl font-bold leading-tight">{t("brandName")}</GradientText>
+          <span className="text-lg md:text-xl font-bold leading-tight bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent drop-shadow-[0_0_4px_rgba(239,68,68,0.5)]">{t("brandName")}</span>
         </Link>
         <nav className="ml-auto hidden lg:flex gap-6 text-sm font-medium items-center">
           {/* Main navigation links */}
@@ -137,8 +137,8 @@ export function SiteHeader() {
           </SheetTrigger>
           <SheetContent side="left" className="bg-gradient-to-br from-white-gold-pink-bg-start to-white-gold-pink-bg-end">
             <Link href="/" className="flex items-center gap-2 font-semibold text-royal-blue" onClick={handleNavigation}>
-              <Crown className="h-6 w-6 text-gold" />
-              <GradientText className="text-lg font-bold leading-tight">{t("brandName")}</GradientText>
+              <Crown className="h-6 w-6 text-gold animate-pulse drop-shadow-[0_0_8px_rgba(255,215,0,0.8)]" />
+              <span className="text-lg font-bold leading-tight bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent drop-shadow-[0_0_4px_rgba(239,68,68,0.5)]">{t("brandName")}</span>
             </Link>
             
             {/* Language Selector for Mobile */}

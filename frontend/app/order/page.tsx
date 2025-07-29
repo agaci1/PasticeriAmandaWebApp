@@ -55,8 +55,34 @@ export default function OrderPage() {
     t("other")
   ]
 
-  const [flavour, setFlavour] = useState("No Preference")
+  const [flavour, setFlavour] = useState(t("noPreference"))
   const [customFlavour, setCustomFlavour] = useState("")
+
+  // Function to convert Albanian flavor names to English for backend
+  const convertFlavourToEnglish = (albanianFlavour: string): string => {
+    const flavourMap: { [key: string]: string } = {
+      [t("noPreference")]: "No Preference",
+      [t("chocolate")]: "Chocolate",
+      [t("vanilla")]: "Vanilla",
+      [t("snickers")]: "Snickers",
+      [t("oreo")]: "Oreo",
+      [t("berries")]: "Berries",
+      [t("strawberry")]: "Strawberry",
+      [t("caramel")]: "Caramel",
+      [t("velvet")]: "Velvet",
+      [t("kinderBueno")]: "Kinder Bueno",
+      [t("lacta")]: "Lacta",
+      [t("rafaelo")]: "Rafaelo",
+      [t("tiramisu")]: "Tiramisu",
+      [t("scandal")]: "Scandal",
+      [t("kiss")]: "Kiss",
+      [t("pistachio")]: "Pistachio",
+      [t("dubai")]: "Dubai",
+      [t("other")]: "Other"
+    }
+    
+    return flavourMap[albanianFlavour] || albanianFlavour
+  }
 
   // Restore form data after login
   useEffect(() => {
@@ -141,10 +167,12 @@ export default function OrderPage() {
     event.preventDefault()
     
     if (!isAuthenticated) {
+      console.log("User not authenticated, redirecting to login");
       handleLoginRedirect()
       return
     }
     
+    console.log("Starting custom order submission...");
     setLoading(true)
   
     const formData = new FormData(event.currentTarget)
@@ -163,10 +191,14 @@ export default function OrderPage() {
       console.log("📸 Frontend: Adding file", idx + 1, ":", file.name, "(", file.size, "bytes)")
       formData.append("uploadedImages", file)
     })
-    formData.set("flavour", flavour === "Other" ? customFlavour : flavour)
+    
+    // Convert Albanian flavor to English for backend
+    const englishFlavour = flavour === t("other") ? customFlavour : convertFlavourToEnglish(flavour)
+    formData.set("flavour", englishFlavour)
   
     const token = localStorage.getItem("auth_token") // ✅ Retrieve JWT from localStorage
-  
+    console.log("Auth token present:", !!token);
+
     try {
       console.log("📸 Frontend: Sending request to backend")
       console.log("📸 Frontend: FormData entries:")
@@ -174,7 +206,7 @@ export default function OrderPage() {
         console.log("📸 Frontend:", key, "=", value instanceof File ? `File: ${value.name} (${value.size} bytes)` : value)
       }
       
-      const res = await fetch("http://localhost:8080/api/orders/custom", {
+      const res = await fetch("http://localhost:8081/api/orders/custom", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`, // ✅ Send token to backend
@@ -182,24 +214,49 @@ export default function OrderPage() {
         body: formData, // Do NOT set Content-Type, browser does it automatically
       })
   
+      console.log("Response status:", res.status);
+      console.log("Response headers:", Object.fromEntries(res.headers.entries()));
+      
       if (!res.ok) {
         const errorData = await res.json()
+        console.error("Backend error response:", errorData);
         throw new Error(errorData.message || `HTTP error! status: ${res.status}`)
       }
-  
+
+      // Check if response has content before trying to parse as JSON
+      const contentType = res.headers.get("content-type");
+      let responseData;
+      if (contentType && contentType.includes("application/json")) {
+        responseData = await res.json();
+        console.log("Order submitted successfully:", responseData);
+      } else {
+        const textResponse = await res.text();
+        console.log("Order submitted successfully:", textResponse);
+      }
+      
       toast({
         title: "Order Submitted!",
         description: "Your custom order has been sent to the admin. You will be notified with a price soon.",
       })
   
+      // Reset form and state
       formRef.current?.reset()
       setCustomOrderDate(undefined)
       setUploadedImages([])
       setPreviewUrls([])
-      setFlavour("No Preference")
+      setFlavour(t("noPreference"))
       setCustomFlavour("")
+      
+      // Navigate to order history or home page
+      router.push("/order-history")
+      
     } catch (error: any) {
       console.error("Failed to submit custom order:", error)
+      console.error("Error details:", {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
       toast({
         title: t("orderError"),
         description: error.message || t("orderErrorMessage"),
@@ -291,7 +348,7 @@ export default function OrderPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                {flavour === "Other" && (
+                {flavour === t("other") && (
                   <div className="grid gap-2">
                                       <Label htmlFor="customFlavour">{t("customFlavour")}</Label>
                   <Input

@@ -21,45 +21,45 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendOrderConfirmation(String to, Order order) {
-        String subject = "🍰 Your Pasticeri Amanda Order Confirmation";
+        String subject = "🍰 Your Pastiçeri Amanda Order Confirmation";
         String body = emailTemplateService.getOrderConfirmationTemplate(order);
         sendHtmlEmailWithLogo(to, subject, body, order);
     }
 
     @Override
     public void sendOrderConfirmation(String to, String htmlContent) {
-        sendHtmlEmailWithLogo(to, "Pasticeri Amanda - Order Confirmation", htmlContent);
+        sendHtmlEmailWithLogo(to, "Pastiçeri Amanda - Order Confirmation", htmlContent);
     }
 
     @Override
     public void sendAdminNotification(String to, Order order) {
-        String subject = "🛎️ New Order Alert - Pasticeri Amanda";
+        String subject = "🛎️ New Order Alert - Pastiçeri Amanda";
         String body = emailTemplateService.getNewOrderNotificationTemplate(order);
         sendHtmlEmailWithLogo(to, subject, body, order);
     }
 
     @Override
     public void sendAdminNotification(String to, String htmlContent) {
-        sendHtmlEmailWithLogo(to, "Pasticeri Amanda - New Order", htmlContent);
+        sendHtmlEmailWithLogo(to, "Pastiçeri Amanda - New Order", htmlContent);
     }
 
     @Override
     public void sendOrderCancelledEmail(String to, Order order) {
-        String subject = "❌ Order Cancelled - Pasticeri Amanda";
+        String subject = "❌ Order Cancelled - Pastiçeri Amanda";
         String body = emailTemplateService.getOrderCancelledTemplate(order);
         sendHtmlEmailWithLogo(to, subject, body, order);
     }
 
     @Override
     public void sendPriceSetEmail(String to, Order order) {
-        String subject = "💰 Price Set - Pasticeri Amanda";
+        String subject = "💰 Price Set - Pastiçeri Amanda";
         String body = emailTemplateService.getPriceSetTemplate(order);
         sendHtmlEmailWithLogo(to, subject, body, order);
     }
 
     @Override
     public void sendPasswordResetEmail(String to, String resetLink) {
-        String subject = "🔐 Reset Your Password - Pasticeri Amanda";
+        String subject = "🔐 Reset Your Password - Pastiçeri Amanda";
         String body = emailTemplateService.getPasswordResetTemplate(resetLink);
         sendHtmlEmailWithLogo(to, subject, body);
     }
@@ -71,7 +71,7 @@ public class EmailServiceImpl implements EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
             helper.setTo(to);
-            helper.setSubject("🧪 Test Email - Pasticeri Amanda");
+            helper.setSubject("🧪 Test Email - Pastiçeri Amanda");
             helper.setText("This is a test email to verify email functionality is working.", false);
             
             System.out.println("📧 Test email created, attempting to send...");
@@ -134,14 +134,16 @@ public class EmailServiceImpl implements EmailService {
                                 currentDir + trimmed,
                                 currentDir + "/backend" + trimmed,
                                 currentDir + "/uploads" + trimmed.substring(8), // Remove /uploads/ prefix
-                                "uploads" + trimmed.substring(8) // Relative path
+                                "uploads" + trimmed.substring(8), // Relative path
+                                currentDir + "/backend/uploads" + trimmed.substring(8), // Backend uploads
+                                currentDir + "/uploads" + trimmed.substring(8) // Direct uploads
                             };
                             
                             File imageFile = null;
                             for (String path : possiblePaths) {
                                 File testFile = new File(path);
                                 System.out.println("🔍 Testing path: " + testFile.getAbsolutePath());
-                                if (testFile.exists()) {
+                                if (testFile.exists() && testFile.isFile()) {
                                     imageFile = testFile;
                                     System.out.println("✅ Found image at: " + testFile.getAbsolutePath());
                                     break;
@@ -155,10 +157,26 @@ public class EmailServiceImpl implements EmailService {
                                     imageIndex++;
                                 } catch (Exception e) {
                                     System.err.println("❌ Failed to add image " + imageIndex + " to email: " + e.getMessage());
+                                    e.printStackTrace();
                                 }
                             } else {
                                 System.err.println("❌ Order image file not found for URL: " + trimmed);
                                 System.err.println("❌ Tried paths: " + String.join(", ", possiblePaths));
+                                // Try to list files in uploads directory for debugging
+                                try {
+                                    File uploadsDir = new File(currentDir + "/uploads");
+                                    if (uploadsDir.exists() && uploadsDir.isDirectory()) {
+                                        System.out.println("📁 Files in uploads directory:");
+                                        File[] files = uploadsDir.listFiles();
+                                        if (files != null) {
+                                            for (File file : files) {
+                                                System.out.println("  - " + file.getName() + " (" + file.length() + " bytes)");
+                                            }
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    System.err.println("❌ Error listing uploads directory: " + e.getMessage());
+                                }
                             }
                         } else {
                             System.out.println("⚠️ Skipping non-upload image: " + trimmed);

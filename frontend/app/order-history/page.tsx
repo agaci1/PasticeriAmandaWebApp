@@ -34,7 +34,7 @@ export default function OrderHistoryPage() {
   const fetchOrders = async () => {
     setLoading(true)
     try {
-      const res = await fetch("http://localhost:8080/api/client/orders", { 
+      const res = await fetch("http://localhost:8081/api/client/orders", { 
         headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` } 
       })
       if (!res.ok) throw new Error("Failed to fetch orders")
@@ -90,7 +90,7 @@ export default function OrderHistoryPage() {
 
     setIsCanceling(true)
     try {
-      const res = await fetch(`http://localhost:8080/api/client/orders/${cancelOrderId}/cancel`, { 
+      const res = await fetch(`http://localhost:8081/api/client/orders/${cancelOrderId}/cancel`, { 
         method: "POST", 
         headers: { 
           Authorization: `Bearer ${localStorage.getItem("auth_token")}`,

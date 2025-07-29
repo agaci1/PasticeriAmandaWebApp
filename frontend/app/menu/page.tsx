@@ -207,10 +207,18 @@ export default function MenuPage() {
               >
                 <div className="relative w-full h-48">
                   <Image
-                    src={item.imageUrl ? `http://localhost:8080${item.imageUrl}` : "/placeholder.svg?height=300&width=400"}
+                    src={item.imageUrl ? `http://localhost:8081${item.imageUrl}` : "/placeholder.svg?height=300&width=400"}
                     alt={item.name}
                     fill
                     className="rounded-t-lg object-cover"
+                    onError={(e) => {
+                      console.error("Failed to load image:", item.imageUrl);
+                      const target = e.target as HTMLImageElement;
+                      target.src = "/placeholder.svg?height=300&width=400";
+                    }}
+                    onLoad={() => {
+                      console.log("Image loaded successfully:", item.imageUrl);
+                    }}
                   />
                 </div>
                 <CardHeader className="text-center">

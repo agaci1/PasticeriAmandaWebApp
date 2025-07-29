@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react"
 import { authenticatedFetch } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { useTranslation } from "@/contexts/TranslationContext"
 
 interface Order {
   id: number
@@ -26,6 +27,33 @@ export default function AdminCompletedOrdersPage() {
   const [error, setError] = useState<string | null>(null)
   const [viewOrder, setViewOrder] = useState<Order | null>(null)
   const [enlargedImage, setEnlargedImage] = useState<string | null>(null)
+  const { t } = useTranslation()
+
+  // Function to convert English flavor names to Albanian for display
+  const convertFlavourToAlbanian = (englishFlavour: string): string => {
+    const flavourMap: { [key: string]: string } = {
+      "No Preference": t("noPreference"),
+      "Chocolate": t("chocolate"),
+      "Vanilla": t("vanilla"),
+      "Snickers": t("snickers"),
+      "Oreo": t("oreo"),
+      "Berries": t("berries"),
+      "Strawberry": t("strawberry"),
+      "Caramel": t("caramel"),
+      "Velvet": t("velvet"),
+      "Kinder Bueno": t("kinderBueno"),
+      "Lacta": t("lacta"),
+      "Rafaelo": t("rafaelo"),
+      "Tiramisu": t("tiramisu"),
+      "Scandal": t("scandal"),
+      "Kiss": t("kiss"),
+      "Pistachio": t("pistachio"),
+      "Dubai": t("dubai"),
+      "Other": t("other")
+    }
+    
+    return flavourMap[englishFlavour] || englishFlavour
+  }
 
   const fetchOrders = async () => {
     setLoading(true)
@@ -57,7 +85,7 @@ export default function AdminCompletedOrdersPage() {
   }
 
   const getFullImageUrl = (url: string) => {
-    return url.startsWith('/uploads/') ? `http://localhost:8080${url}` : url
+    return url.startsWith('/uploads/') ? `http://localhost:8081${url}` : url
   }
 
   return (
@@ -126,8 +154,8 @@ export default function AdminCompletedOrdersPage() {
                   </div>
                   {order.flavour && (
                     <div className="flex justify-between items-center">
-                      <span className="text-royal-blue font-semibold">Flavour:</span>
-                      <span className="text-gray-700 font-medium">{order.flavour}</span>
+                      <span className="text-royal-blue font-semibold">Shija:</span>
+                                              <span className="text-gray-700 font-medium">{convertFlavourToAlbanian(order.flavour)}</span>
                     </div>
                   )}
                 </div>
@@ -187,8 +215,8 @@ export default function AdminCompletedOrdersPage() {
                     </span>
                   </div>
                   {viewOrder.flavour && (
-                    <div><span className="font-semibold text-royal-blue">Flavour:</span> 
-                      <span className="ml-2 text-gray-700 font-medium">{viewOrder.flavour}</span>
+                    <div><span className="font-semibold text-royal-blue">Shija:</span> 
+                                              <span className="ml-2 text-gray-700 font-medium">{convertFlavourToAlbanian(viewOrder.flavour)}</span>
                     </div>
                   )}
                   <div><span className="font-semibold text-royal-blue">Status:</span> 

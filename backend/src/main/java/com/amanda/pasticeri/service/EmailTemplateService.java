@@ -20,7 +20,7 @@ public class EmailTemplateService {
     private String getClientHeader() {
         return """
             <div style=\"background: transparent; padding: 0; text-align: center;\">
-                <img src=\"cid:logoAmanda\" alt=\"Pasticeri Amanda\" style=\"width: 100%%; height: auto; display: block; margin: 0 auto;\">
+                <img src=\"cid:logoAmanda\" alt=\"Pastiçeri Amanda\" style=\"width: 100%%; height: auto; display: block; margin: 0 auto;\">
             </div>
         """;
     }
@@ -35,7 +35,7 @@ public class EmailTemplateService {
                 <p style=\"margin: 15px 0 0 0; font-size: 14px; opacity: 0.9;\">Open every day: 8:00 AM - 11:00 PM</p>
             </div>
             <div style=\"text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #f3f4f6;\">
-                <p style=\"color: #6b7280; font-size: 14px; margin: 0;\">With love,<br><strong style=\"color: #ec4899; font-size: 16px;\">Pasticeri Amanda ❤️</strong></p>
+                <p style=\"color: #6b7280; font-size: 14px; margin: 0;\">With love,<br><strong style=\"color: #ec4899; font-size: 16px;\">Pastiçeri Amanda ❤️</strong></p>
             </div>
         """;
     }
@@ -43,7 +43,7 @@ public class EmailTemplateService {
     private String getAdminHeader() {
         return """
             <div style=\"background: transparent; padding: 0; text-align: center;\">
-                <img src=\"cid:logoAmanda\" alt=\"Pasticeri Amanda\" style=\"width: 100%%; height: auto; display: block; margin: 0 auto;\">
+                <img src=\"cid:logoAmanda\" alt=\"Pastiçeri Amanda\" style=\"width: 100%%; height: auto; display: block; margin: 0 auto;\">
             </div>
         """;
     }
@@ -51,7 +51,7 @@ public class EmailTemplateService {
     private String getAdminFooter() {
         return """
             <div style=\"text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #f3f4f6;\">
-                <p style=\"color: #6b7280; font-size: 14px; margin: 0;\"><strong style=\"color: #dc2626; font-size: 16px;\">Pasticeri Amanda Admin Panel</strong></p>
+                <p style=\"color: #6b7280; font-size: 14px; margin: 0;\"><strong style=\"color: #dc2626; font-size: 16px;\">Pastiçeri Amanda Admin Panel</strong></p>
             </div>
         """;
     }
@@ -73,7 +73,7 @@ public class EmailTemplateService {
                                "pending-quote".equals(order.getStatus());
         
         String flavourSection = isCustomOrder && flavour != null && !flavour.trim().isEmpty() 
-            ? String.format("<p><strong style=\"color: #1e40af;\">Flavour:</strong> %s</p>", flavour)
+            ? String.format("<p><strong style=\"color: #1e40af;\">Flavor:</strong> %s</p>", flavour)
             : "";
         
         return String.format("""
@@ -82,7 +82,7 @@ public class EmailTemplateService {
             <head>
                 <meta charset=\"UTF-8\">
                 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-                <title>Order Confirmation - Pasticeri Amanda</title>
+                <title>Order Confirmation - Pastiçeri Amanda</title>
             </head>
             <body style=\"margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #fdf2f8 0%%, #fef3c7 50%%, #f3e8ff 100%%);\">
                 <div style=\"max-width: 600px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);\">
@@ -120,7 +120,7 @@ public class EmailTemplateService {
                                "pending-quote".equals(order.getStatus());
         
         String flavourSection = isCustomOrder && order.getFlavour() != null && !order.getFlavour().trim().isEmpty() 
-            ? String.format("<p><strong style=\"color: #1e40af;\">Flavour:</strong> %s</p>", order.getFlavour())
+            ? String.format("<p><strong style=\"color: #1e40af;\">Flavor:</strong> %s</p>", order.getFlavour())
             : "";
         
         return String.format("""
@@ -129,7 +129,7 @@ public class EmailTemplateService {
             <head>
                 <meta charset=\"UTF-8\">
                 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-                <title>New Order Received - Pasticeri Amanda</title>
+                <title>New Order Received - Pastiçeri Amanda</title>
             </head>
             <body style=\"margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #fdf2f8 0%%, #fef3c7 50%%, #f3e8ff 100%%);\">
                 <div style=\"max-width: 600px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);\">
@@ -175,7 +175,7 @@ public class EmailTemplateService {
                                "pending-quote".equals(order.getStatus());
         
         String flavourSection = isCustomOrder && order.getFlavour() != null && !order.getFlavour().trim().isEmpty() 
-            ? String.format("<p><strong style=\"color: #1e40af;\">Flavour:</strong> %s</p>", order.getFlavour())
+            ? String.format("<p><strong style=\"color: #1e40af;\">Flavor:</strong> %s</p>", order.getFlavour())
             : "";
         
         return String.format("""
@@ -184,7 +184,7 @@ public class EmailTemplateService {
             <head>
                 <meta charset=\"UTF-8\">
                 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-                <title>Order Cancelled - Pasticeri Amanda</title>
+                <title>Order Cancelled - Pastiçeri Amanda</title>
             </head>
             <body style=\"margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #fdf2f8 0%%, #fef3c7 50%%, #f3e8ff 100%%);\">
                 <div style=\"max-width: 600px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);\">
@@ -220,7 +220,7 @@ public class EmailTemplateService {
                                "pending-quote".equals(order.getStatus());
         
         String flavourSection = isCustomOrder && order.getFlavour() != null && !order.getFlavour().trim().isEmpty() 
-            ? String.format("<p><strong style=\"color: #1e40af;\">Flavour:</strong> %s</p>", order.getFlavour())
+            ? String.format("<p><strong style=\"color: #1e40af;\">Flavor:</strong> %s</p>", order.getFlavour())
             : "";
         
         return String.format("""
@@ -229,7 +229,7 @@ public class EmailTemplateService {
             <head>
                 <meta charset=\"UTF-8\">
                 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-                <title>Price Set - Pasticeri Amanda</title>
+                <title>Price Set - Pastiçeri Amanda</title>
             </head>
             <body style=\"margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #fdf2f8 0%%, #fef3c7 50%%, #f3e8ff 100%%);\">
                 <div style=\"max-width: 600px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);\">
@@ -269,13 +269,13 @@ public class EmailTemplateService {
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Password Reset - Pasticeri Amanda</title>
+                <title>Password Reset - Pastiçeri Amanda</title>
             </head>
             <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #fdf2f8 0%, #fef3c7 50%, #f3e8ff 100%);">
                 <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
                     <!-- Header with Logo -->
                     <div style="background: linear-gradient(135deg, #1e40af 0%, #f59e0b 50%, #8b5cf6 100%); padding: 40px 20px; text-align: center;">
-                        <img src="cid:logoAmanda" alt="Pasticeri Amanda" style="width: 200px; height: auto; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+                        <img src="cid:logoAmanda" alt="Pastiçeri Amanda" style="width: 200px; height: auto; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
                         <h1 style="color: white; margin: 20px 0 0 0; font-size: 28px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
                             🔐 Password Reset
                         </h1>
@@ -287,7 +287,7 @@ public class EmailTemplateService {
                         </h2>
                         <div style="background: linear-gradient(135deg, #fdf2f8 0%, #fef3c7 50%, #f3e8ff 100%); background-color: #fff; padding: 25px; border-radius: 15px; margin: 20px 0;">
                             <p style="color: #374151; line-height: 1.6; margin: 0 0 20px 0;">
-                                We received a request to reset your password for your Pasticeri Amanda account.
+                                We received a request to reset your password for your Pastiçeri Amanda account.
                             </p>
                             <div style="text-align: center; margin: 25px 0;">
                                 <a href="%s" style="background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: 600; display: inline-block; box-shadow: 0 4px 15px rgba(30, 64, 175, 0.3);">
@@ -313,7 +313,7 @@ public class EmailTemplateService {
                         <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #f3f4f6;">
                             <p style="color: #6b7280; font-size: 14px; margin: 0;">
                                 With love,<br>
-                                <strong style="color: #ec4899; font-size: 16px;">Pasticeri Amanda ❤️</strong>
+                                <strong style="color: #ec4899; font-size: 16px;">Pastiçeri Amanda ❤️</strong>
                             </p>
                         </div>
                     </div>
