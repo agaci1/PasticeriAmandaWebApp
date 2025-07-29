@@ -9,6 +9,7 @@ import { Lock } from "lucide-react"
 import { saveCartData, getFormData, clearFormData } from "@/lib/form-persistence"
 import { useAuth } from "@/hooks/use-auth"
 import { useTranslation } from "@/contexts/TranslationContext"
+import API_BASE from "@/lib/api"
 
 // Force dynamic rendering to avoid localStorage issues during build
 export const dynamic = 'force-dynamic'
@@ -110,7 +111,7 @@ export default function CartPage() {
     setInfoError("")
     setIsSubmitting(true)
     try {
-      const res = await fetch("http://localhost:8081/api/orders/menu", {
+      const res = await fetch(`${API_BASE}/api/orders/menu`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("auth_token")}` },
         body: JSON.stringify({
@@ -174,7 +175,7 @@ export default function CartPage() {
                 {cart.map((item) => (
                   <div key={item.id} className="flex items-center gap-4 p-4 bg-white/50 rounded-lg border border-gold/20">
                     <img
-                      src={item.imageUrl ? `http://localhost:8081${item.imageUrl}` : "/placeholder.svg"}
+                      src={item.imageUrl ? `${API_BASE}${item.imageUrl}` : "/placeholder.svg"}
                       alt={item.name}
                       className="w-16 h-16 object-cover rounded-lg"
                     />

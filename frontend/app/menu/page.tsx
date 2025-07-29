@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { isAuthenticated } from "@/lib/auth"
 import { useTranslation } from "@/contexts/TranslationContext"
+import API_BASE from "@/lib/api"
 
 interface MenuItem {
   id: string
@@ -207,7 +208,7 @@ export default function MenuPage() {
               >
                 <div className="relative w-full h-48">
                   <Image
-                    src={item.imageUrl ? `http://localhost:8081${item.imageUrl}` : "/placeholder.svg?height=300&width=400"}
+                    src={item.imageUrl ? `${API_BASE}${item.imageUrl}` : "/placeholder.svg?height=300&width=400"}
                     alt={item.name}
                     fill
                     className="rounded-t-lg object-cover"

@@ -21,6 +21,7 @@ import { saveCustomOrderData, getFormData, clearFormData } from "@/lib/form-pers
 import { useAuth } from "@/hooks/use-auth"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { useTranslation } from "@/contexts/TranslationContext"
+import API_BASE from "@/lib/api"
 
 export default function OrderPage() {
   const [customOrderDate, setCustomOrderDate] = useState<Date | undefined>(undefined)
@@ -206,7 +207,7 @@ export default function OrderPage() {
         console.log("📸 Frontend:", key, "=", value instanceof File ? `File: ${value.name} (${value.size} bytes)` : value)
       }
       
-      const res = await fetch("http://localhost:8081/api/orders/custom", {
+      const res = await fetch(`${API_BASE}/api/orders/custom`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`, // ✅ Send token to backend
