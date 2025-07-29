@@ -17,7 +17,7 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'pasticeriamanda-backend-production.up.railway.app',
+        hostname: 'striking-commitment-production.up.railway.app',
         pathname: '/uploads/**',
       },
     ],
