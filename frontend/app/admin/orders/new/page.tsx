@@ -5,6 +5,7 @@ import { authenticatedFetch } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { useTranslation } from "@/contexts/TranslationContext"
+import API_BASE from "@/lib/api"
 
 interface Order {
   id: number
@@ -108,7 +109,7 @@ export default function AdminNewOrdersPage() {
   }
 
   const getFullImageUrl = (url: string) => {
-    return url.startsWith('/uploads/') ? `http://localhost:8081${url}` : url
+    return url.startsWith('/uploads/') ? `${API_BASE}${url}` : url
   }
 
   return (
