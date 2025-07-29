@@ -69,7 +69,7 @@ export default function HomePage() {
       id: 3,
       name: t("traditional"),
       description: t("traditionalDescription"),
-      imageUrl: "/bakllava123",
+      imageUrl: "/bakllava123.jpeg",
       category: "other",
       menuLink: "/menu?category=other"
     },
