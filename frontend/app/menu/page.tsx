@@ -231,25 +231,25 @@ export default function MenuPage() {
                   <p className={`text-xs sm:text-sm ${styling.categoryColor}`}>{item.category}</p>
                 </CardHeader>
                 <CardContent className="space-y-2 sm:space-y-4 p-3 sm:p-4">
-                  <p className="text-royal-blue text-xs sm:text-sm md:text-base font-medium text-center" style={{
-                    display: '-webkit-box',
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                    lineHeight: '1.4em',
-                    maxHeight: '4.2em'
-                  }}>{item.description}</p>
+                                     <p className="text-royal-blue text-xs sm:text-sm md:text-base font-medium text-center" style={{
+                     display: '-webkit-box',
+                     WebkitLineClamp: 4,
+                     WebkitBoxOrient: 'vertical',
+                     overflow: 'hidden',
+                     lineHeight: '1.3em',
+                     maxHeight: '5.2em'
+                   }}>{item.description}</p>
                   <div className="flex flex-col items-center gap-2 sm:gap-3">
                     <span className="bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent text-sm sm:text-lg md:text-xl font-bold whitespace-nowrap">
                       ALL{item.price}{item.priceType && item.priceType !== "Total" ? item.priceType : ""}
                     </span>
-                    <Button
-                      onClick={() => loggedIn ? handleAddToCart(item) : router.push("/auth/login")}
-                      className={`${styling.buttonColor} text-white transition-colors text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2`}
-                    >
-                      <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                      {loggedIn ? t("addToCart") : t("login")}
-                    </Button>
+                                          <Button
+                        onClick={() => router.push("/cart")}
+                        className={`${styling.buttonColor} text-white transition-colors text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2`}
+                      >
+                        <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                        {t("viewCart")}
+                      </Button>
                   </div>
                 </CardContent>
               </Card>

@@ -99,6 +99,13 @@ export const translations = {
     totalPrice: 'Total Price',
     status: 'Status',
     
+    // Cart
+    addItems: 'Add Items',
+    viewCart: 'View Cart',
+    selectProducts: 'Select Products',
+    searchProducts: 'Search products...',
+    all: 'All',
+    
     // Purchase History Notes
     importantNotes: 'Important Notes:',
     forCustomOrders: 'For Custom Orders:',
@@ -413,6 +420,11 @@ export const translations = {
     remove: 'Hiq',
     emptyCart: 'Shporta juaj është bosh',
     continueShopping: 'Vazhdo Blerjen',
+    addItems: 'Shto Artikuj',
+    viewCart: 'Shiko Shportën',
+    selectProducts: 'Zgjidh Produktet',
+    searchProducts: 'Kërko produkte...',
+    all: 'Të Gjitha',
     
     // Messages
     itemAddedToCart: 'Artikulli u shtua!',
@@ -670,6 +682,11 @@ export const translations = {
     remove: 'Rimuovi',
     emptyCart: 'Il tuo carrello è vuoto',
     continueShopping: 'Continua lo Shopping',
+    addItems: 'Aggiungi Articoli',
+    viewCart: 'Visualizza Carrello',
+    selectProducts: 'Seleziona Prodotti',
+    searchProducts: 'Cerca prodotti...',
+    all: 'Tutti',
     
     // Messages
     itemAddedToCart: 'Articolo Aggiunto!',
