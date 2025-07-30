@@ -58,7 +58,11 @@ export default function AdminPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-8">
-        <GradientText className="text-4xl font-bold mb-4">Admin Panel</GradientText>
+        <h1 className="text-4xl font-bold mb-4 text-white" style={{
+          textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
+        }}>
+          Admin Panel
+        </h1>
         <p className="text-gray-600 text-lg">Welcome to the Pasticeri Amanda administration panel</p>
       </div>
 

@@ -147,7 +147,11 @@ export default function CartPage() {
   return (
     <div className="container mx-auto py-12 px-4 md:px-6 min-h-[calc(100vh-4rem)]">
       <div className="text-center mb-12">
-        <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 animate-pulse drop-shadow-[0_0_10px_rgba(236,72,153,0.5)]">🛒 {t("shoppingCart")}</h1>
+        <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-white" style={{
+          textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
+        }}>
+          🛒 {t("shoppingCart")}
+        </h1>
         <p className="text-royal-blue text-xl">{t("reviewSelections")}</p>
       </div>
       

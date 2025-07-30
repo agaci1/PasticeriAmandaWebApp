@@ -91,7 +91,11 @@ export default function AdminCompletedOrdersPage() {
 
   return (
     <div className="space-y-8">
-      <GradientText className="text-4xl md:text-5xl font-extrabold text-center">Completed Orders</GradientText>
+              <h1 className="text-4xl md:text-5xl font-extrabold text-center text-white" style={{
+          textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
+        }}>
+          Completed Orders
+        </h1>
 
       <Card className="bg-white/80 backdrop-blur-sm border-gold shadow-lg">
         <CardHeader>

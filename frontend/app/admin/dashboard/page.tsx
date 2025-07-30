@@ -108,7 +108,11 @@ export default function AdminDashboardPage() {
   if (loading) {
     return (
       <div className="space-y-8">
-        <GradientText className="text-4xl md:text-5xl font-extrabold text-center">Admin Dashboard</GradientText>
+        <h1 className="text-4xl md:text-5xl font-extrabold text-center text-white" style={{
+          textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
+        }}>
+          Admin Dashboard
+        </h1>
         <div className="flex justify-center items-center h-64">
           <div className="text-royal-blue text-lg">Loading dashboard data...</div>
         </div>
@@ -118,7 +122,11 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <GradientText className="text-4xl md:text-5xl font-extrabold text-center">Admin Dashboard</GradientText>
+              <h1 className="text-4xl md:text-5xl font-extrabold text-center text-white" style={{
+          textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
+        }}>
+          Admin Dashboard
+        </h1>
 
       {/* View New Orders Button - Top */}
       <div className="flex justify-center">

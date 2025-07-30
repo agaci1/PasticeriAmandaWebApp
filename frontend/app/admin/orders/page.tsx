@@ -56,7 +56,11 @@ export default function AdminOrdersPage() {
 
   return (
     <div className="container mx-auto py-12 px-4 md:px-6 min-h-[calc(100vh-4rem)]">
-      <GradientText className="text-4xl md:text-5xl font-extrabold text-center mb-12">Manage Orders</GradientText>
+              <h1 className="text-4xl md:text-5xl font-extrabold text-center mb-12 text-white" style={{
+          textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
+        }}>
+          Manage Orders
+        </h1>
       {loading ? (
         <p>Loading orders...</p>
       ) : error ? (

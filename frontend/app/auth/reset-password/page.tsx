@@ -90,7 +90,11 @@ export default function ResetPasswordPage() {
     <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4 py-12">
       <Card className="mx-auto max-w-sm bg-white/80 backdrop-blur-sm border-gold shadow-lg">
         <CardHeader>
-          <GradientText className="text-3xl font-bold text-center">Reset Password</GradientText>
+          <h1 className="text-3xl font-bold text-center text-white" style={{
+          textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
+        }}>
+          Reset Password
+        </h1>
           <CardDescription className="text-royal-blue text-center">Enter your new password below.</CardDescription>
         </CardHeader>
         <CardContent>
