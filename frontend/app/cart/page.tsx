@@ -111,20 +111,39 @@ export default function CartPage() {
     setInfoError("")
     setIsSubmitting(true)
     try {
+      const cartOrderData = {
+        items: cart.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          priceType: item.priceType,
+          quantity: item.quantity
+        })),
+        name: checkoutInfo.name,
+        surname: checkoutInfo.surname,
+        phone: checkoutInfo.phone,
+        email: checkoutInfo.email,
+        deliveryDateTime: checkoutInfo.deliveryDateTime
+      }
+      
       const res = await fetch(`${API_BASE}/api/orders/menu`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("auth_token")}` },
-        body: JSON.stringify({
-          items: cart,
-          ...checkoutInfo,
-        }),
+        body: JSON.stringify(cartOrderData),
       })
-      if (!res.ok) throw new Error("Failed to place order.")
+      
+      if (!res.ok) {
+        const errorData = await res.text()
+        console.error("Order placement failed:", errorData)
+        throw new Error("Failed to place order.")
+      }
+      
       alert(t("orderPlaced") + " " + t("thankYou"))
       setCart([])
       localStorage.removeItem("cart")
       setShowInfoModal(false)
     } catch (err) {
+      console.error("Order placement error:", err)
       setInfoError(t("orderError") + " " + t("orderErrorMessage"))
     } finally {
       setIsSubmitting(false)

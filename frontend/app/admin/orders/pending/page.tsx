@@ -173,6 +173,33 @@ export default function AdminPendingOrdersPage() {
                   )}
                 </div>
                 
+                {/* Images Preview */}
+                {order.imageUrls && getImageUrls(order.imageUrls).length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-semibold text-royal-blue mb-2">📸 Images ({getImageUrls(order.imageUrls).length})</h4>
+                    <div className="grid grid-cols-3 gap-2">
+                      {getImageUrls(order.imageUrls).slice(0, 3).map((url, idx) => (
+                        <div key={idx} className="relative group">
+                          <img
+                            src={getFullImageUrl(url)}
+                            alt={`Order Image ${idx + 1}`}
+                            className="w-full h-16 object-cover rounded-lg border border-gold/30 cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={() => setEnlargedImage(getFullImageUrl(url))}
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-lg flex items-center justify-center">
+                            <span className="text-white opacity-0 group-hover:opacity-100 text-xs font-medium">Click</span>
+                          </div>
+                        </div>
+                      ))}
+                      {getImageUrls(order.imageUrls).length > 3 && (
+                        <div className="w-full h-16 bg-gray-100 rounded-lg border border-gold/30 flex items-center justify-center">
+                          <span className="text-xs text-gray-600">+{getImageUrls(order.imageUrls).length - 3} more</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* Action Buttons */}
                 <div className="flex gap-2">
                   {confirmId === order.id ? (
