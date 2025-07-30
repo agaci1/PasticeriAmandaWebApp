@@ -216,7 +216,7 @@ export default function AdminNewOrdersPage() {
                 <div className="space-y-3 pt-4 border-t border-gray-200">
                   {/* Set Price */}
                   {setPriceId === order.id ? (
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <input
                         type="number"
                         placeholder="Çmimi (ALL)"
@@ -227,7 +227,7 @@ export default function AdminNewOrdersPage() {
                       <Button
                         onClick={() => handleSetPrice(order.id)}
                         disabled={actionLoading[order.id]}
-                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"
+                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold whitespace-nowrap"
                       >
                         {actionLoading[order.id] ? "..." : "Vendos"}
                       </Button>
@@ -236,7 +236,7 @@ export default function AdminNewOrdersPage() {
                           setSetPriceId(null)
                           setPriceInputs(prev => ({ ...prev, [order.id]: "" }))
                         }}
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
+                        className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg whitespace-nowrap"
                       >
                         Anulo
                       </Button>

@@ -199,7 +199,7 @@ export default function MenuPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 lg:gap-8">
         {filteredItems.length > 0 ? (
           filteredItems.map((item) => {
             const itemCategory = getItemCategory(item);
@@ -210,7 +210,7 @@ export default function MenuPage() {
                 key={item.id}
                 className={`overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm border-2 ${styling.borderColor} hover:scale-105 ${styling.shadowColor}`}
               >
-                <div className="relative w-full h-48">
+                <div className="relative w-full h-32 sm:h-40 md:h-48">
                   <Image
                     src={item.imageUrl ? `${API_BASE}${item.imageUrl}` : "/placeholder.svg?height=300&width=400"}
                     alt={item.name}
@@ -226,21 +226,21 @@ export default function MenuPage() {
                     }}
                   />
                 </div>
-                <CardHeader className="text-center">
-                  <CardTitle className={`text-xl ${styling.titleColor}`}>{item.name}</CardTitle>
-                  <p className={`text-sm ${styling.categoryColor}`}>{item.category}</p>
+                <CardHeader className="text-center p-3 sm:p-4">
+                  <CardTitle className={`text-sm sm:text-base md:text-xl ${styling.titleColor}`}>{item.name}</CardTitle>
+                  <p className={`text-xs sm:text-sm ${styling.categoryColor}`}>{item.category}</p>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-royal-blue text-base font-medium text-center">{item.description}</p>
-                  <div className="flex flex-col items-center gap-3">
-                    <span className="bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent text-xl font-bold whitespace-nowrap">
+                <CardContent className="space-y-2 sm:space-y-4 p-3 sm:p-4">
+                  <p className="text-royal-blue text-xs sm:text-sm md:text-base font-medium text-center line-clamp-2">{item.description}</p>
+                  <div className="flex flex-col items-center gap-2 sm:gap-3">
+                    <span className="bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent text-sm sm:text-lg md:text-xl font-bold whitespace-nowrap">
                       ALL{item.price}{item.priceType && item.priceType !== "Total" ? item.priceType : ""}
                     </span>
                     <Button
                       onClick={() => loggedIn ? handleAddToCart(item) : router.push("/auth/login")}
-                      className={`${styling.buttonColor} text-white transition-colors`}
+                      className={`${styling.buttonColor} text-white transition-colors text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2`}
                     >
-                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                       {loggedIn ? t("addToCart") : t("login")}
                     </Button>
                   </div>
