@@ -111,7 +111,7 @@ public class OrderService {
                         String imageUrl = imageUploadService.saveImage(file);
                         if (urls.length() > 0) urls.append(",");
                         urls.append(imageUrl);
-                    } catch (IOException e) {
+                    } catch (RuntimeException e) {
                         System.err.println("❌ Failed to save image: " + e.getMessage());
                     }
                 }
@@ -128,14 +128,20 @@ public class OrderService {
     }
 
     public void placeMenuOrder(MenuOrderDto dto) {
+        // Get product details to set product name and calculate total price
+        Product product = productRepository.findById(dto.getProductId())
+            .orElseThrow(() -> new RuntimeException("Product not found: " + dto.getProductId()));
+        
+        double totalPrice = product.getPrice() * dto.getQuantity();
+        
         Order order = new Order();
         order.setCustomerName(dto.getCustomerName());
         order.setCustomerEmail(dto.getCustomerEmail());
         order.setCustomerPhone(dto.getCustomerPhone());
-        order.setProductName(dto.getProductName());
+        order.setProductName(product.getName());
         order.setNumberOfPersons(dto.getNumberOfPersons());
         order.setOrderDate(LocalDate.now());
-        order.setTotalPrice(dto.getTotalPrice());
+        order.setTotalPrice(totalPrice);
         order.setStatus("pending");
         order.setOrderType("menu");
 

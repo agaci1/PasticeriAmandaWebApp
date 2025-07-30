@@ -40,5 +40,10 @@ public class CartOrderDto {
         public void setPriceType(String priceType) { this.priceType = priceType; }
         public int getQuantity() { return quantity; }
         public void setQuantity(int quantity) { this.quantity = quantity; }
+        
+        // Helper method to maintain compatibility
+        public Long getProductId() {
+            return id; // Map id to productId
+        }
     }
 } 
