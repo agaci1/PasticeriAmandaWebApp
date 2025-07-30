@@ -138,7 +138,7 @@ export default function CartPage() {
 
   const handleConfirm = async () => {
     if (!checkoutInfo.name || !checkoutInfo.surname || !checkoutInfo.phone || !checkoutInfo.email || !checkoutInfo.deliveryDateTime) {
-      setInfoError("All fields are required.")
+      setInfoError(t("allFieldsRequired"))
       return
     }
     setInfoError("")
@@ -327,7 +327,7 @@ export default function CartPage() {
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-royal-blue text-lg">{product.name}</h3>
                         <p className="text-sm text-gray-600 mb-1">{product.description}</p>
-                        <p className="text-sm font-medium text-royal-purple">ALL{product.price}{product.priceType && product.priceType !== "Total" ? product.priceType : ""}</p>
+                        <p className="text-sm font-medium text-royal-purple">{t("currencySymbol")}{product.price}{product.priceType && product.priceType !== "Total" ? product.priceType : ""}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <Button
@@ -394,11 +394,11 @@ export default function CartPage() {
                     />
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-royal-blue truncate text-lg">{item.name}</h3>
-                      <p className="text-sm text-gray-600 mb-2">ALL{item.price}{item.priceType && item.priceType !== "Total" ? item.priceType : ""}</p>
+                      <p className="text-sm text-gray-600 mb-2">{t("currencySymbol")}{item.price}{item.priceType && item.priceType !== "Total" ? item.priceType : ""}</p>
                       
                       {/* Quantity controls - moved here for better mobile layout */}
                       <div className="flex items-center gap-3 mb-3">
-                        <span className="text-sm font-medium text-royal-blue">Sasia:</span>
+                        <span className="text-sm font-medium text-royal-blue">{t("quantity")}:</span>
                         <div className="flex items-center gap-2">
                           <Button
                             size="sm"
@@ -421,7 +421,7 @@ export default function CartPage() {
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-2 flex-shrink-0 w-full sm:w-auto">
-                      <p className="font-semibold text-royal-purple text-lg">ALL{(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="font-semibold text-royal-purple text-lg">{t("currencySymbol")}{(item.price * item.quantity).toFixed(2)}</p>
                       <Button
                         size="sm"
                         variant="ghost"
@@ -448,14 +448,14 @@ export default function CartPage() {
                   {cart.map((item) => (
                     <div key={item.id} className="flex justify-between text-sm">
                       <span>{item.name} x{item.quantity}</span>
-                      <span>ALL{(item.price * item.quantity).toFixed(2)}</span>
+                      <span>{t("currencySymbol")}{(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                   ))}
                 </div>
                 <div className="border-t pt-4">
                   <div className="flex justify-between font-semibold text-lg">
                     <span></span>
-                    <span className="text-royal-purple">ALL{total.toFixed(2)}</span>
+                    <span className="text-royal-purple">{t("currencySymbol")}{total.toFixed(2)}</span>
                   </div>
                 </div>
                 <Button
@@ -529,7 +529,7 @@ export default function CartPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-royal-blue mb-1">🚚 Data dhe Ora e Dorëzimit</label>
+                             <label className="block text-sm font-medium text-royal-blue mb-1">🚚 {t("deliveryDateTime")}</label>
               <Input
                 name="deliveryDateTime"
                 type="datetime-local"

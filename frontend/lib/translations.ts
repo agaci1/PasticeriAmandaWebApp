@@ -107,6 +107,17 @@ export const translations = {
     all: 'All',
     continue: 'Continue',
     backToProducts: 'Back to Products',
+    deliveryDateTime: 'Delivery Date & Time',
+    allFieldsRequired: 'All fields are required.',
+
+    cartItems: 'Cart Items',
+    proceedToCheckout: 'Proceed to Checkout',
+    toCheckout: 'to Checkout',
+    loginToCheckout: 'Login to Checkout',
+    processing: 'Processing...',
+    confirmOrder: 'Confirm Order',
+    checkoutInformation: 'Checkout Information',
+
     
     // Purchase History Notes
     importantNotes: 'Important Notes:',
@@ -172,9 +183,7 @@ export const translations = {
     reviewSelections: 'Review your delicious selections',
     addDeliciousTreats: 'Add some delicious treats to get started!',
     browseMenu: 'Browse Menu',
-    cartItems: 'Cart Items',
-    toCheckout: 'to Checkout',
-    proceedToCheckout: 'Proceed to Checkout',
+
 
     noPreference: 'No Preference',
     chocolate: 'Chocolate',
@@ -206,18 +215,10 @@ export const translations = {
     // Cart Page
     shoppingCart: 'Shopping Cart',
     cartEmpty: 'Your cart is empty',
-    checkoutInformation: 'Checkout Information',
-    firstName: 'First Name',
-    lastName: 'Last Name',
-    phone: 'Phone',
-    confirmOrder: 'Confirm Order',
-    orderSummary: 'Order Summary',
     items: 'Items',
     subtotal: 'Subtotal',
     totalAmount: 'Total Amount',
     placeOrder: 'Place Order',
-    orderPlaced: 'Order Placed Successfully!',
-    thankYou: 'Thank you for your order!',
     
     // Auth Pages
     signIn: 'Sign In',
@@ -274,11 +275,12 @@ export const translations = {
     specialRequests: 'Special Requests',
     
     // Status Messages
-    processing: 'Processing',
+
     delivered: 'Delivered',
     
     // Currency
     currency: 'ALL',
+    currencySymbol: 'ALL',
     
     // Time
     today: 'Today',
@@ -429,6 +431,10 @@ export const translations = {
     all: 'Të Gjitha',
     continue: 'Vazhdo',
     backToProducts: 'Kthehu te Produktet',
+    deliveryDateTime: 'Data dhe Ora e Dorëzimit',
+    allFieldsRequired: 'Të gjitha fushat janë të detyrueshme.',
+    loginToCheckout: 'Hyr për të Përfunduar Blerjen',
+    processing: 'Duke Procesuar...',
     
     // Messages
     itemAddedToCart: 'Artikulli u shtua!',
@@ -554,11 +560,12 @@ export const translations = {
     specialRequests: 'Kërkesa të Veçanta',
     
     // Status Messages
-    processing: 'Duke Procesuar',
+
     delivered: 'E Dorëzuar',
     
     // Currency
     currency: 'ALL',
+    currencySymbol: 'ALL',
     
     // Time
     today: 'Sot',
@@ -693,6 +700,10 @@ export const translations = {
     all: 'Tutti',
     continue: 'Continua',
     backToProducts: 'Torna ai Prodotti',
+    deliveryDateTime: 'Data e Ora di Consegna',
+    allFieldsRequired: 'Tutti i campi sono obbligatori.',
+    loginToCheckout: 'Accedi per Procedere all\'Acquisto',
+    processing: 'In Elaborazione...',
     
     // Messages
     itemAddedToCart: 'Articolo Aggiunto!',
@@ -834,11 +845,12 @@ export const translations = {
     specialRequests: 'Richieste Speciali',
     
     // Status Messages
-    processing: 'In Elaborazione',
+
     delivered: 'Consegnato',
     
     // Currency
     currency: 'ALL',
+    currencySymbol: 'ALL',
     
     // Time
     today: 'Oggi',

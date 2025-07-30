@@ -73,7 +73,7 @@ export function SiteHeader() {
           <span className="sr-only">Pasticeri Amanda</span>
           <span className="text-lg md:text-xl font-bold leading-tight bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent drop-shadow-[0_0_4px_rgba(239,68,68,0.5)]">{t("brandName")}</span>
         </Link>
-        <nav className="ml-auto hidden lg:flex gap-6 text-sm font-medium items-center">
+        <nav className="ml-auto hidden lg:flex gap-6 text-base font-medium items-center">
           {/* Main navigation links */}
           {(userIsAdmin ? adminNavLinks : loggedIn ? [...userNavLinks, { name: t("cart"), href: "/cart", icon: ShoppingCart }, { name: t("purchaseHistory"), href: "/order-history", icon: History }] : userNavLinks).map((link) => (
             <Link
@@ -146,7 +146,7 @@ export function SiteHeader() {
               <LanguageSelector variant="mobile" />
             </div>
             
-            <nav className="grid gap-2 py-6 text-lg font-medium">
+            <nav className="grid gap-2 py-6 text-xl font-medium">
               {/* Main navigation links */}
               {(userIsAdmin ? adminNavLinks : loggedIn ? [...userNavLinks, { name: t("cart"), href: "/cart", icon: ShoppingCart }, { name: t("purchaseHistory"), href: "/order-history", icon: History }] : userNavLinks).map((link) => (
                 <Link

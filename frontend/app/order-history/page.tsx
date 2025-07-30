@@ -251,7 +251,7 @@ export default function OrderHistoryPage() {
       <h1 className="text-2xl font-bold mb-6 text-white" style={{
         textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
       }}>
-        Purchase History
+        {t("purchaseHistory")}
       </h1>
       <p>Loading...</p>
     </div>
@@ -263,7 +263,7 @@ export default function OrderHistoryPage() {
       <h1 className="text-2xl font-bold mb-6 text-white" style={{
         textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
       }}>
-        Purchase History
+        {t("purchaseHistory")}
       </h1>
       
       {orders.length === 0 ? (
@@ -341,7 +341,7 @@ export default function OrderHistoryPage() {
                       <div>Product(s): {order.productName}</div>
                       <div>Quantity: {order.numberOfPersons}</div>
                       {order.flavour && <div>Flavour: {order.flavour}</div>}
-                      <div>ALL{order.totalPrice}</div>
+                      <div>{t("currencySymbol")}{order.totalPrice}</div>
                       {getOrderType(order) === "custom" ? (
                         <div>Due Date: {formatDate(order.orderDate)}</div>
                       ) : (
