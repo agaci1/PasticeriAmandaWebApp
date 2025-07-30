@@ -231,7 +231,14 @@ export default function MenuPage() {
                   <p className={`text-xs sm:text-sm ${styling.categoryColor}`}>{item.category}</p>
                 </CardHeader>
                 <CardContent className="space-y-2 sm:space-y-4 p-3 sm:p-4">
-                  <p className="text-royal-blue text-xs sm:text-sm md:text-base font-medium text-center line-clamp-2">{item.description}</p>
+                  <p className="text-royal-blue text-xs sm:text-sm md:text-base font-medium text-center" style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    lineHeight: '1.4em',
+                    maxHeight: '4.2em'
+                  }}>{item.description}</p>
                   <div className="flex flex-col items-center gap-2 sm:gap-3">
                     <span className="bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent text-sm sm:text-lg md:text-xl font-bold whitespace-nowrap">
                       ALL{item.price}{item.priceType && item.priceType !== "Total" ? item.priceType : ""}

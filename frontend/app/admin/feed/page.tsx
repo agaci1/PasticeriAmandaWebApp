@@ -15,7 +15,6 @@ export default function AdminFeedPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [mediaType, setMediaType] = useState("image");
-  const [mediaUrl, setMediaUrl] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -40,12 +39,8 @@ export default function AdminFeedPage() {
       formData.append("description", description || "");
       if (mediaType === "image" && file) {
         formData.append("file", file);
-      } else if (mediaType === "video") {
-        if (videoFile) {
-          formData.append("file", videoFile);
-        } else if (mediaUrl) {
-          formData.append("url", mediaUrl);
-        }
+      } else if (mediaType === "video" && videoFile) {
+        formData.append("file", videoFile);
       }
       const token = localStorage.getItem("auth_token");
       const res = await fetch(API_URL, {
@@ -59,7 +54,6 @@ export default function AdminFeedPage() {
       setTitle("");
       setDescription("");
       setMediaType("image");
-      setMediaUrl("");
       setFile(null);
       setVideoFile(null);
     } catch (err: any) {
@@ -127,47 +121,12 @@ export default function AdminFeedPage() {
             required
           />
         ) : (
-          <div className="space-y-4">
-            <div className="flex gap-4">
-              <Button
-                type="button"
-                variant={videoFile ? "default" : "outline"}
-                onClick={() => {
-                  setVideoFile(null);
-                  setMediaUrl("");
-                }}
-                className="flex-1"
-              >
-                Upload Video File
-              </Button>
-              <Button
-                type="button"
-                variant={mediaUrl ? "default" : "outline"}
-                onClick={() => {
-                  setVideoFile(null);
-                  setMediaUrl("");
-                }}
-                className="flex-1"
-              >
-                YouTube URL
-              </Button>
-            </div>
-            {videoFile ? (
-              <Input
-                type="file"
-                accept="video/*"
-                onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
-                required
-              />
-            ) : (
-              <Input
-                placeholder="YouTube Embed URL"
-                value={mediaUrl || ""}
-                onChange={(e) => setMediaUrl(e.target.value)}
-                required
-              />
-            )}
-          </div>
+          <Input
+            type="file"
+            accept="video/*"
+            onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
+            required
+          />
         )}
         <Button type="submit" className="flex items-center gap-2" disabled={loading}>
           <UploadCloud className="h-4 w-4" /> {loading ? "Adding..." : "Add to Feed"}
@@ -185,21 +144,11 @@ export default function AdminFeedPage() {
                   className="rounded-lg max-h-48 object-cover border-2 border-gold shadow"
                 />
               ) : (
-                item.url.startsWith("/uploads/") ? (
-                  <video
-                    src={`${API_BASE}${item.url}`}
-                    controls
-                    className="rounded-lg max-h-48 w-full border-2 border-gold shadow"
-                  />
-                ) : (
-                  <iframe
-                    src={item.url}
-                    title={item.title}
-                    className="rounded-lg max-h-48 w-full border-2 border-gold shadow"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                )
+                <video
+                  src={item.url.startsWith("/uploads/") ? `${API_BASE}${item.url}` : item.url}
+                  controls
+                  className="rounded-lg max-h-48 w-full border-2 border-gold shadow"
+                />
               )}
             </div>
             <div className="flex-1 space-y-2">
