@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { MenuIcon, Crown, ShoppingCart, Home, Info, Utensils, ClipboardList, Star, MapPin, History, Package2, ListOrdered } from "lucide-react"
@@ -70,13 +69,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 w-full border-b bg-white-gold-pink-bg-start/80 backdrop-blur-md">
       <div className="container flex h-16 items-center px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2 font-semibold text-royal-blue hover:text-royal-purple">
-          <Image
-            src="/logoAmanda.jpg"
-            alt="Pasticeri Amanda Logo"
-            width={40}
-            height={40}
-            className="rounded-full border-2 border-gold shadow-lg"
-          />
+          <Crown className="h-6 w-6 text-gold animate-pulse drop-shadow-[0_0_8px_rgba(255,215,0,0.8)]" />
           <span className="sr-only">Pasticeri Amanda</span>
           <span className="text-lg md:text-xl font-bold leading-tight bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent drop-shadow-[0_0_4px_rgba(239,68,68,0.5)]">{t("brandName")}</span>
         </Link>

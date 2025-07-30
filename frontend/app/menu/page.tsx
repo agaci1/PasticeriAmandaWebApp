@@ -243,13 +243,7 @@ export default function MenuPage() {
                     <span className="bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent text-sm sm:text-lg md:text-xl font-bold whitespace-nowrap">
                       ALL{item.price}{item.priceType && item.priceType !== "Total" ? item.priceType : ""}
                     </span>
-                                          <Button
-                        onClick={() => router.push("/cart")}
-                        className={`${styling.buttonColor} text-white transition-colors text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2`}
-                      >
-                        <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                        {t("viewCart")}
-                      </Button>
+                    
                   </div>
                 </CardContent>
               </Card>
