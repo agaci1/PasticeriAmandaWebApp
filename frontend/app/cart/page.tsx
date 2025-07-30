@@ -147,7 +147,7 @@ export default function CartPage() {
   return (
     <div className="container mx-auto py-12 px-4 md:px-6 min-h-[calc(100vh-4rem)]">
       <div className="text-center mb-12">
-        <h1 className="text-4xl lg:text-5xl font-bold text-royal-purple mb-4">🛒 {t("shoppingCart")}</h1>
+        <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 animate-pulse drop-shadow-[0_0_10px_rgba(236,72,153,0.5)]">🛒 {t("shoppingCart")}</h1>
         <p className="text-royal-blue text-xl">{t("reviewSelections")}</p>
       </div>
       
@@ -173,17 +173,17 @@ export default function CartPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {cart.map((item) => (
-                  <div key={item.id} className="flex items-center gap-4 p-4 bg-white/50 rounded-lg border border-gold/20">
+                  <div key={item.id} className="flex items-center gap-4 p-4 bg-white/50 rounded-lg border border-gold/20 min-w-0">
                     <img
                       src={item.imageUrl ? `${API_BASE}${item.imageUrl}` : "/placeholder.svg"}
                       alt={item.name}
-                      className="w-16 h-16 object-cover rounded-lg"
+                      className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
                     />
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-royal-blue">{item.name}</h3>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-royal-blue truncate">{item.name}</h3>
                       <p className="text-sm text-gray-600">ALL{item.price}{item.priceType && item.priceType !== "Total" ? item.priceType : ""}</p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       <Button
                         size="sm"
                         variant="outline"
@@ -202,7 +202,7 @@ export default function CartPage() {
                         +
                       </Button>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right flex-shrink-0">
                       <p className="font-semibold text-royal-purple">ALL{(item.price * item.quantity).toFixed(2)}</p>
                       <Button
                         size="sm"

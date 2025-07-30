@@ -44,7 +44,6 @@ public class OrderService {
         return savedOrder;
     }
 
-
     public List<Order> getAll() {
         return orderRepository.findAll();
     }
@@ -102,129 +101,75 @@ public class OrderService {
             order.setOrderDate(LocalDate.now());
         }
 
-        // Optional: image
+        // Handle image uploads
         List<MultipartFile> files = dto.getUploadedImages();
-        System.out.println("📸 Processing images: " + (files != null ? files.size() : 0) + " files");
         if (files != null && !files.isEmpty()) {
             StringBuilder urls = new StringBuilder();
             for (MultipartFile file : files) {
                 if (file != null && !file.isEmpty()) {
                     try {
-                        System.out.println("📸 Processing file: " + file.getOriginalFilename() + " (" + file.getSize() + " bytes)");
                         String imageUrl = imageUploadService.saveImage(file);
                         if (urls.length() > 0) urls.append(",");
                         urls.append(imageUrl);
-                        System.out.println("✅ Image URL added: " + imageUrl);
-                    } catch (Exception e) {
-                        System.out.println("⚠️ Image upload failed: " + e.getMessage());
-                        e.printStackTrace();
-                            }
-    }
-    
-    // ✅ Auto-complete menu orders when delivery time passes
-    public void autoCompleteMenuOrders() {
-        List<Order> pendingMenuOrders = orderRepository.findAll().stream()
-            .filter(order -> "pending".equals(order.getStatus()) && 
-                           order.getDeliveryDateTime() != null &&
-                           order.getDeliveryDateTime().isBefore(LocalDateTime.now()))
-            .toList();
-        
-        for (Order order : pendingMenuOrders) {
-            order.setStatus("completed");
-            orderRepository.save(order);
-            System.out.println("✅ Auto-completed menu order ID: " + order.getId());
-        }
-    }
-}
-            String finalUrls = urls.toString();
-            order.setImageUrls(finalUrls);
-            System.out.println("📸 Final image URLs: " + finalUrls);
-        } else {
-            System.out.println("📸 No images to process");
+                    } catch (IOException e) {
+                        System.err.println("❌ Failed to save image: " + e.getMessage());
+                    }
+                }
+            }
+            order.setImageUrls(urls.toString());
         }
 
+        // Set initial status and order type
         order.setStatus("pending-quote");
-        order.setTotalPrice(0.0); // Admin sets later
+        order.setOrderType("custom");
 
-        try {
-            save(order);
-            System.out.println("✅ Custom order saved successfully, sending emails...");
-            
-            // Send beautiful confirmation email to customer
-            try {
-                emailService.sendOrderConfirmation(email, order);
-                System.out.println("✅ Order confirmation email sent to customer");
-            } catch (Exception e) {
-                System.err.println("⚠️ Failed to send order confirmation email: " + e.getMessage());
-            }
-            
-            // Send beautiful notification email to admin
-            try {
-                emailService.sendAdminNotification("pasticeriamanda@gmail.com", order);
-                System.out.println("✅ Admin notification email sent");
-            } catch (Exception e) {
-                System.err.println("⚠️ Failed to send admin notification email: " + e.getMessage());
-            }
-            
-        } catch (Exception e) {
-            System.out.println("❌ Failed to save custom order: " + e.getMessage());
-            e.printStackTrace();
-        }
+        // Save the order
+        save(order);
     }
 
     public void placeMenuOrder(MenuOrderDto dto) {
-        Product product = productRepository.findById(dto.getProductId())
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-
-        double totalPrice = product.getPrice() * dto.getQuantity();
-
         Order order = new Order();
         order.setCustomerName(dto.getCustomerName());
         order.setCustomerEmail(dto.getCustomerEmail());
         order.setCustomerPhone(dto.getCustomerPhone());
-        order.setProductName(product.getName());
-        order.setNumberOfPersons(dto.getQuantity());
+        order.setProductName(dto.getProductName());
+        order.setNumberOfPersons(dto.getNumberOfPersons());
         order.setOrderDate(LocalDate.now());
-        order.setTotalPrice(totalPrice);
+        order.setTotalPrice(dto.getTotalPrice());
+        order.setStatus("pending");
+        order.setOrderType("menu");
+
+        // Handle delivery date/time for menu orders
+        if (dto.getDeliveryDateTime() != null && !dto.getDeliveryDateTime().isEmpty()) {
+            try {
+                LocalDateTime deliveryDateTime = LocalDateTime.parse(dto.getDeliveryDateTime());
+                order.setDeliveryDateTime(deliveryDateTime);
+            } catch (Exception e) {
+                System.out.println("⚠️ Failed to parse delivery date/time: " + e.getMessage());
+            }
+        }
 
         save(order);
-        
-        // Send beautiful confirmation email to customer
-        try {
-            emailService.sendOrderConfirmation(dto.getCustomerEmail(), order);
-            System.out.println("✅ Menu order confirmation email sent to customer");
-        } catch (Exception e) {
-            System.err.println("⚠️ Failed to send menu order confirmation email: " + e.getMessage());
-        }
-        
-        // Send beautiful notification email to admin
-        try {
-            emailService.sendAdminNotification("pasticeriamanda@gmail.com", order);
-            System.out.println("✅ Menu order admin notification email sent");
-        } catch (Exception e) {
-            System.err.println("⚠️ Failed to send menu order admin notification email: " + e.getMessage());
-        }
     }
 
     public void placeCartOrder(CartOrderDto cartOrderDto, String authenticatedEmail) {
+        // Calculate total and build product names
         double total = 0;
-        StringBuilder itemsList = new StringBuilder();
-        StringBuilder productNames = new StringBuilder();
         int totalQuantity = 0;
+        StringBuilder productNames = new StringBuilder();
+        
         for (CartOrderDto.CartItem item : cartOrderDto.getItems()) {
-            total += item.getPrice() * item.getQuantity();
+            Product product = productRepository.findById(item.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found: " + item.getProductId()));
+            
+            double itemTotal = product.getPrice() * item.getQuantity();
+            total += itemTotal;
             totalQuantity += item.getQuantity();
-            itemsList.append("<li>")
-                .append(item.getName())
-                .append(" x ")
-                .append(item.getQuantity())
-                .append(" - ALL")
-                .append(item.getPrice())
-                .append(item.getPriceType() != null && !item.getPriceType().equals("Total") ? " " + item.getPriceType() : "")
-                .append("</li>");
+            
             if (productNames.length() > 0) productNames.append(", ");
-            productNames.append(item.getName());
+            productNames.append(product.getName());
         }
+        
         // Save the whole cart as a single Order entity
         Order order = new Order();
         order.setCustomerName(cartOrderDto.getName());
@@ -359,6 +304,21 @@ public class OrderService {
         } catch (Exception e) {
             System.err.println("⚠️ Failed to send admin notification email: " + e.getMessage());
             // Don't throw the error - order cancellation was successful
+        }
+    }
+    
+    // ✅ Auto-complete menu orders when delivery time passes
+    public void autoCompleteMenuOrders() {
+        List<Order> pendingMenuOrders = orderRepository.findAll().stream()
+            .filter(order -> "pending".equals(order.getStatus()) && 
+                           order.getDeliveryDateTime() != null &&
+                           order.getDeliveryDateTime().isBefore(LocalDateTime.now()))
+            .toList();
+        
+        for (Order order : pendingMenuOrders) {
+            order.setStatus("completed");
+            orderRepository.save(order);
+            System.out.println("✅ Auto-completed menu order ID: " + order.getId());
         }
     }
 }

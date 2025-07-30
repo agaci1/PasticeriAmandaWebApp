@@ -281,7 +281,7 @@ export default function OrderPage() {
 
   return (
     <div className="container mx-auto py-12 px-4 md:px-6 min-h-[calc(100vh-4rem)]">
-      <GradientText className="text-4xl md:text-5xl font-extrabold text-center mb-12">{t("orderTitle")}</GradientText>
+              <h1 className="text-4xl md:text-5xl font-extrabold text-center mb-12 text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 animate-pulse drop-shadow-[0_0_10px_rgba(236,72,153,0.5)]">{t("orderTitle")}</h1>
 
       <div className="max-w-3xl mx-auto space-y-8 text-royal-blue">
         <Card className="bg-white/80 backdrop-blur-sm border-gold shadow-lg">

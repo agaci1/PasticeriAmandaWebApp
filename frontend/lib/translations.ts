@@ -423,8 +423,8 @@ export const translations = {
     
     // Menu Page
     ourDeliciousMenu: 'Menyja Jonë e Shijshme',
-    cakes: 'Ëmbëlsirat',
-    sweets: 'Ëmbëlsirat e Vogla',
+    cakes: 'Torta',
+    sweets: 'Ëmbëlsira',
     other: 'Të Tjerat',
     showingItems: 'Duke shfaqur {count} artikuj në {category}',
     noItemsFound: 'Nuk u gjetën artikuj në {category}.',
