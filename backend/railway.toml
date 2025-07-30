@@ -12,4 +12,8 @@ name = "pasticeri-amanda-backend"
 
 [[volumes]]
 name = "uploads-volume"
-mountPath = "/app/uploads" 
+mountPath = "/app/uploads"
+
+[[volumes]]
+name = "data-volume"
+mountPath = "/app/data" 

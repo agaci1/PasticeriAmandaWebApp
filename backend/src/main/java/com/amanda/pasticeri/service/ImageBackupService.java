@@ -25,7 +25,8 @@ public class ImageBackupService {
 
     public void backupImages() {
         try {
-            String uploadDir = System.getenv("UPLOAD_DIR") != null ? System.getenv("UPLOAD_DIR") : "uploads/";
+            String uploadDir = System.getenv("RAILWAY_VOLUME_MOUNT_PATH") != null ? 
+                System.getenv("RAILWAY_VOLUME_MOUNT_PATH") + "/uploads/" : "uploads/";
             Path uploadPath = Paths.get(uploadDir);
             Path backupPath = Paths.get(backupDir);
 
@@ -63,7 +64,8 @@ public class ImageBackupService {
 
     public void restoreImages() {
         try {
-            String uploadDir = System.getenv("UPLOAD_DIR") != null ? System.getenv("UPLOAD_DIR") : "uploads/";
+            String uploadDir = System.getenv("RAILWAY_VOLUME_MOUNT_PATH") != null ? 
+                System.getenv("RAILWAY_VOLUME_MOUNT_PATH") + "/uploads/" : "uploads/";
             Path uploadPath = Paths.get(uploadDir);
             Path backupPath = Paths.get(backupDir);
 
