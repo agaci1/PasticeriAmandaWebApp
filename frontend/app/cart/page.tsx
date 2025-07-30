@@ -25,7 +25,7 @@ interface CartItem {
 
 export default function CartPage() {
   const [cart, setCart] = useState<CartItem[]>([])
-  const [checkoutInfo, setCheckoutInfo] = useState({ name: "", surname: "", phone: "", email: "" })
+  const [checkoutInfo, setCheckoutInfo] = useState({ name: "", surname: "", phone: "", email: "", deliveryDateTime: "" })
   const [showInfoModal, setShowInfoModal] = useState(false)
   const [infoError, setInfoError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -104,7 +104,7 @@ export default function CartPage() {
   }
 
   const handleConfirm = async () => {
-    if (!checkoutInfo.name || !checkoutInfo.surname || !checkoutInfo.phone || !checkoutInfo.email) {
+    if (!checkoutInfo.name || !checkoutInfo.surname || !checkoutInfo.phone || !checkoutInfo.email || !checkoutInfo.deliveryDateTime) {
       setInfoError("All fields are required.")
       return
     }
@@ -308,6 +308,18 @@ export default function CartPage() {
                 onChange={handleInfoChange}
                 className="bg-white border-royal-blue text-royal-blue"
                 required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-royal-blue mb-1">🚚 Data dhe Ora e Dorëzimit</label>
+              <Input
+                name="deliveryDateTime"
+                type="datetime-local"
+                value={checkoutInfo.deliveryDateTime}
+                onChange={handleInfoChange}
+                className="bg-white border-royal-blue text-royal-blue"
+                required
+                min={new Date().toISOString().slice(0, 16)}
               />
             </div>
             {infoError && (

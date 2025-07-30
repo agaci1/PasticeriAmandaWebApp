@@ -219,6 +219,17 @@ public class OrderService {
         order.setOrderDate(LocalDate.now());
         order.setTotalPrice(total);
         order.setStatus("pending");
+        order.setOrderType("menu"); // ✅ Mark as menu order
+        
+        // ✅ Handle delivery date/time for menu orders
+        if (cartOrderDto.getDeliveryDateTime() != null && !cartOrderDto.getDeliveryDateTime().isEmpty()) {
+            try {
+                LocalDateTime deliveryDateTime = LocalDateTime.parse(cartOrderDto.getDeliveryDateTime());
+                order.setDeliveryDateTime(deliveryDateTime);
+            } catch (Exception e) {
+                System.out.println("⚠️ Failed to parse delivery date/time: " + e.getMessage());
+            }
+        }
         orderRepository.save(order);
 
         // Use standardized templates for emails

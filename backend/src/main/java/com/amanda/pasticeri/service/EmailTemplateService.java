@@ -66,6 +66,14 @@ public class EmailTemplateService {
         String totalPrice = order.getTotalPrice() != null ? order.getTotalPrice().toString() : "To be confirmed";
         String imageSection = getImageSection(order);
         
+        // ✅ Add delivery date/time for menu orders
+        String deliverySection = "";
+        if (order.getDeliveryDateTime() != null) {
+            String deliveryDate = order.getDeliveryDateTime().toLocalDate().toString();
+            String deliveryTime = order.getDeliveryDateTime().toLocalTime().toString().substring(0, 5); // HH:mm format
+            deliverySection = String.format("<p><strong style=\"color: #059669;\">🚚 Delivery Date:</strong> %s</p><p><strong style=\"color: #059669;\">⏰ Delivery Time:</strong> %s</p>", deliveryDate, deliveryTime);
+        }
+        
         // Check if this is a custom order (has custom note, flavour, or images)
         boolean isCustomOrder = (order.getCustomNote() != null && !order.getCustomNote().trim().isEmpty()) || 
                                (order.getFlavour() != null && !order.getFlavour().trim().isEmpty()) ||
@@ -97,6 +105,7 @@ public class EmailTemplateService {
                                 <p><strong style=\"color: #1e40af;\">Description:</strong> %s</p>
                                 %s
                                 <p><strong style=\"color: #1e40af;\">Date:</strong> %s</p>
+                                %s
                                 <p><strong style=\"color: #dc2626;\">Total Price:</strong> ALL%s</p>
                             </div>
                         </div>
@@ -109,7 +118,7 @@ public class EmailTemplateService {
                 </div>
             </body>
             </html>
-        """, getClientHeader(), customerName, productName, numberOfPersons, customNote, flavourSection, orderDate, totalPrice, imageSection, getClientFooter());
+        """, getClientHeader(), customerName, productName, numberOfPersons, customNote, flavourSection, orderDate, deliverySection, totalPrice, imageSection, getClientFooter());
     }
     
     public String getNewOrderNotificationTemplate(Order order) {
@@ -122,6 +131,14 @@ public class EmailTemplateService {
         String flavourSection = isCustomOrder && order.getFlavour() != null && !order.getFlavour().trim().isEmpty() 
             ? String.format("<p><strong style=\"color: #1e40af;\">Flavor:</strong> %s</p>", order.getFlavour())
             : "";
+        
+        // ✅ Add delivery date/time for menu orders
+        String deliverySection = "";
+        if (order.getDeliveryDateTime() != null) {
+            String deliveryDate = order.getDeliveryDateTime().toLocalDate().toString();
+            String deliveryTime = order.getDeliveryDateTime().toLocalTime().toString().substring(0, 5); // HH:mm format
+            deliverySection = String.format("<p><strong style=\"color: #059669;\">🚚 Delivery Date:</strong> %s</p><p><strong style=\"color: #059669;\">⏰ Delivery Time:</strong> %s</p>", deliveryDate, deliveryTime);
+        }
         
         return String.format("""
             <!DOCTYPE html>
@@ -152,6 +169,7 @@ public class EmailTemplateService {
                                 <p><strong style=\"color: #1e40af;\">Description:</strong> %s</p>
                                 %s
                                 <p><strong style=\"color: #1e40af;\">Date:</strong> %s</p>
+                                %s
                                 <p><strong style=\"color: #dc2626;\">Total Price:</strong> ALL%s</p>
                             </div>
                         </div>
@@ -164,7 +182,7 @@ public class EmailTemplateService {
                 </div>
             </body>
             </html>
-        """, getAdminHeader(), order.getCustomerName(), order.getCustomerEmail(), order.getCustomerPhone(), order.getProductName(), String.valueOf(order.getNumberOfPersons()), order.getCustomNote(), flavourSection, order.getOrderDate() != null ? order.getOrderDate().toString() : "Unknown", order.getTotalPrice() != null ? order.getTotalPrice().toString() : "To be confirmed", getImageSection(order), getAdminFooter());
+        """, getAdminHeader(), order.getCustomerName(), order.getCustomerEmail(), order.getCustomerPhone(), order.getProductName(), String.valueOf(order.getNumberOfPersons()), order.getCustomNote(), flavourSection, order.getOrderDate() != null ? order.getOrderDate().toString() : "Unknown", deliverySection, order.getTotalPrice() != null ? order.getTotalPrice().toString() : "To be confirmed", getImageSection(order), getAdminFooter());
     }
     
     public String getOrderCancelledTemplate(Order order) {

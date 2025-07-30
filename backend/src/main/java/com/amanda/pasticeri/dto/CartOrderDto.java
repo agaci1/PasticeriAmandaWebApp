@@ -8,6 +8,7 @@ public class CartOrderDto {
     private String surname;
     private String phone;
     private String email;
+    private String deliveryDateTime; // ✅ Delivery date and time for menu orders
 
     public List<CartItem> getItems() { return items; }
     public void setItems(List<CartItem> items) { this.items = items; }
@@ -19,6 +20,8 @@ public class CartOrderDto {
     public void setPhone(String phone) { this.phone = phone; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+    public String getDeliveryDateTime() { return deliveryDateTime; }
+    public void setDeliveryDateTime(String deliveryDateTime) { this.deliveryDateTime = deliveryDateTime; }
 
     public static class CartItem {
         private Long id;

@@ -20,6 +20,8 @@ interface Order {
   customNote?: string
   flavour?: string
   imageUrls?: string
+  deliveryDateTime?: string
+  orderType?: string
 }
 
 export default function AdminPendingOrdersPage() {
@@ -145,6 +147,14 @@ export default function AdminPendingOrdersPage() {
                     <span className="text-royal-blue font-semibold">Date:</span>
                     <span className="text-gray-700">{order.orderDate}</span>
                   </div>
+                  {order.deliveryDateTime && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-green-600 font-semibold">🚚 Delivery:</span>
+                      <span className="text-gray-700 font-medium">
+                        {new Date(order.deliveryDateTime).toLocaleDateString()} at {new Date(order.deliveryDateTime).toLocaleTimeString().slice(0, 5)}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between items-center">
                     <span className="text-royal-blue font-semibold">Type:</span>
                     <span className={`px-3 py-1 rounded-full text-sm font-semibold ${

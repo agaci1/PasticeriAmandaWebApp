@@ -2,6 +2,7 @@ package com.amanda.pasticeri.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "orders")
@@ -43,6 +44,12 @@ public class Order {
 
     @Column(name = "image_urls", columnDefinition = "TEXT")
     private String imageUrls; // Comma-separated list of image URLs
+
+    @Column(nullable = true)
+    private LocalDateTime deliveryDateTime; // ✅ Delivery date and time for menu orders
+
+    @Column(nullable = true)
+    private String orderType = "custom"; // ✅ "custom" or "menu" to distinguish order types
 
     public Long getId() {
         return id;
@@ -138,5 +145,21 @@ public class Order {
 
     public void setImageUrls(String imageUrls) {
         this.imageUrls = imageUrls;
+    }
+
+    public LocalDateTime getDeliveryDateTime() {
+        return deliveryDateTime;
+    }
+
+    public void setDeliveryDateTime(LocalDateTime deliveryDateTime) {
+        this.deliveryDateTime = deliveryDateTime;
+    }
+
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
     }
 }

@@ -227,7 +227,7 @@ export default function AdminNewOrdersPage() {
                       <Button
                         onClick={() => handleSetPrice(order.id)}
                         disabled={actionLoading[order.id]}
-                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"
                       >
                         {actionLoading[order.id] ? "..." : "Vendos"}
                       </Button>
@@ -244,7 +244,7 @@ export default function AdminNewOrdersPage() {
                   ) : (
                     <Button
                       onClick={() => setSetPriceId(order.id)}
-                      className="w-full bg-green-600 hover:bg-green-700 text-white"
+                      className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg"
                     >
                       Vendos Çmimin
                     </Button>
