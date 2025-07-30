@@ -39,6 +39,15 @@ public class OrderController {
         return ResponseEntity.ok("Hello Admin!");
     }
 
+    @GetMapping("/health")
+    public ResponseEntity<?> healthCheck() {
+        return ResponseEntity.ok(Map.of(
+            "status", "healthy",
+            "timestamp", System.currentTimeMillis(),
+            "service", "Pasticeri Amanda Backend"
+        ));
+    }
+
     @GetMapping("/my-orders")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN')")
     public List<Order> getMyOrders(@RequestHeader("Authorization") String tokenHeader) {

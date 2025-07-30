@@ -3,11 +3,13 @@ builder = "nixpacks"
 
 [deploy]
 startCommand = "java -jar target/pasticeri-amanda-backend-0.0.1-SNAPSHOT.jar"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"
 
-[variables]
-SPRING_PROFILES_ACTIVE = "production"
-JWT_SECRET = "your_jwt_secret_key_here"
-SMTP_HOST = "your_smtp_host"
-SMTP_PORT = "587"
-SMTP_USERNAME = "your_email"
-SMTP_PASSWORD = "your_email_password" 
+[[services]]
+name = "pasticeri-amanda-backend"
+
+[[volumes]]
+name = "uploads-volume"
+mountPath = "/app/uploads" 

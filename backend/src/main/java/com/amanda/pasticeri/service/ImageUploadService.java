@@ -11,18 +11,22 @@ import java.nio.file.Paths;
 @Service
 public class ImageUploadService {
 
-    private final String uploadDir = "uploads/";
+    private final String uploadDir = System.getenv("UPLOAD_DIR") != null ? System.getenv("UPLOAD_DIR") : "uploads/";
 
     public String saveImage(MultipartFile file) {
         try {
             String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
             
-            // Get the current working directory and create absolute path
-            String currentDir = System.getProperty("user.dir");
-            Path uploadPath = Paths.get(currentDir, uploadDir);
+            // Use Railway's persistent volume path if available, otherwise use local path
+            String uploadPathStr = uploadDir;
+            if (System.getenv("RAILWAY_VOLUME_MOUNT_PATH") != null) {
+                uploadPathStr = System.getenv("RAILWAY_VOLUME_MOUNT_PATH");
+            }
+            
+            Path uploadPath = Paths.get(uploadPathStr);
             Path filepath = uploadPath.resolve(filename);
             
-            System.out.println("📁 Current directory: " + currentDir);
+            System.out.println("📁 Upload directory: " + uploadPathStr);
             System.out.println("📁 Upload path: " + uploadPath);
             System.out.println("📁 Full file path: " + filepath);
             System.out.println("📁 File size: " + file.getSize() + " bytes");
