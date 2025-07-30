@@ -173,42 +173,47 @@ export default function CartPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {cart.map((item) => (
-                  <div key={item.id} className="flex items-center gap-4 p-4 bg-white/50 rounded-lg border border-gold/20 min-w-0">
+                  <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-white/50 rounded-lg border border-gold/20 min-w-0">
                     <img
                       src={item.imageUrl ? `${API_BASE}${item.imageUrl}` : "/placeholder.svg"}
                       alt={item.name}
-                      className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
+                      className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
                     />
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-royal-blue truncate">{item.name}</h3>
-                      <p className="text-sm text-gray-600">ALL{item.price}{item.priceType && item.priceType !== "Total" ? item.priceType : ""}</p>
+                      <h3 className="font-semibold text-royal-blue truncate text-lg">{item.name}</h3>
+                      <p className="text-sm text-gray-600 mb-2">ALL{item.price}{item.priceType && item.priceType !== "Total" ? item.priceType : ""}</p>
+                      
+                      {/* Quantity controls - moved here for better mobile layout */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className="text-sm font-medium text-royal-blue">Sasia:</span>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => updateQuantity(item.id, Math.max(0, item.quantity - 1))}
+                            className="w-8 h-8 p-0 bg-white hover:bg-gray-50 border-royal-purple text-royal-purple"
+                          >
+                            -
+                          </Button>
+                          <span className="w-12 text-center font-semibold text-lg bg-white px-2 py-1 rounded border border-royal-purple/20">{item.quantity}</span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            className="w-8 h-8 p-0 bg-white hover:bg-gray-50 border-royal-purple text-royal-purple"
+                          >
+                            +
+                          </Button>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => updateQuantity(item.id, Math.max(0, item.quantity - 1))}
-                        className="w-8 h-8 p-0"
-                      >
-                        -
-                      </Button>
-                      <span className="w-8 text-center font-semibold">{item.quantity}</span>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="w-8 h-8 p-0"
-                      >
-                        +
-                      </Button>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                      <p className="font-semibold text-royal-purple">ALL{(item.price * item.quantity).toFixed(2)}</p>
+                    <div className="flex flex-col items-end gap-2 flex-shrink-0 w-full sm:w-auto">
+                      <p className="font-semibold text-royal-purple text-lg">ALL{(item.price * item.quantity).toFixed(2)}</p>
                       <Button
                         size="sm"
                         variant="ghost"
                         onClick={() => removeItem(item.id)}
-                        className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                        className="text-red-600 hover:text-red-800 hover:bg-red-50 px-3 py-1"
                       >
                         {t("remove")}
                       </Button>

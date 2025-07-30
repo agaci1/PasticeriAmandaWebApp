@@ -332,12 +332,12 @@ export default function HomePage() {
               {/* Main Content */}
                  <div className="max-w-4xl mx-auto">
                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-4 md:mb-6 drop-shadow-lg text-white" style={{
-                     textShadow: item.category === 'cakes' ? '0 0 10px #fbbf24, 0 0 20px #fbbf24, 0 0 30px #fbbf24' :
-                                   item.category === 'sweets' ? '0 0 10px #ec4899, 0 0 20px #ec4899, 0 0 30px #ec4899' :
-                                   item.id === 3 ? '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6' :
-                                   item.id === 4 ? '0 0 10px #06b6d4, 0 0 20px #06b6d4, 0 0 30px #06b6d4' :
-                                   item.id === 5 ? '0 0 10px #f0abfc, 0 0 20px #f0abfc, 0 0 30px #f0abfc' :
-                                   '0 0 10px #10b981, 0 0 20px #10b981, 0 0 30px #10b981'
+                     textShadow: item.category === 'cakes' ? '0 0 10px #fbbf24, 0 0 20px #fbbf24, 0 0 30px #fbbf24, 0 0 40px #fbbf24' :
+                                   item.category === 'sweets' ? '0 0 10px #ec4899, 0 0 20px #ec4899, 0 0 30px #ec4899, 0 0 40px #ec4899' :
+                                   item.id === 3 ? '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6' :
+                                   item.id === 4 ? '0 0 10px #06b6d4, 0 0 20px #06b6d4, 0 0 30px #06b6d4, 0 0 40px #06b6d4' :
+                                   item.id === 5 ? '0 0 10px #f0abfc, 0 0 20px #f0abfc, 0 0 30px #f0abfc, 0 0 40px #f0abfc' :
+                                   '0 0 10px #10b981, 0 0 20px #10b981, 0 0 30px #10b981, 0 0 40px #10b981'
                    }}>
                      {item.category === 'cakes' ? t('exquisiteCakes') :
                       item.category === 'sweets' ? t('artisanPastries') :
@@ -353,23 +353,34 @@ export default function HomePage() {
                                    {/* Category Button */}
                    <Button
                      asChild
-                     className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg text-white transition-colors shadow-lg border-2"
+                     className="px-6 md:px-8 py-3 md:py-4 text-base md:text-lg text-white transition-colors shadow-lg border-2 font-bold"
                      style={{
                        backgroundColor: item.category === 'cakes' ? '#fbbf24' :
                                        item.category === 'sweets' ? '#ec4899' :
-                                       '#8b5cf6',
+                                       item.id === 3 ? '#8b5cf6' :
+                                       item.id === 4 ? '#06b6d4' :
+                                       item.id === 5 ? '#f0abfc' :
+                                       '#10b981',
                        borderColor: item.category === 'cakes' ? '#fbbf24' :
                                    item.category === 'sweets' ? '#ec4899' :
-                                   '#8b5cf6',
-                       boxShadow: item.category === 'cakes' ? '0 0 10px #fbbf24, 0 0 20px #fbbf24' :
-                                   item.category === 'sweets' ? '0 0 10px #ec4899, 0 0 20px #ec4899' :
-                                   '0 0 10px #8b5cf6, 0 0 20px #8b5cf6'
+                                   item.id === 3 ? '#8b5cf6' :
+                                   item.id === 4 ? '#06b6d4' :
+                                   item.id === 5 ? '#f0abfc' :
+                                   '#10b981',
+                       boxShadow: item.category === 'cakes' ? '0 0 10px #fbbf24, 0 0 20px #fbbf24, 0 0 30px #fbbf24' :
+                                   item.category === 'sweets' ? '0 0 10px #ec4899, 0 0 20px #ec4899, 0 0 30px #ec4899' :
+                                   item.id === 3 ? '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6' :
+                                   item.id === 4 ? '0 0 10px #06b6d4, 0 0 20px #06b6d4, 0 0 30px #06b6d4' :
+                                   item.id === 5 ? '0 0 10px #f0abfc, 0 0 20px #f0abfc, 0 0 30px #f0abfc' :
+                                   '0 0 10px #10b981, 0 0 20px #10b981, 0 0 30px #10b981'
                      }}
                    >
                      <Link href={item.menuLink}>
                        {item.category === 'cakes' ? t('viewCakes') : 
                         item.category === 'sweets' ? t('viewSweets') : 
-                        item.category === 'other' ? t('viewTraditional') : 
+                        item.id === 3 ? t('viewTraditional') : 
+                        item.id === 4 ? t('viewModern') : 
+                        item.id === 5 ? t('viewIceCream') : 
                         t('viewTrending')}
                      </Link>
                    </Button>
@@ -389,11 +400,17 @@ export default function HomePage() {
                         backgroundColor: index === currentSlide ? 
                           (item.category === 'cakes' ? '#fbbf24' :
                            item.category === 'sweets' ? '#ec4899' :
-                           '#8b5cf6') : 'rgba(255, 255, 255, 0.3)',
+                           item.id === 3 ? '#8b5cf6' :
+                           item.id === 4 ? '#06b6d4' :
+                           item.id === 5 ? '#f0abfc' :
+                           '#10b981') : 'rgba(255, 255, 255, 0.3)',
                         boxShadow: index === currentSlide ? 
-                          (item.category === 'cakes' ? '0 0 10px #fbbf24, 0 0 20px #fbbf24' :
-                           item.category === 'sweets' ? '0 0 10px #ec4899, 0 0 20px #ec4899' :
-                           '0 0 10px #8b5cf6, 0 0 20px #8b5cf6') : 'none'
+                          (item.category === 'cakes' ? '0 0 10px #fbbf24, 0 0 20px #fbbf24, 0 0 30px #fbbf24' :
+                           item.category === 'sweets' ? '0 0 10px #ec4899, 0 0 20px #ec4899, 0 0 30px #ec4899' :
+                           item.id === 3 ? '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6' :
+                           item.id === 4 ? '0 0 10px #06b6d4, 0 0 20px #06b6d4, 0 0 30px #06b6d4' :
+                           item.id === 5 ? '0 0 10px #f0abfc, 0 0 20px #f0abfc, 0 0 30px #f0abfc' :
+                           '0 0 10px #10b981, 0 0 20px #10b981, 0 0 30px #10b981') : 'none'
                       }}
                     />
                   ))}

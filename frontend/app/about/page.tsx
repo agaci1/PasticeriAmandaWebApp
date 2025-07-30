@@ -29,9 +29,11 @@ export default function AboutPage() {
         </div>
       </div>
       <div className="max-w-4xl mx-auto space-y-8 text-royal-blue">
-        <GradientText className="text-4xl md:text-5xl font-extrabold text-center mb-8">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-center mb-8 text-white" style={{
+          textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
+        }}>
           {t("aboutAmanda")}
-        </GradientText>
+        </h1>
 
         {/* Selected Text Section */}
         <div className="relative p-8 md:p-12 bg-gradient-to-br from-white/90 to-white/70 rounded-3xl shadow-2xl border-2 border-gold overflow-hidden">
