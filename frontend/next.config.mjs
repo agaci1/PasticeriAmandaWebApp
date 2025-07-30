@@ -6,6 +6,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  output: 'standalone',
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -21,6 +22,9 @@ const nextConfig = {
         pathname: '/uploads/**',
       },
     ],
+  },
+  experimental: {
+    serverComponentsExternalPackages: [],
   },
 }
 
