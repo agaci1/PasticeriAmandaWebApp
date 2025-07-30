@@ -118,9 +118,24 @@ public class OrderService {
                     } catch (Exception e) {
                         System.out.println("⚠️ Image upload failed: " + e.getMessage());
                         e.printStackTrace();
-                    }
-                }
-            }
+                            }
+    }
+    
+    // ✅ Auto-complete menu orders when delivery time passes
+    public void autoCompleteMenuOrders() {
+        List<Order> pendingMenuOrders = orderRepository.findAll().stream()
+            .filter(order -> "pending".equals(order.getStatus()) && 
+                           order.getDeliveryDateTime() != null &&
+                           order.getDeliveryDateTime().isBefore(LocalDateTime.now()))
+            .toList();
+        
+        for (Order order : pendingMenuOrders) {
+            order.setStatus("completed");
+            orderRepository.save(order);
+            System.out.println("✅ Auto-completed menu order ID: " + order.getId());
+        }
+    }
+}
             String finalUrls = urls.toString();
             order.setImageUrls(finalUrls);
             System.out.println("📸 Final image URLs: " + finalUrls);
@@ -273,20 +288,44 @@ public class OrderService {
             throw new RuntimeException("You can only cancel your own orders");
         }
         
-        // Check if order can be cancelled (24 hours before due date)
-        long orderTime = order.getOrderDate().atStartOfDay().toInstant(java.time.ZoneOffset.UTC).toEpochMilli();
-        long currentTime = System.currentTimeMillis();
-        long twentyFourHours = 24 * 60 * 60 * 1000;
-        
-        System.out.println("⏰ Order time: " + orderTime + ", Current time: " + currentTime + ", Difference: " + (orderTime - currentTime));
-        
-        if (orderTime - currentTime <= twentyFourHours) {
-            throw new RuntimeException("Orders can only be cancelled at least 24 hours before the due date");
-        }
-        
         // Check if order is not already completed or canceled
         if ("completed".equals(order.getStatus()) || "canceled".equals(order.getStatus())) {
             throw new RuntimeException("Cannot cancel this order");
+        }
+        
+        // ✅ Different cancellation rules for menu vs custom orders
+        boolean isCustomOrder = (order.getCustomNote() != null && !order.getCustomNote().trim().isEmpty()) || 
+                               (order.getFlavour() != null && !order.getFlavour().trim().isEmpty()) ||
+                               (order.getImageUrls() != null && !order.getImageUrls().trim().isEmpty()) ||
+                               "pending-quote".equals(order.getStatus()) ||
+                               "custom".equals(order.getOrderType());
+        
+        if (isCustomOrder) {
+            // ✅ Custom orders: 1 day before order date
+            long orderTime = order.getOrderDate().atStartOfDay().toInstant(java.time.ZoneOffset.UTC).toEpochMilli();
+            long currentTime = System.currentTimeMillis();
+            long oneDay = 24 * 60 * 60 * 1000;
+            
+            System.out.println("⏰ Custom order time: " + orderTime + ", Current time: " + currentTime + ", Difference: " + (orderTime - currentTime));
+            
+            if (orderTime - currentTime <= oneDay) {
+                throw new RuntimeException("Custom orders can only be cancelled at least 1 day before the due date");
+            }
+        } else {
+            // ✅ Menu orders: 5 hours before delivery time
+            if (order.getDeliveryDateTime() != null) {
+                long deliveryTime = order.getDeliveryDateTime().toInstant(java.time.ZoneOffset.UTC).toEpochMilli();
+                long currentTime = System.currentTimeMillis();
+                long fiveHours = 5 * 60 * 60 * 1000;
+                
+                System.out.println("⏰ Menu order delivery time: " + deliveryTime + ", Current time: " + currentTime + ", Difference: " + (deliveryTime - currentTime));
+                
+                if (deliveryTime - currentTime <= fiveHours) {
+                    throw new RuntimeException("Menu orders can only be cancelled at least 5 hours before the delivery time");
+                }
+            } else {
+                throw new RuntimeException("Menu order must have a delivery date/time to be cancelled");
+            }
         }
         
         System.out.println("✅ Order can be cancelled, updating status to 'canceled'");

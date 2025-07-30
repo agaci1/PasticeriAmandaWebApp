@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Separator } from "@/components/ui/separator"
 import { ChevronDownIcon } from "lucide-react"
 import API_BASE from "@/lib/api"
+import { useTranslation } from "@/contexts/TranslationContext"
 
 interface Order {
   id: number
@@ -17,6 +18,9 @@ interface Order {
   totalPrice: number
   flavour?: string
   customNote?: string
+  deliveryDateTime?: string
+  orderType?: string
+  imageUrls?: string
 }
 
 type OrderSection = "active" | "previous"
@@ -31,6 +35,7 @@ export default function OrderHistoryPage() {
   const [showCannotCancelDialog, setShowCannotCancelDialog] = useState(false)
   const [cannotCancelReason, setCannotCancelReason] = useState("")
   const { toast } = useToast()
+  const { t } = useTranslation()
 
   const fetchOrders = async () => {
     setLoading(true)
@@ -57,33 +62,82 @@ export default function OrderHistoryPage() {
     fetchOrders()
   }, [])
 
+  const getOrderType = (order: Order) => {
+    // Check if this is a custom order
+    const isCustomOrder = (order.customNote && order.customNote.trim() !== "") || 
+                         (order.flavour && order.flavour.trim() !== "") ||
+                         (order.imageUrls && order.imageUrls.trim() !== "") ||
+                         order.status === "pending-quote" ||
+                         order.orderType === "custom";
+    return isCustomOrder ? "custom" : "menu";
+  };
+
   const canCancelOrder = (order: Order) => {
     // Cannot cancel if already completed or canceled
     if (order.status === "completed" || order.status === "canceled") {
       return false
     }
     
-    // Check time restriction (24 hours before due date)
-    const orderDateTime = new Date(order.orderDate).getTime()
-    const now = Date.now()
-    const twentyFourHours = 24 * 60 * 60 * 1000
-    return orderDateTime - now > twentyFourHours
+    const orderType = getOrderType(order);
+    
+    if (orderType === "custom") {
+      // ✅ Custom orders: 1 day before order date
+      const orderDateTime = new Date(order.orderDate).getTime();
+      const now = Date.now();
+      const oneDay = 24 * 60 * 60 * 1000;
+      return orderDateTime - now > oneDay;
+    } else {
+      // ✅ Menu orders: 5 hours before delivery time
+      if (order.deliveryDateTime) {
+        const deliveryDateTime = new Date(order.deliveryDateTime).getTime();
+        const now = Date.now();
+        const fiveHours = 5 * 60 * 60 * 1000;
+        return deliveryDateTime - now > fiveHours;
+      }
+      return false;
+    }
   }
 
   const isActiveOrder = (order: Order) => {
-    if (order.status === "canceled") return false
-    const orderDateTime = new Date(order.orderDate).getTime()
-    const now = Date.now()
-    const twentyFourHours = 24 * 60 * 60 * 1000
-    return orderDateTime - now > twentyFourHours
+    if (order.status === "canceled") return false;
+    
+    const orderType = getOrderType(order);
+    
+    if (orderType === "custom") {
+      // ✅ Custom orders: active until order date passes
+      const orderDateTime = new Date(order.orderDate).getTime();
+      const now = Date.now();
+      return orderDateTime > now;
+    } else {
+      // ✅ Menu orders: active until delivery time passes
+      if (order.deliveryDateTime) {
+        const deliveryDateTime = new Date(order.deliveryDateTime).getTime();
+        const now = Date.now();
+        return deliveryDateTime > now;
+      }
+      return false;
+    }
   }
 
   const isPreviousOrder = (order: Order) => {
-    if (order.status === "canceled") return true
-    const orderDateTime = new Date(order.orderDate).getTime()
-    const now = Date.now()
-    const twentyFourHours = 24 * 60 * 60 * 1000
-    return orderDateTime - now <= twentyFourHours
+    if (order.status === "canceled") return true;
+    
+    const orderType = getOrderType(order);
+    
+    if (orderType === "custom") {
+      // ✅ Custom orders: previous after order date passes
+      const orderDateTime = new Date(order.orderDate).getTime();
+      const now = Date.now();
+      return orderDateTime <= now;
+    } else {
+      // ✅ Menu orders: previous after delivery time passes
+      if (order.deliveryDateTime) {
+        const deliveryDateTime = new Date(order.deliveryDateTime).getTime();
+        const now = Date.now();
+        return deliveryDateTime <= now;
+      }
+      return false;
+    }
   }
 
   const handleCancelOrder = async () => {
@@ -111,8 +165,14 @@ export default function OrderHistoryPage() {
           return
         }
         
-        if (errorMessage.includes("24 hours")) {
-          setCannotCancelReason("Orders can only be cancelled at least 24 hours before the due date.")
+        if (errorMessage.includes("1 day")) {
+          setCannotCancelReason("Custom orders can only be cancelled at least 1 day before the due date.")
+          setShowCannotCancelDialog(true)
+          setCancelOrderId(null)
+          return
+        }
+        if (errorMessage.includes("5 hours")) {
+          setCannotCancelReason("Menu orders can only be cancelled at least 5 hours before the delivery time.")
           setShowCannotCancelDialog(true)
           setCancelOrderId(null)
           return
@@ -164,13 +224,25 @@ export default function OrderHistoryPage() {
   }
 
   const getOrderCardStyle = (order: Order) => {
-    if (selectedSection === "active") {
-      return "border-green-200 bg-green-50"
-    }
+    const orderType = getOrderType(order);
+    
     if (order.status === "canceled") {
-      return "border-red-200 bg-red-50"
+      return "border-red-200 bg-red-50";
     }
-    return "border-gray-200 bg-gray-50"
+    
+    if (selectedSection === "active") {
+      if (orderType === "custom") {
+        return "border-purple-200 bg-purple-50"; // Purple for custom orders
+      } else {
+        return "border-blue-200 bg-blue-50"; // Blue for menu orders
+      }
+    } else {
+      if (orderType === "custom") {
+        return "border-purple-100 bg-purple-25"; // Light purple for completed custom orders
+      } else {
+        return "border-blue-100 bg-blue-25"; // Light blue for completed menu orders
+      }
+    }
   }
 
   if (loading) {
@@ -244,6 +316,16 @@ export default function OrderHistoryPage() {
                       <CardTitle className="text-royal-purple text-base">Order #{order.id}</CardTitle>
                     </CardHeader>
                     <CardContent>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="text-sm font-medium text-gray-500">
+                          {getOrderType(order) === "custom" ? "🎂 Custom Order" : "🍰 Menu Order"}
+                        </div>
+                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          getOrderType(order) === "custom" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"
+                        }`}>
+                          {getOrderType(order) === "custom" ? "Custom" : "Menu"}
+                        </div>
+                      </div>
                       <div>Status: <span className={`font-semibold ${
                         order.status === "canceled" ? "text-red-600" : 
                         selectedSection === "active" ? "text-green-600" : "text-gray-600"
@@ -252,7 +334,15 @@ export default function OrderHistoryPage() {
                       <div>Quantity: {order.numberOfPersons}</div>
                       {order.flavour && <div>Flavour: {order.flavour}</div>}
                       <div>ALL{order.totalPrice}</div>
-                      <div>Due Date: {formatDate(order.orderDate)}</div>
+                      {getOrderType(order) === "custom" ? (
+                        <div>Due Date: {formatDate(order.orderDate)}</div>
+                      ) : (
+                        order.deliveryDateTime && (
+                          <div className="text-blue-600 font-medium">
+                            🚚 Delivery: {new Date(order.deliveryDateTime).toLocaleDateString()} at {new Date(order.deliveryDateTime).toLocaleTimeString().slice(0, 5)}
+                          </div>
+                        )
+                      )}
                       {selectedSection === "active" && canCancelOrder(order) && (
                         <Button 
                           onClick={() => setCancelOrderId(order.id)} 
@@ -274,6 +364,29 @@ export default function OrderHistoryPage() {
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Notes Section */}
+      {orders.length > 0 && (
+        <div className="mt-8 p-6 bg-gradient-to-r from-royal-purple/5 to-royal-blue/5 rounded-lg border border-gold/20">
+          <h3 className="text-lg font-semibold text-royal-purple mb-4">📋 {t('importantNotes')}</h3>
+          <div className="space-y-3">
+            <div className="flex items-start gap-3">
+              <div className="w-3 h-3 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+              <div>
+                <p className="font-medium text-gray-800">{t('forCustomOrders')}</p>
+                <p className="text-sm text-gray-600">{t('customOrderCancelNote')}</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-3 h-3 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+              <div>
+                <p className="font-medium text-gray-800">{t('forMenuOrders')}</p>
+                <p className="text-sm text-gray-600">{t('menuOrderCancelNote')}</p>
+              </div>
+            </div>
           </div>
         </div>
       )}

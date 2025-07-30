@@ -98,6 +98,13 @@ export const translations = {
     flavour: 'Flavour',
     totalPrice: 'Total Price',
     status: 'Status',
+    
+    // Purchase History Notes
+    importantNotes: 'Important Notes:',
+    forCustomOrders: 'For Custom Orders:',
+    forMenuOrders: 'For Menu Orders:',
+    customOrderCancelNote: 'You can cancel your order up to 1 day before the due date. For example, if your order is due on August 5th, you can cancel until August 4th at 23:59.',
+    menuOrderCancelNote: 'You can cancel your order up to 5 hours before the scheduled delivery time. Menu orders automatically move to "Previous Orders" after the delivery time passes.',
     pending: 'Pending',
     completed: 'Completed',
     canceled: 'Canceled',
@@ -365,6 +372,13 @@ export const translations = {
     flavour: 'Shija',
     totalPrice: 'Çmimi Total',
     status: 'Statusi',
+    
+    // Purchase History Notes
+    importantNotes: 'Shënime të Rëndësishme:',
+    forCustomOrders: 'Për Porositë e Personalizuara:',
+    forMenuOrders: 'Për Porositë nga Menyja:',
+    customOrderCancelNote: 'Mund të anuloni porosinë tuaj deri në 1 ditë para datës së duhur. Për shembull, nëse porosia juaj është për datën 5 gusht, mund ta anuloni deri më 4 gusht në orën 23:59.',
+    menuOrderCancelNote: 'Mund të anuloni porosinë tuaj deri në 5 orë para orës së planifikuar të dorëzimit. Porositë nga menyja kalojnë automatikisht në "Porositë e Mëparshme" pasi të kalojë ora e dorëzimit.',
     pending: 'Në Pritje',
     completed: 'E Përfunduar',
     canceled: 'E Anuluar',
@@ -631,6 +645,13 @@ export const translations = {
     flavour: 'Gusto',
     totalPrice: 'Prezzo Totale',
     status: 'Stato',
+    
+    // Purchase History Notes
+    importantNotes: 'Note Importanti:',
+    forCustomOrders: 'Per Ordini Personalizzati:',
+    forMenuOrders: 'Per Ordini dal Menu:',
+    customOrderCancelNote: 'Puoi cancellare il tuo ordine fino a 1 giorno prima della data di scadenza. Ad esempio, se il tuo ordine è dovuto il 5 agosto, puoi cancellarlo fino al 4 agosto alle 23:59.',
+    menuOrderCancelNote: 'Puoi cancellare il tuo ordine fino a 5 ore prima dell\'orario di consegna programmato. Gli ordini dal menu passano automaticamente agli "Ordini Precedenti" dopo che è trascorso l\'orario di consegna.',
     pending: 'In Attesa',
     completed: 'Completato',
     canceled: 'Annullato',
