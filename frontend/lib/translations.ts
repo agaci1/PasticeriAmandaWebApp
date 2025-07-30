@@ -35,7 +35,7 @@ export const translations = {
     about: 'About',
     menu: 'Menu',
     customOrder: 'Custom Order',
-    cart: 'Cart',
+    cart: 'Shop',
     purchaseHistory: 'Purchase History',
     login: 'Log In',
     logout: 'Logout',
@@ -105,6 +105,8 @@ export const translations = {
     selectProducts: 'Select Products',
     searchProducts: 'Search products...',
     all: 'All',
+    continue: 'Continue',
+    backToProducts: 'Back to Products',
     
     // Purchase History Notes
     importantNotes: 'Important Notes:',
@@ -316,7 +318,7 @@ export const translations = {
     about: 'Rreth Nesh',
     menu: 'Menyja',
     customOrder: 'Porosi e Personalizuar',
-    cart: 'Shporta',
+    cart: 'Porosit',
     purchaseHistory: 'Historia e Blerjeve',
     login: 'Hyr',
     logout: 'Dil',
@@ -425,6 +427,8 @@ export const translations = {
     selectProducts: 'Zgjidh Produktet',
     searchProducts: 'Kërko produkte...',
     all: 'Të Gjitha',
+    continue: 'Vazhdo',
+    backToProducts: 'Kthehu te Produktet',
     
     // Messages
     itemAddedToCart: 'Artikulli u shtua!',
@@ -594,7 +598,7 @@ export const translations = {
     about: 'Chi Siamo',
     menu: 'Menu',
     customOrder: 'Ordine Personalizzata',
-    cart: 'Carrello',
+    cart: 'Ordina',
     purchaseHistory: 'Cronologia Acquisti',
     login: 'Accedi',
     logout: 'Esci',
@@ -687,6 +691,8 @@ export const translations = {
     selectProducts: 'Seleziona Prodotti',
     searchProducts: 'Cerca prodotti...',
     all: 'Tutti',
+    continue: 'Continua',
+    backToProducts: 'Torna ai Prodotti',
     
     // Messages
     itemAddedToCart: 'Articolo Aggiunto!',

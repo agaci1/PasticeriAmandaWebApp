@@ -40,7 +40,8 @@ export default function CartPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [checkoutInfo, setCheckoutInfo] = useState({ name: "", surname: "", phone: "", email: "", deliveryDateTime: "" })
   const [showInfoModal, setShowInfoModal] = useState(false)
-  const [showProductModal, setShowProductModal] = useState(false)
+  const [showProductModal, setShowProductModal] = useState(true) // Always show product modal first
+  const [showReceipt, setShowReceipt] = useState(false)
   const [infoError, setInfoError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
@@ -174,6 +175,8 @@ export default function CartPage() {
       setCart([])
       localStorage.removeItem("cart")
       setShowInfoModal(false)
+      setShowReceipt(false)
+      setShowProductModal(true)
     } catch (err) {
       console.error("Order placement error:", err)
       setInfoError(t("orderError") + " " + t("orderErrorMessage"))
@@ -182,16 +185,6 @@ export default function CartPage() {
     }
   }
 
-  const handleAddItems = () => {
-    setShowProductModal(true);
-    // Initialize selected quantities with current cart items
-    const initialQuantities: {[key: number]: number} = {};
-    cart.forEach(item => {
-      initialQuantities[item.id] = item.quantity;
-    });
-    setSelectedQuantities(initialQuantities);
-  };
-
   const handleQuantityChange = (productId: number, change: number) => {
     setSelectedQuantities(prev => ({
       ...prev,
@@ -199,7 +192,7 @@ export default function CartPage() {
     }));
   };
 
-  const handleAddToCart = () => {
+  const handleContinueToReceipt = () => {
     const newCartItems: CartItem[] = [];
     
     Object.entries(selectedQuantities).forEach(([productId, quantity]) => {
@@ -222,7 +215,19 @@ export default function CartPage() {
     setCart(newCartItems);
     localStorage.setItem("cart", JSON.stringify(newCartItems));
     setShowProductModal(false);
+    setShowReceipt(true);
     setSelectedQuantities({});
+  };
+
+  const handleBackToProducts = () => {
+    setShowReceipt(false);
+    setShowProductModal(true);
+    // Initialize selected quantities with current cart items
+    const initialQuantities: {[key: number]: number} = {};
+    cart.forEach(item => {
+      initialQuantities[item.id] = item.quantity;
+    });
+    setSelectedQuantities(initialQuantities);
   };
 
   const filteredProducts = products.filter(product => {
@@ -255,20 +260,116 @@ export default function CartPage() {
         </h1>
         <p className="text-royal-blue text-xl">{t("reviewSelections")}</p>
       </div>
-      
-      {cart.length === 0 ? (
-        <div className="text-center py-16">
-          <div className="text-8xl mb-6">🛒</div>
-          <h2 className="text-2xl font-bold text-royal-purple mb-4">{t("cartEmpty")}</h2>
-          <p className="text-royal-blue text-lg mb-8">{t("addDeliciousTreats")}</p>
-          <Button 
-            onClick={handleAddItems}
-            className="bg-gradient-to-r from-royal-purple to-royal-blue text-white hover:from-royal-blue hover:to-royal-purple text-lg px-8 py-3 rounded-full"
-          >
-            🍰 {t("addItems")}
-          </Button>
+
+      {/* Product Selection Modal - Always shown first */}
+      {showProductModal && (
+        <div className="max-w-4xl mx-auto">
+          <Card className="bg-white/80 backdrop-blur-sm border-gold shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-royal-purple text-2xl">{t("selectProducts")}</CardTitle>
+            </CardHeader>
+            
+            <CardContent className="space-y-6">
+              {/* Search and Filter */}
+              <div className="space-y-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Input
+                    placeholder={t("searchProducts")}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 bg-white border-royal-blue"
+                  />
+                </div>
+                
+                <div className="flex flex-wrap gap-2">
+                  <Badge
+                    variant={selectedCategory === "all" ? "default" : "outline"}
+                    className={`cursor-pointer ${selectedCategory === "all" ? "bg-royal-purple text-white" : "border-royal-purple text-royal-purple"}`}
+                    onClick={() => setSelectedCategory("all")}
+                  >
+                    {t("all")}
+                  </Badge>
+                  <Badge
+                    variant={selectedCategory === "cakes" ? "default" : "outline"}
+                    className={`cursor-pointer ${selectedCategory === "cakes" ? "bg-royal-purple text-white" : "border-royal-purple text-royal-purple"}`}
+                    onClick={() => setSelectedCategory("cakes")}
+                  >
+                    {t("cakes")}
+                  </Badge>
+                  <Badge
+                    variant={selectedCategory === "sweets" ? "default" : "outline"}
+                    className={`cursor-pointer ${selectedCategory === "sweets" ? "bg-royal-purple text-white" : "border-royal-purple text-royal-purple"}`}
+                    onClick={() => setSelectedCategory("sweets")}
+                  >
+                    {t("sweets")}
+                  </Badge>
+                  <Badge
+                    variant={selectedCategory === "other" ? "default" : "outline"}
+                    className={`cursor-pointer ${selectedCategory === "other" ? "bg-royal-purple text-white" : "border-royal-purple text-royal-purple"}`}
+                    onClick={() => setSelectedCategory("other")}
+                  >
+                    {t("other")}
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Product List */}
+              <div className="max-h-96 overflow-y-auto">
+                <div className="grid gap-4">
+                  {filteredProducts.map((product) => (
+                    <div key={product.id} className="flex items-center gap-4 p-4 bg-white/50 rounded-lg border border-gold/20">
+                      <img
+                        src={product.imageUrl ? `${API_BASE}${product.imageUrl}` : "/placeholder.svg"}
+                        alt={product.name}
+                        className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-royal-blue text-lg">{product.name}</h3>
+                        <p className="text-sm text-gray-600 mb-1">{product.description}</p>
+                        <p className="text-sm font-medium text-royal-purple">ALL{product.price}{product.priceType && product.priceType !== "Total" ? product.priceType : ""}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleQuantityChange(product.id, -1)}
+                          className="w-8 h-8 p-0 bg-white hover:bg-gray-50 border-royal-purple text-royal-purple"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </Button>
+                        <span className="w-12 text-center font-semibold text-lg bg-white px-2 py-1 rounded border border-royal-purple/20">
+                          {selectedQuantities[product.id] || 0}
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleQuantityChange(product.id, 1)}
+                          className="w-8 h-8 p-0 bg-white hover:bg-gray-50 border-royal-purple text-royal-purple"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Button
+                  onClick={handleContinueToReceipt}
+                  className="bg-royal-purple hover:bg-royal-blue text-white px-8 py-3"
+                >
+                  {t("continue")}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      ) : (
+      )}
+
+      {/* Receipt View */}
+      {showReceipt && (
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Cart Items */}
           <div className="lg:col-span-2">
@@ -276,11 +377,11 @@ export default function CartPage() {
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-royal-purple">{t("cartItems")}</CardTitle>
                 <Button 
-                  onClick={handleAddItems}
-                  className="bg-royal-purple hover:bg-royal-blue text-white"
+                  onClick={handleBackToProducts}
+                  variant="outline"
+                  className="border-royal-purple text-royal-purple"
                 >
-                  <Plus className="w-4 h-4 mr-2" />
-                  {t("addItems")}
+                  ← {t("backToProducts")}
                 </Button>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -376,115 +477,6 @@ export default function CartPage() {
           </div>
         </div>
       )}
-
-      {/* Product Selection Modal */}
-      <Dialog open={showProductModal} onOpenChange={setShowProductModal}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle className="text-royal-purple text-2xl">{t("selectProducts")}</DialogTitle>
-          </DialogHeader>
-          
-          {/* Search and Filter */}
-          <div className="space-y-4 mb-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                placeholder={t("searchProducts")}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-white border-royal-blue"
-              />
-            </div>
-            
-            <div className="flex flex-wrap gap-2">
-              <Badge
-                variant={selectedCategory === "all" ? "default" : "outline"}
-                className={`cursor-pointer ${selectedCategory === "all" ? "bg-royal-purple text-white" : "border-royal-purple text-royal-purple"}`}
-                onClick={() => setSelectedCategory("all")}
-              >
-                {t("all")}
-              </Badge>
-              <Badge
-                variant={selectedCategory === "cakes" ? "default" : "outline"}
-                className={`cursor-pointer ${selectedCategory === "cakes" ? "bg-royal-purple text-white" : "border-royal-purple text-royal-purple"}`}
-                onClick={() => setSelectedCategory("cakes")}
-              >
-                {t("cakes")}
-              </Badge>
-              <Badge
-                variant={selectedCategory === "sweets" ? "default" : "outline"}
-                className={`cursor-pointer ${selectedCategory === "sweets" ? "bg-royal-purple text-white" : "border-royal-purple text-royal-purple"}`}
-                onClick={() => setSelectedCategory("sweets")}
-              >
-                {t("sweets")}
-              </Badge>
-              <Badge
-                variant={selectedCategory === "other" ? "default" : "outline"}
-                className={`cursor-pointer ${selectedCategory === "other" ? "bg-royal-purple text-white" : "border-royal-purple text-royal-purple"}`}
-                onClick={() => setSelectedCategory("other")}
-              >
-                {t("other")}
-              </Badge>
-            </div>
-          </div>
-
-          {/* Product List */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="grid gap-4">
-              {filteredProducts.map((product) => (
-                <div key={product.id} className="flex items-center gap-4 p-4 bg-white/50 rounded-lg border border-gold/20">
-                  <img
-                    src={product.imageUrl ? `${API_BASE}${product.imageUrl}` : "/placeholder.svg"}
-                    alt={product.name}
-                    className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-royal-blue text-lg">{product.name}</h3>
-                    <p className="text-sm text-gray-600 mb-1">{product.description}</p>
-                    <p className="text-sm font-medium text-royal-purple">ALL{product.price}{product.priceType && product.priceType !== "Total" ? product.priceType : ""}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleQuantityChange(product.id, -1)}
-                      className="w-8 h-8 p-0 bg-white hover:bg-gray-50 border-royal-purple text-royal-purple"
-                    >
-                      <Minus className="w-3 h-3" />
-                    </Button>
-                    <span className="w-12 text-center font-semibold text-lg bg-white px-2 py-1 rounded border border-royal-purple/20">
-                      {selectedQuantities[product.id] || 0}
-                    </span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleQuantityChange(product.id, 1)}
-                      className="w-8 h-8 p-0 bg-white hover:bg-gray-50 border-royal-purple text-royal-purple"
-                    >
-                      <Plus className="w-3 h-3" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <DialogFooter className="mt-4">
-            <Button
-              variant="outline"
-              onClick={() => setShowProductModal(false)}
-            >
-              {t("cancel")}
-            </Button>
-            <Button
-              onClick={handleAddToCart}
-              className="bg-royal-purple hover:bg-royal-blue"
-            >
-              {t("addToCart")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Checkout Modal */}
       <Dialog open={showInfoModal} onOpenChange={setShowInfoModal}>
