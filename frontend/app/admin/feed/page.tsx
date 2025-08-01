@@ -48,7 +48,10 @@ export default function AdminFeedPage() {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData,
       });
-      if (!res.ok) throw new Error("Failed to add feed item");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to add feed item");
+      }
       const newItem = await res.json();
       setFeed([newItem, ...feed]);
       setTitle("");
@@ -72,7 +75,10 @@ export default function AdminFeedPage() {
         method: "DELETE",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
-      if (!res.ok) throw new Error("Failed to delete feed item");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to delete feed item");
+      }
       setFeed(feed.filter((item) => item.id !== id));
     } catch (err: any) {
       setError(err.message || "Failed to delete feed item");
