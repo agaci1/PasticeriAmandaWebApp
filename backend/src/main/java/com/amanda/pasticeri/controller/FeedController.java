@@ -65,8 +65,17 @@ public class FeedController {
                 if (file != null && !file.isEmpty()) {
                     // Validate file type for videos
                     String contentType = file.getContentType();
+                    String originalFilename = file.getOriginalFilename();
+                    long fileSize = file.getSize();
+                    
+                    // Debug logging
+                    System.out.println("Video upload attempt:");
+                    System.out.println("  Original filename: " + originalFilename);
+                    System.out.println("  Content type: " + contentType);
+                    System.out.println("  File size: " + fileSize + " bytes");
+                    
                     if (contentType == null || !contentType.startsWith("video/")) {
-                        return ResponseEntity.badRequest().body(Map.of("error", "Invalid file type. Only video files are allowed for video type."));
+                        return ResponseEntity.badRequest().body(Map.of("error", "Invalid file type. Only video files are allowed for video type. Received content type: " + contentType));
                     }
                     
                     // Use ImageUploadService for video upload
