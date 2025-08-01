@@ -69,12 +69,12 @@ public class ProductController {
     }
 
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Map<String, String> uploadImage(@RequestParam("image") MultipartFile file) {
+    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file) {
         try {
             String imageUrl = imageUploadService.saveImage(file);
-            return Map.of("imageUrl", imageUrl);
+            return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
         } catch (Exception e) {
-            throw new RuntimeException("Failed to upload image: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", "Failed to upload image: " + e.getMessage()));
         }
     }
 
