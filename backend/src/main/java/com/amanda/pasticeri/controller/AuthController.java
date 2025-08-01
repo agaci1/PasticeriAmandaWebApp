@@ -114,4 +114,20 @@ public class AuthController {
 
         return ResponseEntity.ok("Password has been reset successfully.");
     }
+
+    // Temporary endpoint to promote user to admin (for testing only)
+    @PostMapping("/promote-to-admin")
+    public ResponseEntity<?> promoteToAdmin(@RequestParam String email) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "User not found"));
+        }
+        
+        User user = userOpt.get();
+        user.setRole("ADMIN");
+        userRepository.save(user);
+        
+        return ResponseEntity.ok(Map.of("success", true, "message", "User promoted to admin successfully"));
+    }
 }
