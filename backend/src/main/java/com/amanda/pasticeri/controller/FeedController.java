@@ -74,8 +74,24 @@ public class FeedController {
                     System.out.println("  Content type: " + contentType);
                     System.out.println("  File size: " + fileSize + " bytes");
                     
-                    if (contentType == null || !contentType.startsWith("video/")) {
-                        return ResponseEntity.badRequest().body(Map.of("error", "Invalid file type. Only video files are allowed for video type. Received content type: " + contentType));
+                    // Check content type first, then fallback to file extension
+                    boolean isValidVideo = false;
+                    if (contentType != null && contentType.startsWith("video/")) {
+                        isValidVideo = true;
+                    } else if (originalFilename != null) {
+                        // Fallback: check file extension
+                        String lowerFilename = originalFilename.toLowerCase();
+                        isValidVideo = lowerFilename.endsWith(".mp4") || 
+                                     lowerFilename.endsWith(".avi") || 
+                                     lowerFilename.endsWith(".mov") || 
+                                     lowerFilename.endsWith(".wmv") || 
+                                     lowerFilename.endsWith(".flv") || 
+                                     lowerFilename.endsWith(".webm") || 
+                                     lowerFilename.endsWith(".mkv");
+                    }
+                    
+                    if (!isValidVideo) {
+                        return ResponseEntity.badRequest().body(Map.of("error", "Invalid file type. Only video files are allowed for video type. Received content type: " + contentType + ", filename: " + originalFilename));
                     }
                     
                     // Use ImageUploadService for video upload

@@ -78,7 +78,22 @@ public class ImageUploadService {
             }
 
             if ("video".equals(fileType) && !contentType.startsWith("video/")) {
-                throw new IllegalArgumentException("Invalid file type. Only video files are allowed.");
+                // Fallback: check file extension for videos
+                if (originalFilename != null) {
+                    String lowerFilename = originalFilename.toLowerCase();
+                    boolean isValidVideoExtension = lowerFilename.endsWith(".mp4") || 
+                                                 lowerFilename.endsWith(".avi") || 
+                                                 lowerFilename.endsWith(".mov") || 
+                                                 lowerFilename.endsWith(".wmv") || 
+                                                 lowerFilename.endsWith(".flv") || 
+                                                 lowerFilename.endsWith(".webm") || 
+                                                 lowerFilename.endsWith(".mkv");
+                    if (!isValidVideoExtension) {
+                        throw new IllegalArgumentException("Invalid file type. Only video files are allowed.");
+                    }
+                } else {
+                    throw new IllegalArgumentException("Invalid file type. Only video files are allowed.");
+                }
             }
 
             // Validate file size (50MB limit for videos, 10MB for images)
