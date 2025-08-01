@@ -64,6 +64,8 @@ export default function AdminCakesPage() {
     formData.append('image', file)
     
     const token = getAuthToken()
+    console.log('Uploading image with token:', token ? 'Present' : 'Missing')
+    
     const res = await fetch(`${API_BASE}/api/products/upload-image`, {
       method: 'POST',
       headers: {
@@ -73,11 +75,16 @@ export default function AdminCakesPage() {
       body: formData,
     })
     
+    console.log('Upload response status:', res.status)
+    
     if (!res.ok) {
-      throw new Error('Failed to upload image')
+      const errorText = await res.text()
+      console.error('Upload error response:', errorText)
+      throw new Error(`Failed to upload image: ${res.status} - ${errorText}`)
     }
     
     const data = await res.json()
+    console.log('Upload success:', data)
     return data.imageUrl
   }
 
