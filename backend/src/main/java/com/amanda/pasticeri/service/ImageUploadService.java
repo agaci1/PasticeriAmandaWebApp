@@ -49,6 +49,14 @@ public class ImageUploadService {
     }
 
     public String saveImage(MultipartFile file) {
+        return saveFile(file, "image");
+    }
+
+    public String saveVideo(MultipartFile file) {
+        return saveFile(file, "video");
+    }
+
+    public String saveFile(MultipartFile file, String fileType) {
         try {
             if (file == null || file.isEmpty()) {
                 throw new IllegalArgumentException("File is null or empty");
@@ -59,6 +67,27 @@ public class ImageUploadService {
                 throw new IllegalArgumentException("Original filename is null or empty");
             }
 
+            // Validate file type
+            String contentType = file.getContentType();
+            if (contentType == null) {
+                throw new IllegalArgumentException("Content type is null");
+            }
+
+            if ("image".equals(fileType) && !contentType.startsWith("image/")) {
+                throw new IllegalArgumentException("Invalid file type. Only image files are allowed.");
+            }
+
+            if ("video".equals(fileType) && !contentType.startsWith("video/")) {
+                throw new IllegalArgumentException("Invalid file type. Only video files are allowed.");
+            }
+
+            // Validate file size (50MB limit for videos, 10MB for images)
+            long maxSize = "video".equals(fileType) ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+            if (file.getSize() > maxSize) {
+                String maxSizeMB = "video".equals(fileType) ? "50MB" : "10MB";
+                throw new IllegalArgumentException("File size too large. Maximum size is " + maxSizeMB + ".");
+            }
+
             // Sanitize filename
             String sanitizedFilename = originalFilename.replaceAll("[^a-zA-Z0-9.-]", "_");
             String filename = System.currentTimeMillis() + "_" + sanitizedFilename;
@@ -66,7 +95,7 @@ public class ImageUploadService {
             Path uploadPath = Paths.get(uploadDir);
             Path filepath = uploadPath.resolve(filename);
             
-            logger.info("Saving image to: {}", filepath.toAbsolutePath());
+            logger.info("Saving {} file to: {}", fileType, filepath.toAbsolutePath());
             
             // Create directories if they don't exist
             Files.createDirectories(uploadPath);
@@ -79,16 +108,16 @@ public class ImageUploadService {
                 throw new RuntimeException("File was not saved successfully");
             }
             
-            logger.info("Image saved successfully: {}", filename);
+            logger.info("{} file saved successfully: {}", fileType, filename);
             
             // Return the URL path (relative to the server root)
             return "/uploads/" + filename;
         } catch (IOException e) {
-            logger.error("Failed to upload image: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to upload image: " + e.getMessage(), e);
+            logger.error("Failed to upload {} file: {}", fileType, e.getMessage(), e);
+            throw new RuntimeException("Failed to upload " + fileType + " file: " + e.getMessage(), e);
         } catch (Exception e) {
-            logger.error("Unexpected error during image upload: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to upload image: " + e.getMessage(), e);
+            logger.error("Unexpected error during {} file upload: {}", fileType, e.getMessage(), e);
+            throw new RuntimeException("Failed to upload " + fileType + " file: " + e.getMessage(), e);
         }
     }
 }
