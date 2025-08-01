@@ -71,8 +71,25 @@ public class ProductController {
     @PostMapping(value = "/upload-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file) {
         try {
+            if (file == null || file.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "No image file provided"));
+            }
+            
+            // Validate file type
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Invalid file type. Only image files are allowed."));
+            }
+            
+            // Validate file size (10MB limit)
+            if (file.getSize() > 10 * 1024 * 1024) {
+                return ResponseEntity.badRequest().body(Map.of("error", "File size too large. Maximum size is 10MB."));
+            }
+            
             String imageUrl = imageUploadService.saveImage(file);
             return ResponseEntity.ok(Map.of("imageUrl", imageUrl));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", "Failed to upload image: " + e.getMessage()));
         }
@@ -82,29 +99,50 @@ public class ProductController {
     public ResponseEntity<Map<String, Object>> testUploads() {
         Map<String, Object> response = new HashMap<>();
         String currentDir = System.getProperty("user.dir");
-        String uploadsPath = currentDir + "/uploads";
-        File uploadsDir = new File(uploadsPath);
+        String railwayPath = System.getenv("RAILWAY_VOLUME_MOUNT_PATH");
         
         response.put("currentDirectory", currentDir);
-        response.put("uploadsPath", uploadsPath);
-        response.put("uploadsExists", uploadsDir.exists());
-        response.put("uploadsIsDirectory", uploadsDir.isDirectory());
+        response.put("railwayVolumeMountPath", railwayPath);
         
-        if (uploadsDir.exists() && uploadsDir.isDirectory()) {
-            File[] files = uploadsDir.listFiles();
-            List<Map<String, Object>> fileList = new ArrayList<>();
-            if (files != null) {
-                for (File file : files) {
-                    Map<String, Object> fileInfo = new HashMap<>();
-                    fileInfo.put("name", file.getName());
-                    fileInfo.put("size", file.length());
-                    fileInfo.put("isFile", file.isFile());
-                    fileInfo.put("isDirectory", file.isDirectory());
-                    fileList.add(fileInfo);
+        // Test both possible upload paths
+        String[] possiblePaths = {
+            currentDir + "/uploads",
+            railwayPath != null ? railwayPath + "/uploads" : null
+        };
+        
+        List<Map<String, Object>> pathTests = new ArrayList<>();
+        for (String path : possiblePaths) {
+            if (path != null) {
+                Map<String, Object> pathInfo = new HashMap<>();
+                File uploadsDir = new File(path);
+                pathInfo.put("path", path);
+                pathInfo.put("exists", uploadsDir.exists());
+                pathInfo.put("isDirectory", uploadsDir.isDirectory());
+                pathInfo.put("canRead", uploadsDir.canRead());
+                pathInfo.put("canWrite", uploadsDir.canWrite());
+                pathInfo.put("absolutePath", uploadsDir.getAbsolutePath());
+                
+                if (uploadsDir.exists() && uploadsDir.isDirectory()) {
+                    File[] files = uploadsDir.listFiles();
+                    List<Map<String, Object>> fileList = new ArrayList<>();
+                    if (files != null) {
+                        for (File file : files) {
+                            Map<String, Object> fileInfo = new HashMap<>();
+                            fileInfo.put("name", file.getName());
+                            fileInfo.put("size", file.length());
+                            fileInfo.put("isFile", file.isFile());
+                            fileInfo.put("isDirectory", file.isDirectory());
+                            fileInfo.put("canRead", file.canRead());
+                            fileList.add(fileInfo);
+                        }
+                    }
+                    pathInfo.put("files", fileList);
+                    pathInfo.put("fileCount", files != null ? files.length : 0);
                 }
+                pathTests.add(pathInfo);
             }
-            response.put("files", fileList);
         }
+        response.put("pathTests", pathTests);
         
         return ResponseEntity.ok(response);
     }

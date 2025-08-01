@@ -69,26 +69,39 @@ export default function AdminOtherMenuPage() {
     formData.append('image', file)
     
     const token = getAuthToken()
-    const res = await fetch(`${API_BASE}/api/products/upload-image`, {
-      method: 'POST',
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-        // Don't set Content-Type for FormData - browser will set it automatically with boundary
-      },
-      body: formData,
-    })
+    console.log('Uploading image with token:', token ? 'Present' : 'Missing')
     
-    if (!res.ok) {
-      throw new Error('Failed to upload image')
+    try {
+      const res = await fetch(`${API_BASE}/api/products/upload-image`, {
+        method: 'POST',
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+          // Don't set Content-Type for FormData - browser will set it automatically with boundary
+        },
+        body: formData,
+      })
+      
+      console.log('Upload response status:', res.status)
+      
+      if (!res.ok) {
+        const errorData = await res.json()
+        console.error('Upload error response:', errorData)
+        throw new Error(errorData.error || `Failed to upload image: ${res.status}`)
+      }
+      
+      const data = await res.json()
+      console.log('Upload success:', data)
+      return data.imageUrl
+    } catch (error) {
+      console.error('Image upload error:', error)
+      throw error
     }
-    
-    const data = await res.json()
-    return data.imageUrl
   }
 
   const handleAddEditMenuItem = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setIsSubmitting(true)
+    setError(null) // Clear previous errors
     
     try {
       const formData = new FormData(event.currentTarget)
@@ -97,7 +110,14 @@ export default function AdminOtherMenuPage() {
       // Upload new image if selected
       if (selectedImage) {
         setUploadingImage(true)
-        imageUrl = await uploadImage(selectedImage)
+        try {
+          imageUrl = await uploadImage(selectedImage)
+        } catch (uploadError: any) {
+          setError(`Failed to upload image: ${uploadError.message}`)
+          setUploadingImage(false)
+          setIsSubmitting(false)
+          return
+        }
         setUploadingImage(false)
       }
       
@@ -123,15 +143,20 @@ export default function AdminOtherMenuPage() {
         })
       }
       
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || `HTTP error! status: ${res.status}`)
+      }
+      
       setIsDialogOpen(false)
       setCurrentMenuItem(null)
       setPriceType("ALL")
       setSelectedImage(null)
       setImagePreview(null)
       fetchMenuItems()
-    } catch (error) {
-      setError("There was an error saving the item. Please try again.")
+    } catch (error: any) {
+      console.error('Error saving item:', error)
+      setError(error.message || "There was an error saving the item. Please try again.")
     } finally {
       setIsSubmitting(false)
       setUploadingImage(false)
