@@ -20,12 +20,32 @@ public class ImageUploadService {
     public ImageUploadService() {
         // Check for Railway volume mount path first, then fallback to local uploads
         String railwayPath = System.getenv("RAILWAY_VOLUME_MOUNT_PATH");
+        String currentDir = System.getProperty("user.dir");
+        
+        logger.info("Current directory: {}", currentDir);
+        logger.info("RAILWAY_VOLUME_MOUNT_PATH: {}", railwayPath);
+        
         if (railwayPath != null && !railwayPath.trim().isEmpty()) {
             this.uploadDir = railwayPath + "/uploads/";
+        } else if (currentDir != null && currentDir.contains("/app")) {
+            // We're in Railway production environment
+            this.uploadDir = "/app/uploads/";
         } else {
             this.uploadDir = "uploads/";
         }
+        
         logger.info("ImageUploadService initialized with upload directory: {}", uploadDir);
+        
+        // Ensure upload directory exists
+        try {
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+                logger.info("Created upload directory: {}", uploadPath.toAbsolutePath());
+            }
+        } catch (IOException e) {
+            logger.error("Failed to create upload directory: {}", e.getMessage(), e);
+        }
     }
 
     public String saveImage(MultipartFile file) {

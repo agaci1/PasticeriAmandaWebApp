@@ -104,43 +104,45 @@ public class ProductController {
         response.put("currentDirectory", currentDir);
         response.put("railwayVolumeMountPath", railwayPath);
         
-        // Test both possible upload paths
-        String[] possiblePaths = {
-            currentDir + "/uploads",
-            railwayPath != null ? railwayPath + "/uploads" : null
-        };
+        // Test all possible upload paths
+        List<String> possiblePaths = new ArrayList<>();
+        possiblePaths.add(currentDir + "/uploads");
+        if (railwayPath != null && !railwayPath.trim().isEmpty()) {
+            possiblePaths.add(railwayPath + "/uploads");
+        }
+        if (currentDir != null && currentDir.contains("/app")) {
+            possiblePaths.add("/app/uploads");
+        }
         
         List<Map<String, Object>> pathTests = new ArrayList<>();
         for (String path : possiblePaths) {
-            if (path != null) {
-                Map<String, Object> pathInfo = new HashMap<>();
-                File uploadsDir = new File(path);
-                pathInfo.put("path", path);
-                pathInfo.put("exists", uploadsDir.exists());
-                pathInfo.put("isDirectory", uploadsDir.isDirectory());
-                pathInfo.put("canRead", uploadsDir.canRead());
-                pathInfo.put("canWrite", uploadsDir.canWrite());
-                pathInfo.put("absolutePath", uploadsDir.getAbsolutePath());
-                
-                if (uploadsDir.exists() && uploadsDir.isDirectory()) {
-                    File[] files = uploadsDir.listFiles();
-                    List<Map<String, Object>> fileList = new ArrayList<>();
-                    if (files != null) {
-                        for (File file : files) {
-                            Map<String, Object> fileInfo = new HashMap<>();
-                            fileInfo.put("name", file.getName());
-                            fileInfo.put("size", file.length());
-                            fileInfo.put("isFile", file.isFile());
-                            fileInfo.put("isDirectory", file.isDirectory());
-                            fileInfo.put("canRead", file.canRead());
-                            fileList.add(fileInfo);
-                        }
+            Map<String, Object> pathInfo = new HashMap<>();
+            File uploadsDir = new File(path);
+            pathInfo.put("path", path);
+            pathInfo.put("exists", uploadsDir.exists());
+            pathInfo.put("isDirectory", uploadsDir.isDirectory());
+            pathInfo.put("canRead", uploadsDir.canRead());
+            pathInfo.put("canWrite", uploadsDir.canWrite());
+            pathInfo.put("absolutePath", uploadsDir.getAbsolutePath());
+            
+            if (uploadsDir.exists() && uploadsDir.isDirectory()) {
+                File[] files = uploadsDir.listFiles();
+                List<Map<String, Object>> fileList = new ArrayList<>();
+                if (files != null) {
+                    for (File file : files) {
+                        Map<String, Object> fileInfo = new HashMap<>();
+                        fileInfo.put("name", file.getName());
+                        fileInfo.put("size", file.length());
+                        fileInfo.put("isFile", file.isFile());
+                        fileInfo.put("isDirectory", file.isDirectory());
+                        fileInfo.put("canRead", file.canRead());
+                        fileList.add(fileInfo);
                     }
-                    pathInfo.put("files", fileList);
-                    pathInfo.put("fileCount", files != null ? files.length : 0);
                 }
-                pathTests.add(pathInfo);
+                pathInfo.put("files", fileList);
+                pathInfo.put("fileCount", files != null ? files.length : 0);
             }
+            pathTests.add(pathInfo);
         }
         response.put("pathTests", pathTests);
         
