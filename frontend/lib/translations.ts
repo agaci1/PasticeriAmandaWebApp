@@ -73,7 +73,7 @@ export const translations = {
     
     // Brand
     brandName: 'Amanda Pastry Shop',
-    brandDescription: 'Delicious custom cakes & pastries made with the finest ingredients.',
+    brandDescription: 'Exquisite custom confections & artisanal pastries meticulously crafted with the world\'s finest ingredients.',
     
     // Footer
     contactUs: 'Contact Us',
@@ -152,7 +152,7 @@ export const translations = {
     errorOccurred: 'An error occurred. Please try again.',
     
     // Menu Page
-    ourDeliciousMenu: 'Our Delicious Menu',
+    ourDeliciousMenu: 'Our Exquisite Culinary Collection',
     cakes: 'Cakes',
     sweets: 'Sweets',
     other: 'Other',
@@ -171,7 +171,7 @@ export const translations = {
     customerPhone: 'Customer Phone',
     orderDetails: 'Order Details',
     orderTitle: 'Create Your Perfect Custom Order',
-    orderSubtitle: 'Tell us about your dream dessert and we\'ll make it a reality',
+    orderSubtitle: 'Share your vision of the perfect dessert and we\'ll transform it into a magnificent reality',
     orderInstructions: 'Fill out the form below to place your custom order. We\'ll get back to you with a quote and timeline.',
     orderSuccess: 'Order Submitted Successfully!',
     orderSuccessMessage: 'Thank you for your order! We\'ll contact you soon with details.',
@@ -227,12 +227,12 @@ export const translations = {
     passwordResetSent: 'Password reset email sent!',
     checkYourEmail: 'Please check your email for reset instructions.',
     
-    // About Page
+    // About Page - Enhanced with fancy, classy language
     aboutAmanda: 'About Pastiçeri Amanda',
-    aboutDescription: 'Delicious custom cakes & pastries made with the finest ingredients.',
+    aboutDescription: 'Exquisite custom cakes & artisanal pastries crafted with the finest ingredients.',
     aboutUs: 'About Us',
     welcomeToAmanda: 'Welcome to Pastiçeri Amanda',
-    aboutStory: 'A place where passion for baking meets the art of confectionery. Nestled in the heart of Saranda, Albania, our shop was founded with a simple dream: to bring joy and sweetness to every celebration and everyday moment.',
+    aboutStory: 'A sanctuary where culinary artistry meets the timeless craft of confectionery. Nestled in the heart of Saranda, Albania, our esteemed establishment was founded upon a noble vision: to orchestrate moments of pure delight and enchantment through the alchemy of exceptional desserts.',
     ourStory: 'Our Story',
     ourMission: 'Our Mission',
     ourVision: 'Our Vision',
@@ -246,14 +246,14 @@ export const translations = {
     everyCelebration: 'Every Celebration',
     everydayMoment: 'Everyday Moment',
     ourPhilosophy: 'Our Philosophy',
-    philosophyDescription1: 'At Pastiçeri Amanda, we are more than just bakers; we are artists. Each cake, each pastry, is a canvas where we blend flavors, textures, and designs to create edible masterpieces.',
-    philosophyDescription2: 'From elegant wedding cakes to whimsical birthday treats and delicate daily pastries, we pour our heart into every creation.',
-    ourStoryContent: 'Our journey began in 2018 when Amanda, a passionate pastry chef with a vision, decided to transform her love for baking into something extraordinary. Today, Pastiçeri Amanda stands as a testament to dedication, creativity, and the belief that every dessert tells a story.',
+    philosophyDescription1: 'At Pastiçeri Amanda, we transcend the ordinary realm of baking; we are culinary artisans and visionaries. Each creation is a masterpiece where we harmoniously blend premium flavors, exquisite textures, and innovative designs to craft edible works of art that captivate the senses.',
+    philosophyDescription2: 'From opulent wedding confections to whimsical celebration masterpieces and refined daily delicacies, we infuse every creation with passion, precision, and an unwavering commitment to excellence.',
+    ourStoryContent: 'Our illustrious journey commenced in 2018 when Amanda, a visionary pastry artist with an unyielding passion for culinary excellence, embarked on a mission to transform her profound love for the art of baking into an extraordinary legacy. Today, Pastiçeri Amanda stands as a testament to unwavering dedication, boundless creativity, and the profound belief that every dessert narrates a story of love, celebration, and artistic expression.',
     meetOurTeam: 'Meet Our Team',
-    teamDescription: 'Our talented team of pastry chefs and dedicated staff are the heart of Pastiçeri Amanda. With years of experience and a shared love for baking, they work tirelessly to bring your sweet dreams to life.',
-    amandaDescription: 'With years of experience in pastry arts and a passion for creating edible masterpieces, Amanda leads our team with creativity, precision, and dedication to excellence.',
+    teamDescription: 'Our distinguished ensemble of master pastry artisans and devoted professionals forms the very essence of Pastiçeri Amanda. With decades of combined expertise and a shared devotion to the culinary arts, they tirelessly orchestrate the transformation of your sweetest dreams into magnificent realities.',
+    amandaDescription: 'With an illustrious career spanning years in the refined arts of pastry creation and an unquenchable passion for crafting edible masterpieces, Amanda leads our distinguished team with unparalleled creativity, meticulous precision, and an unwavering dedication to culinary excellence.',
     ourCreations: 'Our Creations',
-    creationsDescription: 'Discover our wide variety of delicious offerings including custom cakes, traditional sweets, modern desserts, and everything in between.',
+    creationsDescription: 'Embark on a journey through our extensive collection of extraordinary offerings, featuring bespoke confections, time-honored delicacies, avant-garde desserts, and everything in between.',
     learnMoreAboutUs: 'Learn More About Us',
     newsSection: 'Latest News & Updates',
     followOurJourney: 'Follow Our Journey',
@@ -288,7 +288,7 @@ export const translations = {
     nextWeek: 'Next Week',
     customDate: 'Custom Date',
     
-    // Carousel
+    // Carousel - Enhanced with fancy language
     cake: 'Cake',
     pastries: 'Pastries',
     traditional: 'Traditional',
@@ -301,12 +301,12 @@ export const translations = {
     modernCreations: 'Modern Creations',
     frozenDelights: 'Frozen Delights',
     trendingSensations: 'Trending Sensations',
-    cakeDescription: 'Masterfully crafted custom cakes that turn your dreams into edible art',
-    pastriesDescription: 'Handcrafted pastries made with love and the finest ingredients',
-    traditionalDescription: 'Authentic traditional sweets that tell stories of heritage',
-    modernDescription: 'Innovative desserts that push the boundaries of flavor',
-    iceCreamDescription: 'Creamy ice cream creations that delight your senses',
-    trendingDescription: 'Latest trending desserts that everyone is talking about',
+    cakeDescription: 'Exquisitely crafted custom confections that transform your most cherished dreams into magnificent edible masterpieces',
+    pastriesDescription: 'Artisanal pastries meticulously crafted with passion and the world\'s finest ingredients',
+    traditionalDescription: 'Authentic traditional delicacies that weave tales of cultural heritage and timeless traditions',
+    modernDescription: 'Avant-garde dessert innovations that transcend conventional boundaries of flavor and presentation',
+    iceCreamDescription: 'Luxuriously creamy frozen creations that orchestrate a symphony of delight for your senses',
+    trendingDescription: 'Cutting-edge dessert sensations that captivate the culinary world and inspire sweet conversations',
     viewCakes: 'View Cakes',
     viewSweets: 'View Sweets',
     viewTraditional: 'View Traditional Desserts',
@@ -358,7 +358,7 @@ export const translations = {
     
     // Brand
     brandName: 'Pastiçeri Amanda',
-    brandDescription: 'Ëmbëlsira të shijshme dhe ëmbëlsira të personalizuara të bëra me përbërësit më të mirë.',
+    brandDescription: 'Ëmbëlsira të shkëlqyera dhe konfeksione të personalizuara të krijuara me metikulozitet me përbërësit më të zgjedhur të botës.',
     
     // Footer
     contactUs: 'Na Kontaktoni',
@@ -394,7 +394,7 @@ export const translations = {
     completed: 'E Përfunduar',
     canceled: 'E Anuluar',
     orderTitle: 'Krijo Porosinë Tënde të Përsosur të Personalizuar',
-    orderSubtitle: 'Na tregoni për ëmbëlsirën tuaj të ëndrrave dhe ne do ta bëjmë realitet',
+    orderSubtitle: 'Ndani vizionin tuaj të ëmbëlsirës së përsosur dhe ne do ta shndërrojmë atë në një realitet madhështor',
     orderInstructions: 'Plotësoni formularin më poshtë për të bërë porosinë tuaj të personalizuar. Do t\'ju kontaktojmë me një kuotë dhe afat kohor.',
     orderSuccess: 'Porosia u Paraqit me Sukses!',
     orderSuccessMessage: 'Faleminderit për porosinë tuaj! Do t\'ju kontaktojmë së shpejti me detaje.',
@@ -444,7 +444,7 @@ export const translations = {
     errorOccurred: 'Ndodhi një gabim. Ju lutemi provoni përsëri.',
     
     // Menu Page
-    ourDeliciousMenu: 'Menyja Jonë e Shijshme',
+    ourDeliciousMenu: 'Koleksioni Jonë Kulinar i Shkëlqyeshëm',
     cakes: 'Torta',
     sweets: 'Ëmbëlsira',
     other: 'Të Tjerat',
@@ -512,12 +512,12 @@ export const translations = {
     passwordResetSent: 'Emaili i rivendosjes së fjalëkalimit u dërgua!',
     checkYourEmail: 'Ju lutemi kontrolloni emailin tuaj për udhëzimet e rivendosjes.',
     
-    // About Page - Shortened and improved
+    // About Page - Enhanced with fancy, classy language
     aboutAmanda: 'Rreth Pastiçeri Amanda',
-    aboutDescription: 'Ëmbëlsira të shijshme dhe ëmbëlsira të personalizuara të bëra me përbërësit më të mirë.',
+    aboutDescription: 'Ëmbëlsira të shkëlqyera dhe ëmbëlsira të personalizuara të krijuara me përbërësit më të zgjedhur.',
     aboutUs: 'Rreth Nesh',
     welcomeToAmanda: 'Mirë se vini në Pastiçeri Amanda',
-    aboutStory: 'Një vend ku pasioni për pjekjen takohet me artin e konfeksionerisë. E vendosur në zemër të Sarandës, Shqipëri, dyqani ynë u themelua me një ëndërr të thjeshtë: të sjellim gëzim dhe ëmbëlsirë në çdo festim dhe moment të përditshëm.',
+    aboutStory: 'Një shenjtëror ku arti kulinar takohet me zejtarinë e përjetshme të konfeksionerisë. E vendosur në zemër të Sarandës, Shqipëri, ndërmarrja jonë e nderuara u themelua mbi një vizion fisnik: të orkestrojmë momente të gëzimit të pastër dhe magjisë përmes alkemisë së ëmbëlsirave të jashtëzakonshme.',
     ourStory: 'Historia Jonë',
     ourMission: 'Misioni Ynë',
     ourVision: 'Vizioni Ynë',
@@ -531,14 +531,14 @@ export const translations = {
     everyCelebration: 'Çdo Festim',
     everydayMoment: 'Moment i Përditshëm',
     ourPhilosophy: 'Filozofia Jonë',
-    philosophyDescription1: 'Në Pastiçeri Amanda, ne jemi më shumë se thjesht pjekës; ne jemi artistë. Çdo tortë, çdo ëmbëlsirë, është një kanavacë ku ne përzijmë shijet, teksturat dhe dizajnet për të krijuar kryevepra të ngritshme.',
-    philosophyDescription2: 'Nga tortat elegante të dasmës deri te ëmbëlsirat e ditëlindjes dhe ëmbëlsirat e hollë të përditshme, ne derdhim zemrën tonë në çdo krijim.',
-    ourStoryContent: 'Rrugëtimi ynë filloi në vitin 2018 kur Amanda, një pasticiere e pasionuar me një vizion, vendosi të shndërrojë dashurinë e saj për pjekjen në diçka të jashtëzakonshme. Sot, Pastiçeri Amanda qëndron si një testament i dedikimit, krijimtarisë dhe besimit se çdo ëmbëlsirë tregon një histori.',
+    philosophyDescription1: 'Në Pastiçeri Amanda, ne tejkalojmë sferën e zakonshme të pjekjes; ne jemi zejtarë kulinarë dhe vizionarë. Çdo krijim është një kryevepër ku ne përzijmë harmonikisht shijet premium, teksturat e shkëlqyera dhe dizajnet inovative për të krijuar vepra arti të hajshme që kapin shqisat.',
+    philosophyDescription2: 'Nga konfeksionet luksoze të dasmës deri te kryeveprat fantastike të festimeve dhe delikatesat e rafinuara të përditshme, ne derdhim pasionin, precizionin dhe një angazhim të pandryshueshëm për përsosmërinë në çdo krijim.',
+    ourStoryContent: 'Rrugëtimi ynë i lavdishëm filloi në vitin 2018 kur Amanda, një artiste pasticiere vizionare me një pasion të pandryshueshëm për përsosmërinë kulinare, filloi një mision për të shndërruar dashurinë e saj të thellë për artin e pjekjes në një trashëgimi të jashtëzakonshme. Sot, Pastiçeri Amanda qëndron si një testament i dedikimit të pandryshueshëm, krijimtarisë së pakufishme dhe besimit të thellë se çdo ëmbëlsirë tregon një histori dashurie, festimi dhe shprehje artistike.',
     meetOurTeam: 'Njihni Ekipin Tonë',
-    teamDescription: 'Ekipi ynë i talentuar i pasticierëve dhe stafi i dedikuar janë zemra e Pastiçeri Amanda. Me vite përvoje dhe një dashuri të përbashkët për pjekjen, ata punojnë pa lodur për t\'i sjellë ëndrrat tuaja të ëmbla në jetë.',
-    amandaDescription: 'Me vite përvoje në artet e pjekjes dhe një pasion për krijimin e kryeveprave të ngritshme, Amanda udhëheq ekipin tonë me kreativitet, precizion dhe dedikim për përsosmërinë.',
+    teamDescription: 'Ensembli ynë i dalluar i zejtarëve kryesorë të pasticierisë dhe profesionistëve të dedikuar formon thelbin e Pastiçeri Amanda. Me dekada përvoje të kombinuar dhe një devotim të përbashkët për artet kulinare, ata orkestrojnë pa lodur transformimin e ëndrrave tuaja më të ëmbla në realitete madhështore.',
+    amandaDescription: 'Me një karrierë të lavdishme që përfshin vite në artet e rafinuara të krijimit të pasticierisë dhe një pasion për krijimin e kryeveprave të hajshme, Amanda udhëheq ekipin tonë të dalluar me krijimtari të paparë, precizion metikuloz dhe një dedikim të pandryshueshëm për përsosmërinë kulinare.',
     ourCreations: 'Krijimet Tona',
-    creationsDescription: 'Zbuloni shumëllojshmërinë tonë të gjerë të ofertave të shijshme duke përfshirë tortat e personalizuara, ëmbëlsirat tradicionale, ëmbëlsirat moderne dhe gjithçka në mes.',
+    creationsDescription: 'Nisni një udhëtim përmes koleksionit tonë të gjerë të ofertave të jashtëzakonshme, duke përfshirë konfeksione të personalizuara, delikatesa të nderuara nga koha, ëmbëlsira avangarde dhe gjithçka në mes.',
     learnMoreAboutUs: 'Mëso Më Shumë Rreth Nesh',
     newsSection: 'Lajmet dhe Përditësimet e Fundit',
     followOurJourney: 'Ndiq Rrugëtimin Tonë',
@@ -573,7 +573,7 @@ export const translations = {
     nextWeek: 'Javën e Ardhshme',
     customDate: 'Data e Personalizuar',
     
-    // Carousel
+    // Carousel - Enhanced with fancy language
     cake: 'Tortë',
     pastries: 'Ëmbëlsira',
     traditional: 'Tradicionale',
@@ -586,12 +586,12 @@ export const translations = {
     modernCreations: 'Krijime Moderne',
     frozenDelights: 'Delikatesa të Ngrira',
     trendingSensations: 'Sensacione Trending',
-    cakeDescription: 'Torta të krijuara me mjeshtëri që shndërrojnë ëndrrat tuaja në art të hajshëm',
-    pastriesDescription: 'Ëmbëlsira të bëra me dorë me dashuri dhe përbërësit më të mirë',
-    traditionalDescription: 'Ëmbëlsira tradicionale autentike që tregojnë histori të trashëgimisë',
-    modernDescription: 'Ëmbëlsira inovative që shtyjnë kufijtë e shijes',
-    iceCreamDescription: 'Krijime të akullores kremoze që kënaqin shqisat tuaja',
-    trendingDescription: 'Ëmbëlsirat më të fundit trending për të cilat të gjithë po flasin',
+    cakeDescription: 'Konfeksione të personalizuara të krijuara me mjeshtëri që shndërrojnë ëndrrat tuaja më të dashura në kryevepra madhështore të hajshme',
+    pastriesDescription: 'Ëmbëlsira artizanale të krijuara me metikulozitet me pasion dhe përbërësit më të zgjedhur të botës',
+    traditionalDescription: 'Delikatesa tradicionale autentike që thurin histori të trashëgimisë kulturore dhe traditave të përjetshme',
+    modernDescription: 'Inovacione avangarde të ëmbëlsirave që tejkalojnë kufijtë konvencionale të shijes dhe prezantimit',
+    iceCreamDescription: 'Krijime të ngrira luksoze kremoze që orkestrojnë një simfoni gëzimi për shqisat tuaja',
+    trendingDescription: 'Sensacione të ëmbëlsirave të fundit që kapin botën kulinare dhe frymëzojnë biseda të ëmbla',
     viewCakes: 'Shiko Tortat',
     viewSweets: 'Shiko Ëmbëlsirat',
     viewTraditional: 'Shiko Ëmbëlsirat Tradicionale',
@@ -643,7 +643,7 @@ export const translations = {
     
     // Brand
     brandName: 'Pasticceria Amanda',
-    brandDescription: 'Deliziose torte personalizzate e pasticcini realizzati con i migliori ingredienti.',
+    brandDescription: 'Squisite confezioni personalizzate e pasticcini artigianali meticolosamente realizzati con i migliori ingredienti del mondo.',
     
     // Footer
     contactUs: 'Contattaci',
@@ -713,7 +713,7 @@ export const translations = {
     errorOccurred: 'Si è verificato un errore. Riprova.',
     
     // Menu Page
-    ourDeliciousMenu: 'Il Nostro Delizioso Menu',
+    ourDeliciousMenu: 'La Nostra Squisita Collezione Culinaria',
     cakes: 'Torte',
     sweets: 'Dolci',
     other: 'Altro',
@@ -732,7 +732,7 @@ export const translations = {
     customerPhone: 'Telefono Cliente',
     orderDetails: 'Dettagli Ordine',
     orderTitle: 'Crea il Tuo Ordine Personalizzato Perfetto',
-    orderSubtitle: 'Raccontaci del tuo dessert dei sogni e lo renderemo realtà',
+    orderSubtitle: 'Condividi la tua visione del dessert perfetto e lo trasformeremo in una magnifica realtà',
     orderInstructions: 'Compila il modulo qui sotto per effettuare il tuo ordine personalizzato. Ti contatteremo con un preventivo e una tempistica.',
     orderSuccess: 'Ordine Inviato con Successo!',
     orderSuccessMessage: 'Grazie per il tuo ordine! Ti contatteremo presto con i dettagli.',
@@ -797,12 +797,12 @@ export const translations = {
     passwordResetSent: 'Email di reset password inviata!',
     checkYourEmail: 'Controlla la tua email per le istruzioni di reset.',
     
-    // About Page
+    // About Page - Enhanced with fancy, classy language
     aboutAmanda: 'Chi Siamo - Pastiçeri Amanda',
-    aboutDescription: 'Deliziose torte personalizzate e pasticcini realizzati con i migliori ingredienti.',
+    aboutDescription: 'Squisite torte personalizzate e pasticcini artigianali realizzati con i migliori ingredienti.',
     aboutUs: 'Chi Siamo',
     welcomeToAmanda: 'Benvenuti alla Pastiçeri Amanda',
-    aboutStory: 'Un luogo dove la passione per la pasticceria incontra l\'arte della confetteria. Situata nel cuore di Saranda, Albania, la nostra pasticceria è stata fondata con un semplice sogno: portare gioia e dolcezza ad ogni celebrazione e momento quotidiano.',
+    aboutStory: 'Un santuario dove l\'arte culinaria incontra l\'artigianato senza tempo della confetteria. Situata nel cuore di Saranda, Albania, la nostra prestigiosa istituzione è stata fondata su una visione nobile: orchestrare momenti di pura gioia e incanto attraverso l\'alchimia di dessert eccezionali.',
     ourStory: 'La Nostra Storia',
     ourMission: 'La Nostra Missione',
     ourVision: 'La Nostra Visione',
@@ -816,14 +816,14 @@ export const translations = {
     everyCelebration: 'Ogni Celebrazione',
     everydayMoment: 'Momento Quotidiano',
     ourPhilosophy: 'La Nostra Filosofia',
-    philosophyDescription1: 'Alla Pastiçeri Amanda, siamo più che semplici pasticcieri; siamo artisti. Ogni torta, ogni pasticcino, è una tela dove mescoliamo sapori, texture e design per creare capolavori commestibili.',
-    philosophyDescription2: 'Dalle eleganti torte nuziali ai dolci fantasiosi per compleanni e ai delicati pasticcini quotidiani, mettiamo il cuore in ogni creazione.',
-    ourStoryContent: 'Il nostro viaggio è iniziato nel 2018 quando Amanda, una pasticciera appassionata con una visione, ha deciso di trasformare il suo amore per la pasticceria in qualcosa di straordinario. Oggi, la Pastiçeri Amanda si erge come testimonianza di dedizione, creatività e della convinzione che ogni dolce racconti una storia.',
+    philosophyDescription1: 'Alla Pastiçeri Amanda, trascendiamo il regno ordinario della pasticceria; siamo artigiani culinari e visionari. Ogni creazione è un capolavoro dove armonizziamo sapori premium, trame squisite e design innovativi per creare opere d\'arte commestibili che catturano i sensi.',
+    philosophyDescription2: 'Dalle opulente confezioni nuziali ai capolavori fantasiosi per le celebrazioni e le raffinate delicatezze quotidiane, infondiamo ogni creazione con passione, precisione e un impegno incrollabile per l\'eccellenza.',
+    ourStoryContent: 'Il nostro illustre viaggio è iniziato nel 2018 quando Amanda, un\'artista pasticciera visionaria con una passione incrollabile per l\'eccellenza culinaria, ha intrapreso una missione per trasformare il suo profondo amore per l\'arte della pasticceria in un\'eredità straordinaria. Oggi, la Pastiçeri Amanda si erge come testimonianza di dedizione incrollabile, creatività illimitata e la profonda convinzione che ogni dolce narri una storia di amore, celebrazione ed espressione artistica.',
     meetOurTeam: 'Incontra il Nostro Team',
-    teamDescription: 'Il nostro talentuoso team di pasticcieri e personale dedicato è il cuore della Pastiçeri Amanda. Con anni di esperienza e un amore condiviso per la pasticceria, lavorano instancabilmente per dare vita ai vostri sogni dolci.',
-    amandaDescription: 'Con anni di esperienza nelle arti pasticcere e una passione per la creazione di capolavori commestibili, Amanda guida il nostro team con creatività, precisione e dedizione all\'eccellenza.',
+    teamDescription: 'Il nostro distinto ensemble di maestri artigiani pasticcieri e professionisti devoti forma l\'essenza stessa della Pastiçeri Amanda. Con decenni di esperienza combinata e una devozione condivisa per le arti culinarie, orchestrano instancabilmente la trasformazione dei vostri sogni più dolci in realtà magnifiche.',
+    amandaDescription: 'Con una carriera illustre che abbraccia anni nelle raffinate arti della creazione pasticciera e una passione inestinguibile per la creazione di capolavori commestibili, Amanda guida il nostro distinto team con creatività senza precedenti, precisione meticolosa e una dedizione incrollabile all\'eccellenza culinaria.',
     ourCreations: 'Le Nostre Creazioni',
-    creationsDescription: 'Scopri la nostra vasta varietà di deliziose offerte inclusi torte personalizzate, dolci tradizionali, dessert moderni e tutto il resto.',
+    creationsDescription: 'Intraprendi un viaggio attraverso la nostra vasta collezione di offerte straordinarie, caratterizzate da confezioni su misura, delicatezze onorate dal tempo, dessert d\'avanguardia e tutto il resto.',
     learnMoreAboutUs: 'Scopri di Più su di Noi',
     newsSection: 'Ultime Notizie e Aggiornamenti',
     followOurJourney: 'Segui il Nostro Viaggio',
@@ -858,7 +858,7 @@ export const translations = {
     nextWeek: 'Prossima Settimana',
     customDate: 'Data Personalizzata',
     
-    // Carousel
+    // Carousel - Enhanced with fancy language
     cake: 'Torta',
     pastries: 'Dolci',
     traditional: 'Tradizionale',
@@ -871,12 +871,12 @@ export const translations = {
     modernCreations: 'Creazioni Moderne',
     frozenDelights: 'Delizie Ghiacciate',
     trendingSensations: 'Sensazioni di Tendenza',
-    cakeDescription: 'Torte personalizzate create magistralmente che trasformano i vostri sogni in arte commestibile',
-    pastriesDescription: 'Dolci fatti a mano con amore e gli ingredienti più fini',
-    traditionalDescription: 'Dolci tradizionali autentici che raccontano storie di eredità',
-    modernDescription: 'Dessert innovativi che spingono i confini del gusto',
-    iceCreamDescription: 'Creazioni di gelato cremoso che deliziano i vostri sensi',
-    trendingDescription: 'Gli ultimi dessert di tendenza di cui tutti parlano',
+    cakeDescription: 'Confezioni personalizzate create squisitamente che trasformano i vostri sogni più cari in magnifici capolavori commestibili',
+    pastriesDescription: 'Dolci artigianali meticolosamente realizzati con passione e gli ingredienti più fini del mondo',
+    traditionalDescription: 'Delicatezze tradizionali autentiche che tessono racconti di eredità culturale e tradizioni senza tempo',
+    modernDescription: 'Innovazioni dessert d\'avanguardia che trascendono i confini convenzionali del gusto e della presentazione',
+    iceCreamDescription: 'Creazioni gelato lussuosamente cremose che orchestrano una sinfonia di delizia per i vostri sensi',
+    trendingDescription: 'Sensazioni dessert all\'avanguardia che catturano il mondo culinario e ispirano conversazioni dolci',
     viewCakes: 'Vedi Torte',
     viewSweets: 'Vedi Dolci',
     viewTraditional: 'Vedi Dolci Tradizionali',
