@@ -232,8 +232,7 @@ export default function CartPage() {
 
   const filteredProducts = products.filter(product => {
     const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         product.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -326,7 +325,6 @@ export default function CartPage() {
                       />
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-royal-blue text-lg">{product.name}</h3>
-                        <p className="text-sm text-gray-600 mb-1">{product.description}</p>
                         <p className="text-sm font-medium text-royal-purple">{t("currencySymbol")}{product.price}{product.priceType && product.priceType !== "Total" ? product.priceType : ""}</p>
                       </div>
                       <div className="flex items-center gap-2">
