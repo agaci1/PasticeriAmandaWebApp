@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { GradientText } from "@/components/ui/gradient-text"
 import Image from "next/image"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { authenticatedFetch } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { ShoppingCart } from "lucide-react"
@@ -23,7 +23,42 @@ interface MenuItem {
   category: string
 }
 
+// Backend Product interface (what we receive from API)
+interface BackendProduct {
+  id: number | string  // Backend returns Long, which can be number or string
+  name: string
+  description: string
+  price: number
+  priceType?: string
+  imageUrl: string
+  category: string
+}
+
 type CategoryFilter = 'cakes' | 'sweets' | 'other'
+
+// Pure function to get category - moved outside component for better performance
+const getItemCategory = (item: MenuItem): CategoryFilter => {
+  if (!item.category) {
+    return 'other'
+  }
+  
+  const category = item.category.toLowerCase().trim();
+  
+  // Check for cakes category
+  if (category === 'cakes' || category === 'cake' || category.includes('cake') || category.includes('pastry')) {
+    return 'cakes';
+  }
+  
+  // Check for sweets category
+  if (category === 'sweets' || category === 'sweet' || 
+      category.includes('sweet') || category.includes('candy') || 
+      category.includes('chocolate') || category.includes('dessert')) {
+    return 'sweets';
+  }
+  
+  // Default to other
+  return 'other';
+};
 
 export default function MenuPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
@@ -35,19 +70,55 @@ export default function MenuPage() {
   const loggedIn = isAuthenticated()
   const { t } = useTranslation()
 
+  // Helper function to normalize image URL
+  const getImageUrl = (imageUrl: string | null | undefined): string => {
+    if (!imageUrl) {
+      return "/placeholder.svg?height=300&width=400"
+    }
+    
+    // If URL already starts with http/https, use it as-is
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl
+    }
+    
+    // If URL starts with /uploads/, prepend API_BASE
+    if (imageUrl.startsWith('/uploads/')) {
+      return `${API_BASE}${imageUrl}`
+    }
+    
+    // If it doesn't start with /, add it
+    const normalizedUrl = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`
+    return `${API_BASE}${normalizedUrl}`
+  }
+
   useEffect(() => {
     const fetchMenu = async () => {
       try {
         setLoading(true)
-        const res = await authenticatedFetch("/api/products") // Assuming /api/products endpoint for menu items
+        setError(null)
+        const res = await authenticatedFetch("/api/products")
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`)
         }
-        const data: MenuItem[] = await res.json()
-        setMenuItems(data)
+        const backendData: BackendProduct[] = await res.json()
+        
+        // Convert backend data to frontend format
+        // Ensure IDs are strings and handle image URLs properly
+        const normalizedData: MenuItem[] = backendData.map((product) => ({
+          id: String(product.id), // Convert Long/number to string
+          name: product.name || '',
+          description: product.description || '',
+          price: product.price || 0,
+          priceType: product.priceType,
+          imageUrl: product.imageUrl || '',
+          category: product.category || 'other',
+        }))
+        
+        setMenuItems(normalizedData)
       } catch (err) {
         console.error("Failed to fetch menu items:", err)
-        setError(t("failedToLoadMenu"))
+        const errorMessage = err instanceof Error ? err.message : "Unknown error"
+        setError(errorMessage)
         toast({
           title: t("error"),
           description: t("failedToLoadMenuItems"),
@@ -59,7 +130,9 @@ export default function MenuPage() {
     }
 
     fetchMenu()
-  }, [toast])
+    // Remove toast from dependencies to prevent unnecessary re-renders
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleAddToCart = (item: MenuItem) => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -80,22 +153,12 @@ export default function MenuPage() {
     toast({ title: t("itemAddedToCart"), description: `${item.name} ${t("itemAddedDescription")}` });
   };
 
-  // Get category for an item
-  const getItemCategory = (item: MenuItem): CategoryFilter => {
-    const category = item.category.toLowerCase();
-    if (category.includes('cake') || category.includes('pastry')) {
-      return 'cakes';
-    } else if (category.includes('sweet') || category.includes('candy') || category.includes('chocolate') || category.includes('dessert')) {
-      return 'sweets';
-    } else {
-      return 'other';
-    }
-  };
-
-  // Filter menu items based on active filter
-  const filteredItems = menuItems.filter(item => {
-    return getItemCategory(item) === activeFilter;
-  });
+  // Filter menu items based on active filter - memoized for performance
+  const filteredItems = useMemo(() => {
+    return menuItems.filter(item => {
+      return getItemCategory(item) === activeFilter;
+    });
+  }, [menuItems, activeFilter]);
 
   // Get card styling based on category
   const getCardStyling = (category: CategoryFilter) => {
@@ -204,25 +267,25 @@ export default function MenuPage() {
           filteredItems.map((item) => {
             const itemCategory = getItemCategory(item);
             const styling = getCardStyling(itemCategory);
+            const imageSrc = getImageUrl(item.imageUrl);
             
             return (
               <Card
                 key={item.id}
                 className={`overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm border-2 ${styling.borderColor} hover:scale-105 ${styling.shadowColor}`}
               >
-                <div className="relative w-full h-32 sm:h-40 md:h-48">
+                <div className="relative w-full h-32 sm:h-40 md:h-48 bg-gray-100">
                   <Image
-                    src={item.imageUrl ? `${API_BASE}${item.imageUrl}` : "/placeholder.svg?height=300&width=400"}
-                    alt={item.name}
+                    src={imageSrc}
+                    alt={item.name || 'Menu item'}
                     fill
                     className="rounded-t-lg object-cover"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
+                    loading="lazy"
                     onError={(e) => {
-                      console.error("Failed to load image:", item.imageUrl);
+                      console.error("Failed to load image:", imageSrc, "Original URL:", item.imageUrl);
                       const target = e.target as HTMLImageElement;
                       target.src = "/placeholder.svg?height=300&width=400";
-                    }}
-                    onLoad={() => {
-                      console.log("Image loaded successfully:", item.imageUrl);
                     }}
                   />
                 </div>
