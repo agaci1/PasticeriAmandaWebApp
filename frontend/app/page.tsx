@@ -352,7 +352,7 @@ export default function HomePage() {
                       item.id === 5 ? t('frozenDelights') :
                       t('trendingSensations')}
                    </h1>
-                   <p className={`text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 text-white/90 max-w-2xl mx-auto drop-shadow-md ${playfairDisplay.className}`} style={{ fontWeight: 400, fontStyle: 'normal', opacity: 0.95, color: '#b91c7a' }}>
+                   <p className={`text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 text-white/90 max-w-2xl mx-auto drop-shadow-md ${playfairDisplay.className}`} style={{ fontWeight: 400, fontStyle: 'normal', opacity: 0.95 }}>
                      {item.description}
                    </p>
                 
