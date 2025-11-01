@@ -8,10 +8,16 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { GradientText } from "@/components/ui/gradient-text"
 import FeedSection from "@/app/components/FeedSection";
 import API_BASE from "@/lib/api";
-import { Dancing_Script } from "next/font/google"
+import { Dancing_Script, Playfair_Display } from "next/font/google"
 import { useTranslation } from "@/contexts/TranslationContext"
+import { ScrollFadeIn } from "@/components/ScrollFadeIn"
 
 const dancingScript = Dancing_Script({ subsets: ["latin"] })
+const playfairDisplay = Playfair_Display({ 
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-playfair"
+})
 
 interface CarouselItem {
   id: number;
@@ -346,7 +352,7 @@ export default function HomePage() {
                       item.id === 5 ? t('frozenDelights') :
                       t('trendingSensations')}
                    </h1>
-                   <p className="text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 text-white/90 max-w-2xl mx-auto drop-shadow-md">
+                   <p className={`text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 text-white/90 max-w-2xl mx-auto drop-shadow-md ${playfairDisplay.className}`} style={{ fontWeight: 400, fontStyle: 'normal', opacity: 0.95 }}>
                      {item.description}
                    </p>
                 
@@ -438,6 +444,7 @@ export default function HomePage() {
         </div>
 
           <div className="relative z-10">
+          <ScrollFadeIn threshold={0.2} direction="up">
           <div className="relative flex justify-center mb-8">
             {/* Top Left Corner Decoration */}
             <div className="absolute top-0 left-0 w-40 h-40 md:w-48 md:h-48 pointer-events-none">
@@ -565,6 +572,7 @@ export default function HomePage() {
               </div>
             </div>
           </div>
+          </ScrollFadeIn>
           </div>
         </section>
 
@@ -583,7 +591,9 @@ export default function HomePage() {
           
           <div className="relative z-10">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-royal-purple mb-8 text-center">{t('featuredMenuItems')}</h2>
+            <ScrollFadeIn threshold={0.2} delay={0}>
+              <h2 className="text-3xl md:text-4xl font-bold text-royal-purple mb-8 text-center">{t('featuredMenuItems')}</h2>
+            </ScrollFadeIn>
             
             {/* Menu Carousel */}
             <div 
@@ -783,17 +793,23 @@ export default function HomePage() {
                   </div>
                   <div className="relative z-10">
                   <div className="text-center space-y-6">
-                    <p className="text-lg md:text-xl text-royal-blue leading-relaxed font-bold">
-                      {t('aboutStory')}
-                    </p>
+                    <ScrollFadeIn threshold={0.2} delay={0}>
+                      <p className={`text-lg md:text-xl text-royal-blue leading-relaxed ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9 }}>
+                        {t('aboutStory')}
+                      </p>
+                    </ScrollFadeIn>
                     
-                    <p className="text-lg md:text-xl text-royal-blue leading-relaxed font-bold">
-                      {t('philosophyDescription1')}
-                    </p>
+                    <ScrollFadeIn threshold={0.2} delay={150}>
+                      <p className={`text-lg md:text-xl text-royal-blue leading-relaxed ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9 }}>
+                        {t('philosophyDescription1')}
+                      </p>
+                    </ScrollFadeIn>
                     
-                    <p className="text-lg md:text-xl text-royal-blue leading-relaxed font-bold">
-                      {t('teamDescription')}
-                    </p>
+                    <ScrollFadeIn threshold={0.2} delay={300}>
+                      <p className={`text-lg md:text-xl text-royal-blue leading-relaxed ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9 }}>
+                        {t('teamDescription')}
+                      </p>
+                    </ScrollFadeIn>
                     
                     <div className="pt-6">
                       <Button

@@ -4,11 +4,19 @@ import { GradientText } from "@/components/ui/gradient-text"
 import Image from "next/image"
 import OurCreationsCarousel from "@/app/components/OurCreationsCarousel"
 import { useTranslation } from "@/contexts/TranslationContext"
+import { Playfair_Display } from "next/font/google"
+import { ScrollFadeIn } from "@/components/ScrollFadeIn"
 
 // Add Dancing Script font for fancy titles
 const dancingScript = {
   fontFamily: 'Dancing Script, cursive',
 }
+
+const playfairDisplay = Playfair_Display({ 
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-playfair"
+})
 
 export default function AboutPage() {
   const { t } = useTranslation()
@@ -80,9 +88,11 @@ export default function AboutPage() {
             >
               {t("welcomeToAmanda")}
             </h2>
-            <p className="text-xl md:text-2xl leading-relaxed font-semibold text-royal-blue max-w-4xl mx-auto tracking-wide">
-              {t("aboutStory")}
-            </p>
+            <ScrollFadeIn threshold={0.2} delay={0}>
+              <p className={`text-xl md:text-2xl leading-relaxed text-royal-blue max-w-4xl mx-auto tracking-wide ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9 }}>
+                {t("aboutStory")}
+              </p>
+            </ScrollFadeIn>
           </div>
         </div>
 
@@ -132,18 +142,22 @@ export default function AboutPage() {
               >
                 {t("ourStory")}
               </h3>
-              <p className="text-lg md:text-xl leading-relaxed font-medium text-royal-blue tracking-wide">
-                {t("ourStoryContent")}
-              </p>
+              <ScrollFadeIn threshold={0.2} delay={100}>
+                <p className={`text-lg md:text-xl leading-relaxed text-royal-blue tracking-wide ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9 }}>
+                  {t("ourStoryContent")}
+                </p>
+              </ScrollFadeIn>
             </div>
-            <div className="relative w-full h-64 md:h-96 rounded-xl overflow-hidden shadow-lg order-1 md:order-2">
-              <Image
-                src="/cakespic.WEBP"
-                alt="Beautiful Cakes"
-                fill
-                className="rounded-xl object-cover"
-              />
-            </div>
+            <ScrollFadeIn threshold={0.2} delay={200} direction="right">
+              <div className="relative w-full h-64 md:h-96 rounded-xl overflow-hidden shadow-lg order-1 md:order-2">
+                <Image
+                  src="/cakespic.WEBP"
+                  alt="Beautiful Cakes"
+                  fill
+                  className="rounded-xl object-cover"
+                />
+              </div>
+            </ScrollFadeIn>
           </div>
         </div>
 
@@ -194,22 +208,28 @@ export default function AboutPage() {
                 {t("ourPhilosophy")}
               </h2>
               <div className="space-y-4">
-                <p className="text-lg md:text-xl leading-relaxed font-medium text-royal-blue tracking-wide">
-                  {t("philosophyDescription1")}
-                </p>
-                <p className="text-lg md:text-xl leading-relaxed font-medium text-royal-blue tracking-wide">
-                  {t("philosophyDescription2")}
-                </p>
+                <ScrollFadeIn threshold={0.2} delay={0}>
+                  <p className={`text-lg md:text-xl leading-relaxed text-royal-blue tracking-wide ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9 }}>
+                    {t("philosophyDescription1")}
+                  </p>
+                </ScrollFadeIn>
+                <ScrollFadeIn threshold={0.2} delay={150}>
+                  <p className={`text-lg md:text-xl leading-relaxed text-royal-blue tracking-wide ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9 }}>
+                    {t("philosophyDescription2")}
+                  </p>
+                </ScrollFadeIn>
               </div>
             </div>
-            <div className="relative w-full h-64 md:h-96 rounded-xl overflow-hidden shadow-lg order-1 md:order-2">
-              <Image
-                src="/tartapic.webp"
-                alt="Beautiful Tarts"
-                fill
-                className="rounded-xl object-cover"
-              />
-            </div>
+            <ScrollFadeIn threshold={0.2} delay={200} direction="left">
+              <div className="relative w-full h-64 md:h-96 rounded-xl overflow-hidden shadow-lg order-1 md:order-2">
+                <Image
+                  src="/tartapic.webp"
+                  alt="Beautiful Tarts"
+                  fill
+                  className="rounded-xl object-cover"
+                />
+              </div>
+            </ScrollFadeIn>
           </div>
         </div>
 
@@ -258,24 +278,30 @@ export default function AboutPage() {
             >
               {t("meetOurTeam")}
             </h2>
-            <p className="text-lg md:text-xl max-w-2xl mx-auto mb-8 font-medium text-royal-blue tracking-wide leading-relaxed">
-              {t("teamDescription")}
-            </p>
+            <ScrollFadeIn threshold={0.2} delay={100}>
+              <p className={`text-lg md:text-xl max-w-2xl mx-auto mb-8 text-royal-blue tracking-wide leading-relaxed ${playfairDisplay.className}`} style={{ fontWeight: 300 }}>
+                {t("teamDescription")}
+              </p>
+            </ScrollFadeIn>
             <div className="flex justify-center">
               <div className="text-center">
-                <div className="relative w-64 h-64 md:w-80 md:h-80 mx-auto mb-6">
-                  <Image
-                    src="/amandapic.jpg"
-                    alt="Amanda Gaci - Founder & Head Pastry Chef"
-                    fill
-                    className="rounded-full object-cover border-6 border-gold shadow-2xl"
-                  />
-                </div>
+                <ScrollFadeIn threshold={0.2} delay={150} direction="up">
+                  <div className="relative w-64 h-64 md:w-80 md:h-80 mx-auto mb-6">
+                    <Image
+                      src="/amandapic.jpg"
+                      alt="Amanda Gaci - Founder & Head Pastry Chef"
+                      fill
+                      className="rounded-full object-cover border-6 border-gold shadow-2xl"
+                    />
+                  </div>
+                </ScrollFadeIn>
                 <h3 className="text-2xl md:text-3xl font-bold text-royal-purple mb-2 leading-tight">Amanda Gaci</h3>
                 <p className="text-lg md:text-xl text-royal-blue font-semibold mb-3 tracking-wide">Founder, Head Pastry Chef & Custom Cake Specialist</p>
-                <p className="text-base md:text-lg text-royal-blue/80 mt-2 max-w-md mx-auto font-medium leading-relaxed tracking-wide">
-                  {t("amandaDescription")}
-                </p>
+                <ScrollFadeIn threshold={0.2} delay={200}>
+                  <p className={`text-base md:text-lg text-royal-blue/80 mt-2 max-w-md mx-auto leading-relaxed tracking-wide ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.85 }}>
+                    {t("amandaDescription")}
+                  </p>
+                </ScrollFadeIn>
               </div>
             </div>
           </div>
@@ -305,9 +331,11 @@ export default function AboutPage() {
           >
             {t("ourCreations")}
           </h2>
-          <p className="text-xl md:text-2xl text-center mb-12 text-royal-blue font-medium max-w-4xl mx-auto px-4 tracking-wide leading-relaxed">
-            {t("creationsDescription")}
-          </p>
+          <ScrollFadeIn threshold={0.2} delay={0}>
+            <p className={`text-xl md:text-2xl text-center mb-12 text-royal-blue max-w-4xl mx-auto px-4 tracking-wide leading-relaxed ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9 }}>
+              {t("creationsDescription")}
+            </p>
+          </ScrollFadeIn>
           <OurCreationsCarousel />
         </div>
       </div>
