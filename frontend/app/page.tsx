@@ -352,7 +352,7 @@ export default function HomePage() {
                       item.id === 5 ? t('frozenDelights') :
                       t('trendingSensations')}
                    </h1>
-                   <p className={`text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 text-white/90 max-w-2xl mx-auto drop-shadow-md ${playfairDisplay.className}`} style={{ fontWeight: 400, fontStyle: 'normal', opacity: 0.95 }}>
+                   <p className={`text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 text-white/90 max-w-2xl mx-auto drop-shadow-md ${playfairDisplay.className}`} style={{ fontWeight: 400, fontStyle: 'normal', opacity: 0.95, color: '#b91c7a' }}>
                      {item.description}
                    </p>
                 
@@ -794,19 +794,19 @@ export default function HomePage() {
                   <div className="relative z-10">
                   <div className="text-center space-y-6">
                     <ScrollFadeIn threshold={0.2} delay={0}>
-                      <p className={`text-lg md:text-xl text-royal-blue leading-relaxed ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9 }}>
+                      <p className={`text-lg md:text-xl leading-relaxed ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9, color: '#b91c7a' }}>
                         {t('aboutStory')}
                       </p>
                     </ScrollFadeIn>
                     
                     <ScrollFadeIn threshold={0.2} delay={150}>
-                      <p className={`text-lg md:text-xl text-royal-blue leading-relaxed ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9 }}>
+                      <p className={`text-lg md:text-xl leading-relaxed ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9, color: '#b91c7a' }}>
                         {t('philosophyDescription1')}
                       </p>
                     </ScrollFadeIn>
                     
                     <ScrollFadeIn threshold={0.2} delay={300}>
-                      <p className={`text-lg md:text-xl text-royal-blue leading-relaxed ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9 }}>
+                      <p className={`text-lg md:text-xl leading-relaxed ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9, color: '#b91c7a' }}>
                         {t('teamDescription')}
                       </p>
                     </ScrollFadeIn>

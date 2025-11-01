@@ -89,7 +89,7 @@ export default function AboutPage() {
               {t("welcomeToAmanda")}
             </h2>
             <ScrollFadeIn threshold={0.2} delay={0}>
-              <p className={`text-xl md:text-2xl leading-relaxed text-royal-blue max-w-4xl mx-auto tracking-wide ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9 }}>
+              <p className={`text-xl md:text-2xl leading-relaxed max-w-4xl mx-auto tracking-wide ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9, color: '#b91c7a' }}>
                 {t("aboutStory")}
               </p>
             </ScrollFadeIn>
@@ -143,7 +143,7 @@ export default function AboutPage() {
                 {t("ourStory")}
               </h3>
               <ScrollFadeIn threshold={0.2} delay={100}>
-                <p className={`text-lg md:text-xl leading-relaxed text-royal-blue tracking-wide ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9 }}>
+                <p className={`text-lg md:text-xl leading-relaxed tracking-wide ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9, color: '#b91c7a' }}>
                   {t("ourStoryContent")}
                 </p>
               </ScrollFadeIn>
@@ -209,12 +209,12 @@ export default function AboutPage() {
               </h2>
               <div className="space-y-4">
                 <ScrollFadeIn threshold={0.2} delay={0}>
-                  <p className={`text-lg md:text-xl leading-relaxed text-royal-blue tracking-wide ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9 }}>
+                  <p className={`text-lg md:text-xl leading-relaxed tracking-wide ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9, color: '#b91c7a' }}>
                     {t("philosophyDescription1")}
                   </p>
                 </ScrollFadeIn>
                 <ScrollFadeIn threshold={0.2} delay={150}>
-                  <p className={`text-lg md:text-xl leading-relaxed text-royal-blue tracking-wide ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9 }}>
+                  <p className={`text-lg md:text-xl leading-relaxed tracking-wide ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9, color: '#b91c7a' }}>
                     {t("philosophyDescription2")}
                   </p>
                 </ScrollFadeIn>
@@ -298,7 +298,7 @@ export default function AboutPage() {
                 <h3 className="text-2xl md:text-3xl font-bold text-royal-purple mb-2 leading-tight">Amanda Gaci</h3>
                 <p className="text-lg md:text-xl text-royal-blue font-semibold mb-3 tracking-wide">Founder, Head Pastry Chef & Custom Cake Specialist</p>
                 <ScrollFadeIn threshold={0.2} delay={200}>
-                  <p className={`text-base md:text-lg text-royal-blue/80 mt-2 max-w-md mx-auto leading-relaxed tracking-wide ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.85 }}>
+                  <p className={`text-base md:text-lg mt-2 max-w-md mx-auto leading-relaxed tracking-wide ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.85, color: '#b91c7a' }}>
                     {t("amandaDescription")}
                   </p>
                 </ScrollFadeIn>
@@ -332,7 +332,7 @@ export default function AboutPage() {
             {t("ourCreations")}
           </h2>
           <ScrollFadeIn threshold={0.2} delay={0}>
-            <p className={`text-xl md:text-2xl text-center mb-12 text-royal-blue max-w-4xl mx-auto px-4 tracking-wide leading-relaxed ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9 }}>
+            <p className={`text-xl md:text-2xl text-center mb-12 max-w-4xl mx-auto px-4 tracking-wide leading-relaxed ${playfairDisplay.className}`} style={{ fontWeight: 400, opacity: 0.9, color: '#b91c7a' }}>
               {t("creationsDescription")}
             </p>
           </ScrollFadeIn>
