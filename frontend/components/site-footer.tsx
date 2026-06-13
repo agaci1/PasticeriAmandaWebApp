@@ -93,9 +93,13 @@ export function SiteFooter() {
               <p className="text-xs text-cream/50 font-serif">© 2025 {t("brandName")}. All rights reserved.</p>
               <p className="text-xs text-cream/40 font-serif">
                 Designed by{" "}
-                <span className="text-antique-gold/80">Alkeo Gaci</span>
-                {" "}+355 69 685 1089
+                <span className="text-antique-gold/80">DTW Code Studio</span>
+                {" · "}
+                <Link href="tel:+355696851089" className="transition-colors hover:text-antique-gold">
+                  +355 69 685 1089
+                </Link>
               </p>
+              <p className="text-xs font-serif italic tracking-wide text-cream/35">debug the world</p>
             </div>
           </div>
         </ScrollFadeIn>
