@@ -1,9 +1,7 @@
 "use client"
 
 import type React from "react"
-
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
@@ -11,14 +9,17 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import API_BASE from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
-import { GradientText } from "@/components/ui/gradient-text"
 import { Eye, EyeOff } from "lucide-react"
+import { useTranslation } from "@/contexts/TranslationContext"
+
+const fieldClass = "luxury-input w-full"
 
 export default function SignupPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const { toast } = useToast()
+  const { t } = useTranslation()
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -30,7 +31,6 @@ export default function SignupPage() {
 
     try {
       const res = await fetch(`${API_BASE}/api/auth/signup`, {
-        // Assuming /api/auth/signup endpoint for clients
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
@@ -42,15 +42,15 @@ export default function SignupPage() {
       }
 
       toast({
-        title: "Signup Successful!",
-        description: "Your account has been created. Please log in.",
+        title: t("signupSuccessful"),
+        description: t("signupSuccessfulMessage"),
       })
       router.push("/auth/login")
-    } catch (error: any) {
-      console.error("Signup error:", error)
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : t("signupFailedMessage")
       toast({
-        title: "Signup Failed",
-        description: error.message || "There was an error creating your account. Please try again.",
+        title: t("signupFailed"),
+        description: message,
         variant: "destructive",
       })
     } finally {
@@ -59,82 +59,89 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] px-4 py-12">
-      <Card className="mx-auto max-w-sm bg-white/80 backdrop-blur-sm border-gold shadow-lg">
-        <CardHeader>
-          <h1 className="text-3xl font-bold text-center text-white" style={{
-          textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
-        }}>
-          Sign Up
-        </h1>
-          <CardDescription className="text-royal-blue text-center">
-            Enter your information to create an account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                name="name"
-                placeholder="Max Robinson"
-                required
-                className="bg-white border-royal-blue text-royal-blue"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-                className="bg-white border-royal-blue text-royal-blue"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  className="bg-white border-royal-blue text-royal-blue pr-10"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-500" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-500" />
-                  )}
-                </Button>
+    <div className="relative min-h-[calc(100vh-4rem)] bg-cream">
+      <div className="pointer-events-none absolute inset-0 vintage-paper opacity-70" />
+
+      <div className="container relative z-10 mx-auto flex max-w-md items-center justify-center px-4 py-12 md:px-6 md:py-16">
+        <div className="w-full">
+          <header className="mb-8 text-center md:mb-10">
+            <p className="mb-2 font-script text-xl text-antique-gold md:text-2xl">Pastiçeri Amanda</p>
+            <h1 className="font-display text-4xl font-light text-charcoal md:text-5xl">{t("signUp")}</h1>
+            <div className="mx-auto mt-6 h-px w-20 bg-gradient-to-r from-transparent via-antique-gold to-transparent" />
+            <p className="mx-auto mt-6 max-w-sm font-serif text-base leading-relaxed text-charcoal/75">
+              {t("signupSubtitle")}
+            </p>
+          </header>
+
+          <div className="luxury-panel p-6 md:p-8">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="grid gap-2">
+                <Label htmlFor="name" className="luxury-label">
+                  {t("name")}
+                </Label>
+                <Input id="name" name="name" placeholder={t("name")} required className={fieldClass} />
               </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="email" className="luxury-label">
+                  {t("email")}
+                </Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  required
+                  className={fieldClass}
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="password" className="luxury-label">
+                  {t("password")}
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    className={`${fieldClass} pr-10`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-charcoal/50 transition-colors hover:text-charcoal"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <Button type="submit" disabled={loading} className="btn-luxury w-full">
+                {loading ? (
+                  <>
+                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-cream/30 border-t-cream" />
+                    {t("signingUp")}
+                  </>
+                ) : (
+                  t("createAccount")
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-6 border-t border-antique-gold/20 pt-6 text-center font-serif text-sm text-charcoal/70">
+              <p>
+                {t("alreadyHaveAccount")}{" "}
+                <Link href="/auth/login" className="text-antique-gold-dark transition-colors hover:text-antique-gold">
+                  {t("login")}
+                </Link>
+              </p>
             </div>
-            <Button
-              type="submit"
-              className="w-full bg-royal-purple text-white hover:bg-royal-blue transition-colors"
-              disabled={loading}
-            >
-              {loading ? "Signing Up..." : "Create an account"}
-            </Button>
-          </form>
-          <div className="mt-4 text-center text-sm text-royal-blue">
-            Already have an account?{" "}
-            <Link href="/auth/login" className="underline text-royal-purple hover:text-royal-blue">
-              Login
-            </Link>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

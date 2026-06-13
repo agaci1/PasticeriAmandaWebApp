@@ -54,11 +54,21 @@ const config = {
           foreground: "hsl(var(--card-foreground))",
         },
         // Custom Colors
-        "royal-blue": "#4169E1", // A shade of royal blue
-        "royal-purple": "#8A2BE2", // A shade of royal purple
-        "dark-royal-blue": "#2A4B9A", // Darker shade for text
-        "dark-royal-purple": "#6A1B9A", // Darker shade for text
-        gold: "#FFD700", // Standard gold
+        "royal-blue": "#4169E1",
+        "royal-purple": "#8A2BE2",
+        "dark-royal-blue": "#2A4B9A",
+        "dark-royal-purple": "#6A1B9A",
+        gold: "#FFD700",
+        // Vintage luxury palette
+        charcoal: "#1C1C1E",
+        "charcoal-light": "#2D2D30",
+        cream: "#F5F0E8",
+        "cream-dark": "#E8DFD0",
+        "antique-gold": "#C9A961",
+        "antique-gold-light": "#D4BC82",
+        "antique-gold-dark": "#A68B4B",
+        burgundy: "#722F37",
+        "burgundy-light": "#8B3A44",
         "pink-gradient-start": "#FFC0CB", // Light pink
         "pink-gradient-end": "#DA70D6", // Orchid/medium purple-pink
         // Updated background gradient colors
@@ -121,6 +131,47 @@ const config = {
           "50%": { transform: "translate(-12vw, -18vh) scale(1.2)" },
           "75%": { transform: "translate(7vw, 12vh) scale(1.0)" },
         },
+        "fade-in-up": {
+          "0%": { opacity: "0", transform: "translateY(24px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        "gentle-float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-8px)" },
+        },
+        "gold-pulse": {
+          "0%, 100%": { opacity: "0.4", transform: "scale(1)" },
+          "50%": { opacity: "0.7", transform: "scale(1.05)" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+        "slide-in-left": {
+          "0%": { opacity: "0", transform: "translateX(-40px)" },
+          "100%": { opacity: "1", transform: "translateX(0)" },
+        },
+        "slide-in-right": {
+          "0%": { opacity: "0", transform: "translateX(40px)" },
+          "100%": { opacity: "1", transform: "translateX(0)" },
+        },
+        "promo-marquee": {
+          "0%": { transform: "translate3d(0, 0, 0)" },
+          "100%": { transform: "translate3d(-50%, 0, 0)" },
+        },
+      },
+      boxShadow: {
+        vintage: "0 4px 24px rgba(28, 28, 30, 0.12), 0 1px 3px rgba(201, 169, 97, 0.15)",
+        gold: "0 0 20px rgba(201, 169, 97, 0.3), 0 0 40px rgba(201, 169, 97, 0.1)",
+        "gold-lg": "0 0 30px rgba(201, 169, 97, 0.4), 0 4px 20px rgba(28, 28, 30, 0.2)",
+      },
+      fontFamily: {
+        serif: ["var(--font-playfair)", "Georgia", "serif"],
+        script: ["var(--font-dancing)", "cursive"],
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -130,6 +181,14 @@ const config = {
         "move-circle-3": "move-circle-3 18s ease-in-out infinite",
         "move-circle-4": "move-circle-4 22s ease-in-out infinite",
         "move-circle-5": "move-circle-5 28s ease-in-out infinite reverse",
+        "fade-in-up": "fade-in-up 0.8s ease-out forwards",
+        "fade-in": "fade-in 0.6s ease-out forwards",
+        "gentle-float": "gentle-float 4s ease-in-out infinite",
+        "gold-pulse": "gold-pulse 3s ease-in-out infinite",
+        shimmer: "shimmer 3s linear infinite",
+        "slide-in-left": "slide-in-left 0.7s ease-out forwards",
+        "slide-in-right": "slide-in-right 0.7s ease-out forwards",
+        "promo-marquee": "promo-marquee 38s linear infinite",
       },
     },
   },

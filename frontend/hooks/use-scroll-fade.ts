@@ -22,6 +22,12 @@ export function useScrollFade(options: UseScrollFadeOptions = {}) {
     const element = elementRef.current
     if (!element) return
 
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight
+    const rect = element.getBoundingClientRect()
+    if (rect.top < viewportHeight && rect.bottom > 0) {
+      setIsVisible(true)
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {

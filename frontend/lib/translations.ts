@@ -90,6 +90,34 @@ export const translations = {
     signUp: 'Sign Up',
     alreadyHaveAccount: 'Already have an account?',
     dontHaveAccount: "Don't have an account?",
+    loginSubtitle: 'Enter your email below to sign in to your account',
+    loginSuccessful: 'Login Successful!',
+    loginWelcomeBack: 'Welcome back!',
+    loginFailed: 'Login Failed',
+    loginFailedMessage: 'Invalid credentials. Please try again.',
+    loggingIn: 'Logging in...',
+    signupSubtitle: 'Enter your details below to create your account',
+    signupSuccessful: 'Signup Successful!',
+    signupSuccessfulMessage: 'Your account has been created. Please log in.',
+    signupFailed: 'Signup Failed',
+    signupFailedMessage: 'There was an error creating your account. Please try again.',
+    signingUp: 'Creating account...',
+    createAccount: 'Create Account',
+    contactPageSubtitle: 'We would love to hear from you. Reach out for orders, questions, or simply to say hello.',
+    getInTouch: 'Get in Touch',
+    visitUs: 'Visit Us',
+    callUs: 'Call Us',
+    writeUs: 'Write to Us',
+    hoursLabel: 'Opening Hours',
+    contactFormHint: 'Fill in your details and we will open WhatsApp with your message ready to send.',
+    contactFormName: 'Your Name',
+    contactFormMessage: 'Your Message',
+    contactFormSubject: 'Website Contact',
+    contactWhatsAppGreeting: 'Hello Pastiçeri Amanda,',
+    sendMessage: 'Send Message',
+    sendWhatsAppMessage: 'Send via WhatsApp',
+    contactFormSent: 'Opening WhatsApp',
+    contactFormSentMessage: 'WhatsApp is opening with your message. Tap send to reach us.',
     
     // Order
     orderDate: 'Order Date',
@@ -162,6 +190,22 @@ export const translations = {
     loadingMenu: 'Loading menu...',
     failedToLoadMenu: 'Failed to load menu. Please try again later.',
     failedToLoadMenuItems: 'Failed to load menu items.',
+    menuBrowseDescription:
+      'Browse what we offer at Pastiçeri Amanda. These menus are for in-store reference — to order a custom cake or celebration piece, use our custom order form.',
+    menuOrderCustomCta: 'Place a Custom Order',
+    menuCategoryTraditionalSweets: 'Traditional Sweets',
+    menuCategoryTraditionalSweetsDesc:
+      'Time-honoured Albanian and Mediterranean confections — baklava, kadaif, and seasonal specialties made with premium ingredients.',
+    menuCategoryCrepesWaffles: 'Crêpes & Waffles',
+    menuCategoryCrepesWafflesDesc:
+      'Golden crêpes and Belgian waffles prepared fresh, with sweet or classic toppings — perfect any time of day.',
+    menuCategoryCoffeesJuices: 'Coffees & Juices',
+    menuCategoryCoffeesJuicesDesc:
+      'Espresso, cappuccino, specialty coffee, fresh juices, smoothies, and ice cream — crafted to pair with our pastries.',
+    menuCategoryCakesDesc:
+      'Custom celebration cakes and elegant everyday treats, designed and decorated by hand for every occasion.',
+    menuCategorySweetsDesc:
+      'Artisan pastries, tarts, cookies, and daily sweet selections from our display case.',
     
     // Order Page
     orderForm: 'Order Form',
@@ -248,7 +292,7 @@ export const translations = {
     ourPhilosophy: 'Our Philosophy',
     philosophyDescription1: 'At Pastiçeri Amanda, we transcend the ordinary realm of baking; we are culinary artisans and visionaries. Each creation is a masterpiece where we harmoniously blend premium flavors, exquisite textures, and innovative designs to craft edible works of art that captivate the senses.',
     philosophyDescription2: 'From opulent wedding confections to whimsical celebration masterpieces and refined daily delicacies, we infuse every creation with passion, precision, and an unwavering commitment to excellence.',
-    ourStoryContent: 'Our illustrious journey commenced in 2018 when Amanda, a visionary pastry artist with an unyielding passion for culinary excellence, embarked on a mission to transform her profound love for the art of baking into an extraordinary legacy. Today, Pastiçeri Amanda stands as a testament to unwavering dedication, boundless creativity, and the profound belief that every dessert narrates a story of love, celebration, and artistic expression.',
+    ourStoryContent: 'Our illustrious journey commenced in 2019 when Amanda, a visionary pastry artist with an unyielding passion for culinary excellence, embarked on a mission to transform her profound love for the art of baking into an extraordinary legacy. Today, Pastiçeri Amanda stands as a testament to unwavering dedication, boundless creativity, and the profound belief that every dessert narrates a story of love, celebration, and artistic expression.',
     meetOurTeam: 'Meet Our Team',
     teamDescription: 'Our distinguished ensemble of master pastry artisans and devoted professionals forms the very essence of Pastiçeri Amanda. With decades of combined expertise and a shared devotion to the culinary arts, they tirelessly orchestrate the transformation of your sweetest dreams into magnificent realities.',
     amandaDescription: 'With an illustrious career spanning years in the refined arts of pastry creation and an unquenchable passion for crafting edible masterpieces, Amanda leads our distinguished team with unparalleled creativity, meticulous precision, and an unwavering dedication to culinary excellence.',
@@ -375,6 +419,36 @@ export const translations = {
     signUp: 'Regjistrohu',
     alreadyHaveAccount: 'Keni tashmë një llogari?',
     dontHaveAccount: 'Nuk keni llogari?',
+    loginSubtitle: 'Shkruani emailin tuaj më poshtë për të hyrë në llogarinë tuaj',
+    loginSuccessful: 'Hyrja u Krye me Sukses!',
+    loginWelcomeBack: 'Mirë se u kthyet!',
+    loginFailed: 'Hyrja Dështoi',
+    loginFailedMessage: 'Kredencialet janë të pavlefshme. Ju lutemi provoni përsëri.',
+    loggingIn: 'Duke u futur...',
+    signupSubtitle: 'Plotësoni të dhënat më poshtë për të krijuar llogarinë tuaj',
+    signupSuccessful: 'Regjistrimi u Krye me Sukses!',
+    signupSuccessfulMessage: 'Llogaria juaj u krijua. Ju lutemi hyni.',
+    signupFailed: 'Regjistrimi Dështoi',
+    signupFailedMessage: 'Pati një gabim gjatë krijimit të llogarisë. Ju lutemi provoni përsëri.',
+    signingUp: 'Duke krijuar llogarinë...',
+    createAccount: 'Krijo Llogarinë',
+
+    // Contact
+    contactPageSubtitle: 'Do të donim të dëgjonim nga ju. Na kontaktoni për porosi, pyetje, ose thjesht për të përshëndetur.',
+    getInTouch: 'Na Kontaktoni',
+    visitUs: 'Na Vizitoni',
+    callUs: 'Na Telefononi',
+    writeUs: 'Na Shkruani',
+    hoursLabel: 'Orari',
+    contactFormHint: 'Plotësoni të dhënat tuaja dhe do të hapim WhatsApp me mesazhin tuaj gati për dërgim.',
+    contactFormName: 'Emri Juaj',
+    contactFormMessage: 'Mesazhi Juaj',
+    contactFormSubject: 'Kontakt nga Faqja',
+    contactWhatsAppGreeting: 'Përshëndetje Pastiçeri Amanda,',
+    sendMessage: 'Dërgo Mesazhin',
+    sendWhatsAppMessage: 'Dërgo në WhatsApp',
+    contactFormSent: 'Duke hapur WhatsApp',
+    contactFormSentMessage: 'WhatsApp po hapet me mesazhin tuaj. Shtypni dërgo për të na arritur.',
     
     // Order
     orderDate: 'Data e Porosisë',
@@ -454,6 +528,22 @@ export const translations = {
     loadingMenu: 'Duke ngarkuar menynë...',
     failedToLoadMenu: 'Dështoi ngarkimi i menusë. Ju lutemi provoni përsëri më vonë.',
     failedToLoadMenuItems: 'Dështoi ngarkimi i artikujve të menusë.',
+    menuBrowseDescription:
+      'Shfletoni çfarë ofrojmë në Pastiçeri Amanda. Këto menu janë për referencë në dyqan — për të porositur një tortë të personalizuar, përdorni formularin e porosisë së personalizuar.',
+    menuOrderCustomCta: 'Porosi e Personalizuar',
+    menuCategoryTraditionalSweets: 'Ëmbëlsira Tradicionale',
+    menuCategoryTraditionalSweetsDesc:
+      'Konfeksione shqiptare dhe mesdhetare — bakllava, kadaif dhe specialitete sezonale me përbërës premium.',
+    menuCategoryCrepesWaffles: 'Krëp & Waffle',
+    menuCategoryCrepesWafflesDesc:
+      'Krëpë të arta dhe waffle belge të përgatitura freskë, me mbushje të ëmbla ose klasike.',
+    menuCategoryCoffeesJuices: 'Kafe & Lëngje',
+    menuCategoryCoffeesJuicesDesc:
+      'Espresso, kapuçino, kafe speciale, lëngje freskë, smoothie dhe akullore — të përsosura me pasticetë tona.',
+    menuCategoryCakesDesc:
+      'Torta festimi të personalizuara dhe ëmbëlsira elegante, të dizajnuara dhe dekoruar me dorë.',
+    menuCategorySweetsDesc:
+      'Pastiçeri artizanale, tarta, biskota dhe përzgjedhje të ëmbla ditore nga vitrina jonë.',
     
     // Order Page
     orderForm: 'Formulari i Porosisë',
@@ -533,7 +623,7 @@ export const translations = {
     ourPhilosophy: 'Filozofia Jonë',
     philosophyDescription1: 'Në Pastiçeri Amanda, ne tejkalojmë sferën e zakonshme të pjekjes; ne jemi zejtarë kulinarë dhe vizionarë. Çdo krijim është një kryevepër ku ne përzijmë harmonikisht shijet premium, teksturat e shkëlqyera dhe dizajnet inovative për të krijuar vepra arti të hajshme që kapin shqisat.',
     philosophyDescription2: 'Nga konfeksionet luksoze të dasmës deri te kryeveprat fantastike të festimeve dhe delikatesat e rafinuara të përditshme, ne derdhim pasionin, precizionin dhe një angazhim të pandryshueshëm për përsosmërinë në çdo krijim.',
-    ourStoryContent: 'Rrugëtimi ynë i lavdishëm filloi në vitin 2018 kur Amanda, një artiste pasticiere vizionare me një pasion të pandryshueshëm për përsosmërinë kulinare, filloi një mision për të shndërruar dashurinë e saj të thellë për artin e pjekjes në një trashëgimi të jashtëzakonshme. Sot, Pastiçeri Amanda qëndron si një testament i dedikimit të pandryshueshëm, krijimtarisë së pakufishme dhe besimit të thellë se çdo ëmbëlsirë tregon një histori dashurie, festimi dhe shprehje artistike.',
+    ourStoryContent: 'Rrugëtimi ynë i lavdishëm filloi në vitin 2019 kur Amanda, një artiste pasticiere vizionare me një pasion të pandryshueshëm për përsosmërinë kulinare, filloi një mision për të shndërruar dashurinë e saj të thellë për artin e pjekjes në një trashëgimi të jashtëzakonshme. Sot, Pastiçeri Amanda qëndron si një testament i dedikimit të pandryshueshëm, krijimtarisë së pakufishme dhe besimit të thellë se çdo ëmbëlsirë tregon një histori dashurie, festimi dhe shprehje artistike.',
     meetOurTeam: 'Njihni Ekipin Tonë',
     teamDescription: 'Ensembli ynë i dalluar i zejtarëve kryesorë të pasticierisë dhe profesionistëve të dedikuar formon thelbin e Pastiçeri Amanda. Me dekada përvoje të kombinuar dhe një devotim të përbashkët për artet kulinare, ata orkestrojnë pa lodur transformimin e ëndrrave tuaja më të ëmbla në realitete madhështore.',
     amandaDescription: 'Me një karrierë të lavdishme që përfshin vite në artet e rafinuara të krijimit të pasticierisë dhe një pasion për krijimin e kryeveprave të hajshme, Amanda udhëheq ekipin tonë të dalluar me krijimtari të paparë, precizion metikuloz dhe një dedikim të pandryshueshëm për përsosmërinë kulinare.',
@@ -660,6 +750,36 @@ export const translations = {
     signUp: 'Registrati',
     alreadyHaveAccount: 'Hai già un account?',
     dontHaveAccount: 'Non hai un account?',
+    loginSubtitle: 'Inserisci la tua email qui sotto per accedere al tuo account',
+    loginSuccessful: 'Accesso Riuscito!',
+    loginWelcomeBack: 'Bentornato!',
+    loginFailed: 'Accesso Fallito',
+    loginFailedMessage: 'Credenziali non valide. Riprova.',
+    loggingIn: 'Accesso in corso...',
+    signupSubtitle: 'Inserisci i tuoi dati qui sotto per creare il tuo account',
+    signupSuccessful: 'Registrazione Riuscita!',
+    signupSuccessfulMessage: 'Il tuo account è stato creato. Effettua l\'accesso.',
+    signupFailed: 'Registrazione Fallita',
+    signupFailedMessage: 'Si è verificato un errore durante la creazione dell\'account. Riprova.',
+    signingUp: 'Creazione account...',
+    createAccount: 'Crea Account',
+
+    // Contact
+    contactPageSubtitle: 'Ci farebbe piacere sentirti. Contattaci per ordini, domande, o semplicemente per salutarci.',
+    getInTouch: 'Contattaci',
+    visitUs: 'Vieni a Trovarci',
+    callUs: 'Chiamaci',
+    writeUs: 'Scrivici',
+    hoursLabel: 'Orari di Apertura',
+    contactFormHint: 'Compila i tuoi dati e apriremo WhatsApp con il messaggio pronto da inviare.',
+    contactFormName: 'Il Tuo Nome',
+    contactFormMessage: 'Il Tuo Messaggio',
+    contactFormSubject: 'Contatto dal Sito',
+    contactWhatsAppGreeting: 'Ciao Pastiçeri Amanda,',
+    sendMessage: 'Invia Messaggio',
+    sendWhatsAppMessage: 'Invia su WhatsApp',
+    contactFormSent: 'Apertura WhatsApp',
+    contactFormSentMessage: 'WhatsApp si sta aprendo con il tuo messaggio. Tocca invia per contattarci.',
     
     // Order
     orderDate: 'Data Ordine',
@@ -723,6 +843,22 @@ export const translations = {
     loadingMenu: 'Caricamento menu...',
     failedToLoadMenu: 'Impossibile caricare il menu. Riprova più tardi.',
     failedToLoadMenuItems: 'Impossibile caricare gli articoli del menu.',
+    menuBrowseDescription:
+      'Sfoglia le nostre proposte alla Pastiçeri Amanda. Questi menu sono di riferimento in negozio — per ordinare una torta personalizzata, usa il modulo ordine personalizzato.',
+    menuOrderCustomCta: 'Ordine Personalizzato',
+    menuCategoryTraditionalSweets: 'Dolci Tradizionali',
+    menuCategoryTraditionalSweetsDesc:
+      'Confezioni albanesi e mediterranee — baklava, kadaif e specialità stagionali con ingredienti premium.',
+    menuCategoryCrepesWaffles: 'Crêpes & Waffle',
+    menuCategoryCrepesWafflesDesc:
+      'Crêpes dorate e waffle belgi preparati al momento, con topping dolci o classici.',
+    menuCategoryCoffeesJuices: 'Caffè & Succhi',
+    menuCategoryCoffeesJuicesDesc:
+      'Espresso, cappuccino, caffè speciali, succhi freschi, smoothie e gelato — perfetti con i nostri pasticcini.',
+    menuCategoryCakesDesc:
+      'Torte personalizzate per celebrazioni e dolci eleganti, progettati e decorati a mano.',
+    menuCategorySweetsDesc:
+      'Pasticceria artigianale, crostate, biscotti e selezione dolce quotidiana dalla nostra vetrina.',
     
     // Order Page
     orderForm: 'Modulo Ordine',
@@ -818,7 +954,7 @@ export const translations = {
     ourPhilosophy: 'La Nostra Filosofia',
     philosophyDescription1: 'Alla Pastiçeri Amanda, trascendiamo il regno ordinario della pasticceria; siamo artigiani culinari e visionari. Ogni creazione è un capolavoro dove armonizziamo sapori premium, trame squisite e design innovativi per creare opere d\'arte commestibili che catturano i sensi.',
     philosophyDescription2: 'Dalle opulente confezioni nuziali ai capolavori fantasiosi per le celebrazioni e le raffinate delicatezze quotidiane, infondiamo ogni creazione con passione, precisione e un impegno incrollabile per l\'eccellenza.',
-    ourStoryContent: 'Il nostro illustre viaggio è iniziato nel 2018 quando Amanda, un\'artista pasticciera visionaria con una passione incrollabile per l\'eccellenza culinaria, ha intrapreso una missione per trasformare il suo profondo amore per l\'arte della pasticceria in un\'eredità straordinaria. Oggi, la Pastiçeri Amanda si erge come testimonianza di dedizione incrollabile, creatività illimitata e la profonda convinzione che ogni dolce narri una storia di amore, celebrazione ed espressione artistica.',
+    ourStoryContent: 'Il nostro illustre viaggio è iniziato nel 2019 quando Amanda, un\'artista pasticciera visionaria con una passione incrollabile per l\'eccellenza culinaria, ha intrapreso una missione per trasformare il suo profondo amore per l\'arte della pasticceria in un\'eredità straordinaria. Oggi, la Pastiçeri Amanda si erge come testimonianza di dedizione incrollabile, creatività illimitata e la profonda convinzione che ogni dolce narri una storia di amore, celebrazione ed espressione artistica.',
     meetOurTeam: 'Incontra il Nostro Team',
     teamDescription: 'Il nostro distinto ensemble di maestri artigiani pasticcieri e professionisti devoti forma l\'essenza stessa della Pastiçeri Amanda. Con decenni di esperienza combinata e una devozione condivisa per le arti culinarie, orchestrano instancabilmente la trasformazione dei vostri sogni più dolci in realtà magnifiche.',
     amandaDescription: 'Con una carriera illustre che abbraccia anni nelle raffinate arti della creazione pasticciera e una passione inestinguibile per la creazione di capolavori commestibili, Amanda guida il nostro distinto team con creatività senza precedenti, precisione meticolosa e una dedizione incrollabile all\'eccellenza culinaria.',

@@ -4,12 +4,9 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Instagram } from "lucide-react";
 
-// Cake images array
-const cakeImages = [
-  "/cake1.jpg", "/cake2.jpg", "/cake3.jpg", "/cake4.jpg", "/cake5.jpg", "/cake6.jpg",
-  "/cake7.jpg", "/cake8.jpg", "/cake9.jpg", "/cake10.jpg", "/cake11.jpg", "/cake12.jpg",
-  "/cake13.jpg", "/cake14.jpg", "/cake15.jpg", "/cake16.jpg"
-];
+import { media } from "@/lib/media";
+
+const cakeImages = media.cakes.gallery;
 
 export default function OurCreationsCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -183,7 +180,7 @@ export default function OurCreationsCarousel() {
                 }}
                 onClick={() => !isCenter && goToSlide(item.index)}
               >
-                <div className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-2xl overflow-hidden shadow-2xl border-2 border-gold">
+                <div className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-sm overflow-hidden shadow-gold-lg border-2 border-antique-gold transition-shadow duration-500 hover:shadow-gold">
                   <Image
                     src={item.src}
                     alt={`Cake ${item.index + 1}`}
@@ -193,7 +190,7 @@ export default function OurCreationsCarousel() {
                   />
                   {/* Glow effect for center image */}
                   {isCenter && (
-                    <div className="absolute inset-0 bg-gradient-to-t from-gold/20 via-transparent to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-antique-gold/25 via-transparent to-transparent" />
                   )}
                 </div>
               </div>
@@ -207,10 +204,10 @@ export default function OurCreationsCarousel() {
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-200 ${
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${
                 index === currentIndex
-                  ? 'bg-royal-purple scale-125'
-                  : 'bg-gray-300 hover:bg-gray-400'
+                  ? 'bg-antique-gold scale-125 shadow-gold'
+                  : 'bg-charcoal/20 hover:bg-antique-gold/50'
               }`}
             />
           ))}
@@ -219,14 +216,14 @@ export default function OurCreationsCarousel() {
 
       {/* Instagram Link */}
       <div className="text-center mt-8">
-        <p className="text-lg text-royal-blue font-semibold mb-4">
+        <p className="text-lg text-charcoal font-serif mb-4">
           You can find this and more models in our pastry shop account
         </p>
         <a
           href="https://www.instagram.com/pasticeri_amanda"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:from-pink-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+          className="inline-flex items-center gap-2 bg-charcoal text-cream border border-antique-gold px-6 py-3 rounded-sm font-serif tracking-wider uppercase text-sm hover:bg-antique-gold hover:text-charcoal transition-all duration-300 shadow-vintage hover:shadow-gold"
         >
           <Instagram className="w-5 h-5" />
           @pasticeri_amanda

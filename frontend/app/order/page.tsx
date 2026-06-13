@@ -2,26 +2,27 @@
 
 import type React from "react"
 import { useRouter } from "next/navigation"
-
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { CalendarIcon, UploadCloud, Lock } from "lucide-react"
+import { CalendarIcon, UploadCloud, Lock, X } from "lucide-react"
 import { format } from "date-fns"
 import { useState, useRef, useEffect } from "react"
-import { authenticatedFetch } from "@/lib/auth"
 import { useToast } from "@/hooks/use-toast"
-import { GradientText } from "@/components/ui/gradient-text"
 import { saveCustomOrderData, getFormData, clearFormData } from "@/lib/form-persistence"
 import { useAuth } from "@/hooks/use-auth"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { useTranslation } from "@/contexts/TranslationContext"
 import API_BASE from "@/lib/api"
+import { cn } from "@/lib/utils"
+
+const fieldClass = "luxury-input w-full"
+const selectTriggerClass =
+  "luxury-input flex h-11 w-full items-center justify-between [&>span]:line-clamp-1"
 
 export default function OrderPage() {
   const [customOrderDate, setCustomOrderDate] = useState<Date | undefined>(undefined)
@@ -53,13 +54,12 @@ export default function OrderPage() {
     t("kiss"),
     t("pistachio"),
     t("dubai"),
-    t("other")
+    t("other"),
   ]
 
   const [flavour, setFlavour] = useState(t("noPreference"))
   const [customFlavour, setCustomFlavour] = useState("")
 
-  // Function to convert Albanian flavor names to English for backend
   const convertFlavourToEnglish = (albanianFlavour: string): string => {
     const flavourMap: { [key: string]: string } = {
       [t("noPreference")]: "No Preference",
@@ -79,44 +79,34 @@ export default function OrderPage() {
       [t("kiss")]: "Kiss",
       [t("pistachio")]: "Pistachio",
       [t("dubai")]: "Dubai",
-      [t("other")]: "Other"
+      [t("other")]: "Other",
     }
-    
+
     return flavourMap[albanianFlavour] || albanianFlavour
   }
 
-  // Restore form data after login
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
       const savedData = getFormData()
-      if (savedData && savedData.type === 'custom_order') {
-        // Restore form data
+      if (savedData && savedData.type === "custom_order") {
         if (formRef.current) {
           const form = formRef.current
           if (savedData.customerName) {
-            (form.querySelector('[name="customerName"]') as HTMLInputElement).value = savedData.customerName
+            ;(form.querySelector('[name="customerName"]') as HTMLInputElement).value = savedData.customerName
           }
           if (savedData.customerEmail) {
-            (form.querySelector('[name="customerEmail"]') as HTMLInputElement).value = savedData.customerEmail
+            ;(form.querySelector('[name="customerEmail"]') as HTMLInputElement).value = savedData.customerEmail
           }
           if (savedData.customerPhone) {
-            (form.querySelector('[name="customerPhone"]') as HTMLInputElement).value = savedData.customerPhone
+            ;(form.querySelector('[name="customerPhone"]') as HTMLInputElement).value = savedData.customerPhone
           }
           if (savedData.customNote) {
-            (form.querySelector('[name="customNote"]') as HTMLTextAreaElement).value = savedData.customNote
+            ;(form.querySelector('[name="customNote"]') as HTMLTextAreaElement).value = savedData.customNote
           }
         }
-        if (savedData.flavour) {
-          setFlavour(savedData.flavour)
-        }
-        if (savedData.customFlavour) {
-          setCustomFlavour(savedData.customFlavour)
-        }
-        if (savedData.customOrderDate) {
-          setCustomOrderDate(new Date(savedData.customOrderDate))
-        }
-        // Note: File objects can't be serialized, so we can't restore uploaded images
-        // But we can show a message to the user
+        if (savedData.flavour) setFlavour(savedData.flavour)
+        if (savedData.customFlavour) setCustomFlavour(savedData.customFlavour)
+        if (savedData.customOrderDate) setCustomOrderDate(new Date(savedData.customOrderDate))
         if (savedData.uploadedImages && savedData.uploadedImages.length > 0) {
           toast({
             title: t("imagesNeedReupload"),
@@ -124,27 +114,23 @@ export default function OrderPage() {
             variant: "destructive",
           })
         }
-        // Clear the saved data
         clearFormData()
       }
     }
-  }, [isAuthenticated, isLoading, toast])
+  }, [isAuthenticated, isLoading, toast, t])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     setUploadedImages(files)
-    setPreviewUrls(files.map(file => URL.createObjectURL(file)))
+    setPreviewUrls(files.map((file) => URL.createObjectURL(file)))
   }
 
   const removeImage = (index: number) => {
-    const newImages = uploadedImages.filter((_, i) => i !== index)
-    const newPreviewUrls = previewUrls.filter((_, i) => i !== index)
-    setUploadedImages(newImages)
-    setPreviewUrls(newPreviewUrls)
+    setUploadedImages(uploadedImages.filter((_, i) => i !== index))
+    setPreviewUrls(previewUrls.filter((_, i) => i !== index))
   }
 
   const handleLoginRedirect = () => {
-    // Save current form data before redirecting
     if (formRef.current) {
       const formData = new FormData(formRef.current)
       saveCustomOrderData({
@@ -159,314 +145,338 @@ export default function OrderPage() {
         previewUrls: previewUrls.length > 0 ? previewUrls : undefined,
       })
     }
-    
-    // Redirect to login with return URL
-    router.push(`/auth/login?redirect=${encodeURIComponent('/order')}`)
+    router.push(`/auth/login?redirect=${encodeURIComponent("/order")}`)
   }
 
   const handleSubmitCustomOrder = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    
+
     if (!isAuthenticated) {
-      console.log("User not authenticated, redirecting to login");
       handleLoginRedirect()
       return
     }
-    
-    console.log("Starting custom order submission...");
+
     setLoading(true)
-  
+
     const formData = new FormData(event.currentTarget)
-    // Override some values
     formData.set("productName", "Custom Order")
     formData.set("numberOfPersons", "1")
     formData.set("customerPhone", formData.get("customerPhone")?.toString() || "")
 
-    
     if (customOrderDate) {
       formData.set("orderDate", format(customOrderDate, "yyyy-MM-dd"))
     }
-    // Add all images
-    console.log("📸 Frontend: Adding", uploadedImages.length, "images to form data")
-    uploadedImages.forEach((file, idx) => {
-      console.log("📸 Frontend: Adding file", idx + 1, ":", file.name, "(", file.size, "bytes)")
+
+    uploadedImages.forEach((file) => {
       formData.append("uploadedImages", file)
     })
-    
-    // Convert Albanian flavor to English for backend
+
     const englishFlavour = flavour === t("other") ? customFlavour : convertFlavourToEnglish(flavour)
     formData.set("flavour", englishFlavour)
-  
-    const token = localStorage.getItem("auth_token") // ✅ Retrieve JWT from localStorage
-    console.log("Auth token present:", !!token);
+
+    const token = localStorage.getItem("auth_token")
 
     try {
-      console.log("📸 Frontend: Sending request to backend")
-      console.log("📸 Frontend: FormData entries:")
-      for (let [key, value] of formData.entries()) {
-        console.log("📸 Frontend:", key, "=", value instanceof File ? `File: ${value.name} (${value.size} bytes)` : value)
-      }
-      
       const res = await fetch(`${API_BASE}/api/orders/custom`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`, // ✅ Send token to backend
-        },
-        body: formData, // Do NOT set Content-Type, browser does it automatically
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
       })
-  
-      console.log("Response status:", res.status);
-      console.log("Response headers:", Object.fromEntries(res.headers.entries()));
-      
+
       if (!res.ok) {
         const errorData = await res.json()
-        console.error("Backend error response:", errorData);
         throw new Error(errorData.message || `HTTP error! status: ${res.status}`)
       }
 
-      // Check if response has content before trying to parse as JSON
-      const contentType = res.headers.get("content-type");
-      let responseData;
+      const contentType = res.headers.get("content-type")
       if (contentType && contentType.includes("application/json")) {
-        responseData = await res.json();
-        console.log("Order submitted successfully:", responseData);
+        await res.json()
       } else {
-        const textResponse = await res.text();
-        console.log("Order submitted successfully:", textResponse);
+        await res.text()
       }
-      
+
       toast({
         title: "Order Submitted!",
-        description: "Your custom order has been sent to the admin. You will be notified with a price soon.",
+        description:
+          "Your custom order has been sent to the admin. You will be notified with a price soon.",
       })
-  
-      // Reset form and state
+
       formRef.current?.reset()
       setCustomOrderDate(undefined)
       setUploadedImages([])
       setPreviewUrls([])
       setFlavour(t("noPreference"))
       setCustomFlavour("")
-      
-      // Navigate to order history or home page
       router.push("/order-history")
-      
-    } catch (error: any) {
-      console.error("Failed to submit custom order:", error)
-      console.error("Error details:", {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
-      });
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : t("orderErrorMessage")
       toast({
         title: t("orderError"),
-        description: error.message || t("orderErrorMessage"),
+        description: message,
         variant: "destructive",
       })
     } finally {
       setLoading(false)
     }
-  }  
+  }
 
-  // Show loading state while checking authentication
   if (isLoading) {
     return (
-      <div className="container mx-auto py-12 px-4 md:px-6 min-h-[calc(100vh-4rem)]">
-        <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-royal-purple"></div>
-        </div>
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-cream">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-antique-gold/30 border-t-antique-gold" />
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto py-12 px-4 md:px-6 min-h-[calc(100vh-4rem)]">
-              <h1 className="text-4xl md:text-5xl font-extrabold text-center mb-12 text-white" style={{
-          textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
-        }}>
-          {t("orderTitle")}
-        </h1>
+    <div className="relative min-h-[calc(100vh-4rem)] bg-cream">
+      <div className="pointer-events-none absolute inset-0 vintage-paper opacity-70" />
 
-      <div className="max-w-3xl mx-auto space-y-8 text-royal-blue">
-        <Card className="bg-white/80 backdrop-blur-sm border-gold shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-royal-purple">{t("customOrder")}</CardTitle>
-            <CardDescription className="text-royal-blue">
+      <div className="container relative z-10 mx-auto max-w-3xl px-4 py-12 md:px-6 md:py-16">
+        <header className="mb-10 text-center md:mb-14">
+          <p className="mb-2 font-script text-xl text-antique-gold md:text-2xl">Pastiçeri Amanda</p>
+          <h1 className="font-display text-4xl font-light text-charcoal md:text-5xl">{t("orderTitle")}</h1>
+          <div className="mx-auto mt-6 h-px w-20 bg-gradient-to-r from-transparent via-antique-gold to-transparent" />
+          <p className="mx-auto mt-6 max-w-2xl font-serif text-base leading-relaxed text-charcoal/75 md:text-lg">
+            {t("orderSubtitle")}
+          </p>
+        </header>
+
+        <div className="luxury-panel p-6 md:p-10">
+          <div className="mb-8 border-b border-antique-gold/20 pb-6">
+            <h2 className="font-display text-2xl font-light text-charcoal md:text-3xl">{t("customOrder")}</h2>
+            <p className="mt-2 font-serif text-sm text-charcoal/60 md:text-base">
               {t("orderSubtitle")}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form ref={formRef} onSubmit={handleSubmitCustomOrder} className="grid gap-4">
+            </p>
+          </div>
+
+          <form ref={formRef} onSubmit={handleSubmitCustomOrder} className="space-y-10">
+            <fieldset className="space-y-5">
+              <legend className="mb-1 font-serif text-sm uppercase tracking-[0.25em] text-antique-gold-dark">
+                Your Details
+              </legend>
+
+              <div className="grid gap-2">
+                <Label htmlFor="customerNameCustom" className="luxury-label">
+                  {t("customerName")}
+                </Label>
+                <Input
+                  id="customerNameCustom"
+                  name="customerName"
+                  placeholder={t("customerName")}
+                  required
+                  className={fieldClass}
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="customerEmailCustom" className="luxury-label">
+                  {t("customerEmail")}
+                </Label>
+                <Input
+                  id="customerEmailCustom"
+                  name="customerEmail"
+                  type="email"
+                  placeholder={t("customerEmail")}
+                  required
+                  className={fieldClass}
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="customerPhoneCustom" className="luxury-label">
+                  {t("customerPhone")}
+                </Label>
+                <Input
+                  id="customerPhoneCustom"
+                  name="customerPhone"
+                  placeholder={t("customerPhone")}
+                  required
+                  className={fieldClass}
+                />
+              </div>
+            </fieldset>
+
+            <fieldset className="space-y-5">
+              <legend className="mb-1 font-serif text-sm uppercase tracking-[0.25em] text-antique-gold-dark">
+                Order Details
+              </legend>
+
+              <div className="grid gap-2">
+                <Label htmlFor="customNote" className="luxury-label">
+                  {t("description")}
+                </Label>
+                <Textarea
+                  id="customNote"
+                  name="customNote"
+                  placeholder={t("description")}
+                  className={cn(fieldClass, "min-h-[120px] resize-y")}
+                  required
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="flavour" className="luxury-label">
+                  {t("flavour")}
+                </Label>
+                <Select value={flavour} onValueChange={setFlavour}>
+                  <SelectTrigger id="flavour" className={selectTriggerClass}>
+                    <SelectValue placeholder={t("flavour")} />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-none border-antique-gold/30 font-serif">
+                    {FLAVOURS.map((flavourOption) => (
+                      <SelectItem key={flavourOption} value={flavourOption} className="font-serif">
+                        {flavourOption}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {flavour === t("other") && (
                 <div className="grid gap-2">
-                  <Label htmlFor="customerNameCustom">{t("customerName")}</Label>
-                  <Input
-                    id="customerNameCustom"
-                    name="customerName"
-                    placeholder={t("customerName")}
-                    required
-                    className="bg-white border-royal-blue text-royal-blue"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="customerEmailCustom">{t("customerEmail")}</Label>
-                  <Input
-                    id="customerEmailCustom"
-                    name="customerEmail"
-                    type="email"
-                    placeholder={t("customerEmail")}
-                    required
-                    className="bg-white border-royal-blue text-royal-blue"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="customerPhoneCustom">{t("customerPhone")}</Label>
-                  <Input
-                    id="customerPhoneCustom"
-                    name="customerPhone"
-                    placeholder={t("customerPhone")}
-                    required
-                    className="bg-white border-royal-blue text-royal-blue"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="customNote">{t("description")}</Label>
-                  <Textarea
-                    id="customNote"
-                    name="customNote"
-                    placeholder={t("description")}
-                    className="bg-white border-royal-blue text-royal-blue min-h-[100px]"
-                    required
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="flavour">{t("flavour")}</Label>
-                  <Select value={flavour} onValueChange={setFlavour}>
-                    <SelectTrigger className="bg-white border-royal-blue text-royal-blue">
-                      <SelectValue placeholder={t("flavour")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {FLAVOURS.map((flavourOption) => (
-                        <SelectItem key={flavourOption} value={flavourOption}>
-                          {flavourOption}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                {flavour === t("other") && (
-                  <div className="grid gap-2">
-                                      <Label htmlFor="customFlavour">{t("customFlavour")}</Label>
+                  <Label htmlFor="customFlavour" className="luxury-label">
+                    {t("customFlavour")}
+                  </Label>
                   <Input
                     id="customFlavour"
                     value={customFlavour}
                     onChange={(e) => setCustomFlavour(e.target.value)}
                     placeholder={t("customFlavour")}
-                      className="bg-white border-royal-blue text-royal-blue"
-                      required
+                    className={fieldClass}
+                    required
+                  />
+                </div>
+              )}
+
+              <div className="grid gap-2">
+                <Label className="luxury-label">{t("orderDate")}</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className={cn(
+                        selectTriggerClass,
+                        "justify-start text-left font-normal",
+                        !customOrderDate && "text-charcoal/45"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4 shrink-0 text-antique-gold" />
+                      {customOrderDate ? format(customOrderDate, "PPP") : t("selectDate")}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto rounded-none border-antique-gold/30 p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={customOrderDate}
+                      onSelect={setCustomOrderDate}
+                      initialFocus
+                      disabled={(date) => date < new Date()}
                     />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </fieldset>
+
+            <fieldset className="space-y-5">
+              <legend className="mb-1 font-serif text-sm uppercase tracking-[0.25em] text-antique-gold-dark">
+                Reference Images
+              </legend>
+
+              <div className="grid gap-2">
+                <Label htmlFor="images" className="luxury-label">
+                  {t("uploadImages")}
+                </Label>
+                <div className="group cursor-pointer border border-dashed border-antique-gold/40 bg-cream-dark/20 px-6 py-10 text-center transition-colors hover:border-antique-gold/70 hover:bg-antique-gold/5">
+                  <UploadCloud className="mx-auto mb-4 h-10 w-10 text-antique-gold/70 transition-colors group-hover:text-antique-gold" />
+                  <input
+                    type="file"
+                    id="images"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                  <label htmlFor="images" className="cursor-pointer">
+                    <span className="font-serif text-sm uppercase tracking-wider text-charcoal">
+                      {t("dragAndDrop")}
+                    </span>
+                    <p className="mt-2 font-serif text-xs text-charcoal/50">PNG, JPG, GIF up to 10MB each</p>
+                  </label>
+                </div>
+
+                {previewUrls.length > 0 && (
+                  <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-3">
+                    {previewUrls.map((url, index) => (
+                      <div key={url} className="group relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={url}
+                          alt={`Preview ${index + 1}`}
+                          className="h-32 w-full cursor-pointer border border-antique-gold/30 bg-cream object-contain transition-colors group-hover:border-antique-gold"
+                          onClick={() => setEnlargedImage(url)}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center border border-antique-gold/50 bg-charcoal font-serif text-sm text-cream transition-colors hover:bg-antique-gold hover:text-charcoal"
+                          aria-label="Remove image"
+                        >
+                          ×
+                        </button>
+                        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-charcoal/0 transition-colors group-hover:bg-charcoal/15">
+                          <span className="font-serif text-xs uppercase tracking-wider text-cream opacity-0 transition-opacity group-hover:opacity-100">
+                            {t("clickToEnlarge")}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
-                <div className="grid gap-2">
-                  <Label>{t("orderDate")}</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="bg-white border-royal-blue text-royal-blue justify-start text-left font-normal"
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {customOrderDate ? format(customOrderDate, "PPP") : t("selectDate")}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={customOrderDate}
-                        onSelect={setCustomOrderDate}
-                        initialFocus
-                        disabled={(date) => date < new Date()}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="images">{t("uploadImages")}</Label>
-                  <div className="border-2 border-dashed border-royal-blue rounded-lg p-6 text-center">
-                    <UploadCloud className="mx-auto h-12 w-12 text-royal-blue mb-4" />
-                    <input
-                      type="file"
-                      id="images"
-                      multiple
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="hidden"
-                    />
-                    <label htmlFor="images" className="cursor-pointer">
-                      <span className="text-royal-blue font-semibold">{t("dragAndDrop")}</span>
-                      <p className="text-sm text-gray-500 mt-1">PNG, JPG, GIF up to 10MB each</p>
-                    </label>
-                  </div>
-                  {previewUrls.length > 0 && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-                      {previewUrls.map((url, index) => (
-                        <div key={index} className="relative group">
-                          <img
-                            src={url}
-                            alt={`Preview ${index + 1}`}
-                            className="w-full h-32 object-contain rounded-lg border border-royal-blue bg-white cursor-pointer"
-                            onClick={() => setEnlargedImage(url)}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeImage(index)}
-                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors"
-                          >
-                            ×
-                          </button>
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 rounded-lg flex items-center justify-center">
-                            <span className="text-white opacity-0 group-hover:opacity-100 font-semibold text-sm">{t("clickToEnlarge")}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full bg-royal-purple text-white hover:bg-royal-blue transition-colors py-3 text-lg font-semibold"
-                  disabled={loading}
-                >
-                  {!isAuthenticated ? (
-                    <>
-                      <Lock className="mr-2 h-5 w-5" />
-                      {t("login")} {t("toSubmitOrder")}
-                    </>
-                  ) : loading ? (
-                    t("submittingOrder")
-                  ) : (
-                    t("submitOrder")
-                  )}
-                </Button>
-            </form>
-          </CardContent>
-        </Card>
+              </div>
+            </fieldset>
+
+            <div className="border-t border-antique-gold/20 pt-8">
+              <Button type="submit" className="btn-luxury h-auto w-full py-4 text-sm" disabled={loading}>
+                {!isAuthenticated ? (
+                  <>
+                    <Lock className="mr-2 h-4 w-4" />
+                    {t("login")} {t("toSubmitOrder")}
+                  </>
+                ) : loading ? (
+                  t("submittingOrder")
+                ) : (
+                  t("submitOrder")
+                )}
+              </Button>
+
+              {!isAuthenticated && (
+                <p className="mt-4 text-center font-serif text-xs text-charcoal/50">
+                  Sign in to submit your bespoke order — your details will be saved.
+                </p>
+              )}
+            </div>
+          </form>
+        </div>
       </div>
 
-      {/* Image Enlargement Dialog */}
-      <Dialog open={!!enlargedImage} onOpenChange={open => !open && setEnlargedImage(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden">
+      <Dialog open={!!enlargedImage} onOpenChange={(open) => !open && setEnlargedImage(null)}>
+        <DialogContent className="max-h-[90vh] max-w-4xl overflow-hidden rounded-none border-antique-gold/30 bg-charcoal p-0">
           <div className="relative">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={enlargedImage || ''}
-              alt="Enlarged Image"
-              className="w-full h-auto max-h-[80vh] object-contain bg-white"
+              src={enlargedImage || ""}
+              alt="Enlarged reference"
+              className="max-h-[80vh] w-full object-contain bg-cream"
             />
             <Button
+              type="button"
               onClick={() => setEnlargedImage(null)}
-              className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white"
+              className="absolute right-3 top-3 h-9 w-9 rounded-none border border-antique-gold/50 bg-charcoal/80 p-0 text-cream hover:bg-antique-gold hover:text-charcoal"
               size="sm"
             >
-              ✕
+              <X className="h-4 w-4" />
             </Button>
           </div>
         </DialogContent>

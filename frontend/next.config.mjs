@@ -23,9 +23,7 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    serverComponentsExternalPackages: [],
-  },
+  transpilePackages: ['framer-motion'],
 }
 
 export default nextConfig

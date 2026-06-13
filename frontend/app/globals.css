@@ -2,13 +2,105 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+  overflow-x: clip;
+}
+
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter, system-ui, sans-serif);
+  overflow-x: clip;
+  max-width: 100vw;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .vintage-paper {
+    background-image:
+      radial-gradient(ellipse at 20% 50%, rgba(201, 169, 97, 0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(114, 47, 55, 0.03) 0%, transparent 50%);
+  }
+
+  .text-gold-shimmer {
+    background: linear-gradient(
+      90deg,
+      #A68B4B 0%,
+      #D4BC82 25%,
+      #C9A961 50%,
+      #D4BC82 75%,
+      #A68B4B 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 4s linear infinite;
+  }
+
+  .luxury-heading {
+    @apply font-serif text-charcoal tracking-wide;
+    text-shadow: 0 1px 2px rgba(201, 169, 97, 0.2);
+  }
+
+  .luxury-script {
+    @apply font-script text-antique-gold;
+  }
+
+  .luxury-body {
+    @apply font-serif text-charcoal/85 leading-relaxed tracking-wide;
+  }
+
+  .font-display {
+    font-family: var(--font-cormorant), Georgia, serif;
+  }
+
+  .btn-luxury {
+    @apply bg-charcoal text-cream border border-antique-gold/50 px-8 py-3 font-serif tracking-wider uppercase text-sm transition-all duration-300;
+    box-shadow: 0 2px 12px rgba(201, 169, 97, 0.2);
+  }
+
+  .btn-luxury:hover {
+    @apply bg-antique-gold text-charcoal border-antique-gold;
+    box-shadow: 0 4px 20px rgba(201, 169, 97, 0.4);
+    transform: translateY(-1px);
+  }
+
+  .btn-luxury-outline {
+    @apply bg-transparent text-charcoal border-2 border-antique-gold px-8 py-3 font-serif tracking-wider uppercase text-sm transition-all duration-300;
+  }
+
+  .btn-luxury-outline:hover {
+    @apply bg-antique-gold/10 text-charcoal;
+    box-shadow: 0 4px 16px rgba(201, 169, 97, 0.25);
+  }
+
+  .menu-card-3d {
+    transform: translateY(0) scale(1);
+    transition:
+      transform 0.45s ease,
+      box-shadow 0.45s ease;
+  }
+
+  .menu-card-3d:hover {
+    transform: translateY(-12px) scale(1.02);
+  }
+
+  .luxury-label {
+    @apply font-serif text-xs uppercase tracking-[0.2em] text-charcoal/65;
+  }
+
+  .luxury-input {
+    @apply rounded-none border border-antique-gold/30 bg-cream px-4 py-2.5 font-serif text-charcoal shadow-none transition-colors placeholder:text-charcoal/40 focus-visible:border-antique-gold focus-visible:ring-1 focus-visible:ring-antique-gold/35;
+  }
+
+  .luxury-panel {
+    @apply border border-antique-gold/30 bg-cream;
+    box-shadow: 0 4px 24px rgba(28, 28, 30, 0.12), 0 1px 3px rgba(201, 169, 97, 0.15);
   }
 }
 
@@ -97,7 +189,7 @@ body {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-cream text-charcoal;
   }
 }
 
