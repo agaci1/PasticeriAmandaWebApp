@@ -38,6 +38,7 @@ export const media = {
   },
   videos: {
     hero: "/media/videos/promo-0603.mp4",
+    heroMobile: "/media/videos/main123-vid.mp4",
     logo: "/media/videos/what-we-do.mp4",
     birthdayCakeTogether: "/media/videos/birthday-cake-together.mp4",
     whatWeDo: "/media/videos/what-we-do.mp4",

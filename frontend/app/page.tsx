@@ -19,18 +19,31 @@ import { ChevronDown } from "lucide-react"
 export default function HomePage() {
   const { t } = useTranslation()
   const heroVideoRef = useRef<HTMLVideoElement>(null)
+  const heroMobileVideoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
-    const video = heroVideoRef.current
-    if (!video) return
-    video.muted = true
-    video.play().catch(() => {})
+    const play = (video: HTMLVideoElement | null) => {
+      if (!video) return
+      video.muted = true
+      video.play().catch(() => {})
+    }
+    play(heroVideoRef.current)
+    play(heroMobileVideoRef.current)
   }, [])
 
   return (
     <div className="relative w-full max-w-[100vw] bg-[#F5F1EA]">
-      {/* Hero — unchanged */}
       <section className="relative isolate h-[100dvh] min-h-[480px] max-h-[100dvh] w-full overflow-hidden">
+        <video
+          ref={heroMobileVideoRef}
+          src={media.videos.heroMobile}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          className="pointer-events-none absolute inset-0 h-full max-h-full w-full max-w-full object-cover object-center md:hidden"
+        />
         <video
           ref={heroVideoRef}
           src={media.videos.hero}
@@ -39,7 +52,7 @@ export default function HomePage() {
           loop
           playsInline
           preload="metadata"
-          className="pointer-events-none absolute inset-0 h-full max-h-full w-full max-w-full object-cover object-center"
+          className="pointer-events-none absolute inset-0 hidden h-full max-h-full w-full max-w-full object-cover object-center md:block"
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-black/70" />
 
