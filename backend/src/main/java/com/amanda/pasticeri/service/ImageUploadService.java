@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.amanda.pasticeri.util.UploadPathResolver;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,22 +19,11 @@ public class ImageUploadService {
     private final String uploadDir;
 
     public ImageUploadService() {
-        // Check for Railway volume mount path first, then fallback to local uploads
-        String railwayPath = System.getenv("RAILWAY_VOLUME_MOUNT_PATH");
         String currentDir = System.getProperty("user.dir");
+        this.uploadDir = UploadPathResolver.resolveUploadDirectory();
         
         logger.info("Current directory: {}", currentDir);
-        logger.info("RAILWAY_VOLUME_MOUNT_PATH: {}", railwayPath);
-        
-        if (railwayPath != null && !railwayPath.trim().isEmpty()) {
-            this.uploadDir = railwayPath + "/uploads/";
-        } else if (currentDir != null && currentDir.contains("/app")) {
-            // We're in Railway production environment
-            this.uploadDir = "/app/uploads/";
-        } else {
-            this.uploadDir = "uploads/";
-        }
-        
+        logger.info("RAILWAY_VOLUME_MOUNT_PATH: {}", System.getenv("RAILWAY_VOLUME_MOUNT_PATH"));
         logger.info("ImageUploadService initialized with upload directory: {}", uploadDir);
         
         // Ensure upload directory exists

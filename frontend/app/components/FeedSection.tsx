@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import API_BASE from "@/lib/api";
+import { isEmbedVideoUrl, resolveFeedMediaUrl } from "@/lib/feed-media";
 import { useTranslation } from "@/contexts/TranslationContext";
 
 const API_URL = `${API_BASE}/api/feed`;
@@ -171,7 +172,7 @@ export default function FeedSection() {
           <div className="w-full h-full bg-gray-100 flex items-center justify-center relative">
             {currentItem.type === "image" ? (
               <img
-                src={currentItem.url.startsWith("/uploads/") ? `${API_BASE}${currentItem.url}` : currentItem.url}
+                src={resolveFeedMediaUrl(currentItem.url)}
                 alt={currentItem.title}
                 className="object-contain w-full h-full"
                 onLoad={handleImageLoad}
@@ -182,7 +183,7 @@ export default function FeedSection() {
                   maxHeight: `${MAX_HEIGHT}px`
                 }}
               />
-            ) : (
+            ) : isEmbedVideoUrl(currentItem.url) ? (
               <iframe
                 src={currentItem.url}
                 title={currentItem.title}
@@ -195,6 +196,20 @@ export default function FeedSection() {
                 }}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
+              />
+            ) : (
+              <video
+                src={resolveFeedMediaUrl(currentItem.url)}
+                controls
+                playsInline
+                preload="metadata"
+                className="object-contain w-full h-full"
+                style={{
+                  minWidth: `${MIN_WIDTH}px`,
+                  minHeight: `${MIN_HEIGHT}px`,
+                  maxWidth: `${MAX_WIDTH}px`,
+                  maxHeight: `${MAX_HEIGHT}px`,
+                }}
               />
             )}
           </div>

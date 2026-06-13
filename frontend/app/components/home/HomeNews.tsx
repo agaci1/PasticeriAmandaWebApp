@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import API_BASE from "@/lib/api"
+import { isEmbedVideoUrl, resolveFeedMediaUrl } from "@/lib/feed-media"
 import { useTranslation } from "@/contexts/TranslationContext"
 import { MediaZoomFrame } from "./MediaZoomFrame"
 
@@ -58,9 +59,7 @@ export function HomeNews() {
   if (error || feed.length === 0) return null
 
   const currentItem = feed[currentIndex]
-  const mediaUrl = currentItem.url.startsWith("/uploads/")
-    ? `${API_BASE}${currentItem.url}`
-    : currentItem.url
+  const mediaUrl = resolveFeedMediaUrl(currentItem.url)
 
   return (
     <section className="bg-[#F5F1EA] py-16 sm:py-20">
@@ -105,13 +104,21 @@ export function HomeNews() {
                     alt={currentItem.title}
                     className="max-h-[min(55vh,420px)] w-auto max-w-full object-contain"
                   />
-                ) : (
+                ) : isEmbedVideoUrl(currentItem.url) ? (
                   <iframe
                     src={mediaUrl}
                     title={currentItem.title}
                     className="aspect-video w-full max-w-full border-0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
+                  />
+                ) : (
+                  <video
+                    src={mediaUrl}
+                    controls
+                    playsInline
+                    preload="metadata"
+                    className="max-h-[min(55vh,420px)] w-full max-w-full object-contain"
                   />
                 )}
               </MediaZoomFrame>

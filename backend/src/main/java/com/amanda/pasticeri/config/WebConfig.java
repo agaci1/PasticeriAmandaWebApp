@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import com.amanda.pasticeri.util.UploadPathResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,29 +16,15 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Check for Railway volume mount path
-        String railwayPath = System.getenv("RAILWAY_VOLUME_MOUNT_PATH");
-        String currentDir = System.getProperty("user.dir");
-        String uploadsPath;
-
-        logger.info("Current directory: {}", currentDir);
-        logger.info("RAILWAY_VOLUME_MOUNT_PATH: {}", railwayPath);
-
-        if (railwayPath != null && !railwayPath.trim().isEmpty()) {
-            uploadsPath = "file:" + railwayPath + "/uploads/";
-        } else if (currentDir != null && currentDir.contains("/app")) {
-            // We're in Railway production environment
-            uploadsPath = "file:/app/uploads/";
-        } else {
-            uploadsPath = "file:uploads/";
-        }
+        String uploadDir = UploadPathResolver.resolveUploadDirectory();
+        String uploadsPath = UploadPathResolver.toFileLocation(uploadDir);
 
         logger.info("Configuring static resource handler for uploads at: {}", uploadsPath);
 
         registry
             .addResourceHandler("/uploads/**")
             .addResourceLocations(uploadsPath)
-            .setCachePeriod(3600); // Cache for 1 hour
+            .setCachePeriod(3600);
     }
 
     @Bean
