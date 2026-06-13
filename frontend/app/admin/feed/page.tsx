@@ -28,10 +28,25 @@ export default function AdminFeedPage() {
       .catch(() => setError("Failed to load feed items"));
   }, []);
 
+  const MAX_IMAGE_BYTES = 10 * 1024 * 1024
+  const MAX_VIDEO_BYTES = 50 * 1024 * 1024
+
   const handleAddFeed = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+
+    const uploadFile = mediaType === "image" ? file : videoFile
+    if (uploadFile) {
+      const maxBytes = mediaType === "image" ? MAX_IMAGE_BYTES : MAX_VIDEO_BYTES
+      const maxLabel = mediaType === "image" ? "10MB" : "50MB"
+      if (uploadFile.size > maxBytes) {
+        setError(`File is too large. Maximum size for ${mediaType}s is ${maxLabel}.`)
+        setLoading(false)
+        return
+      }
+    }
+
     try {
       const formData = new FormData();
       formData.append("type", mediaType);
@@ -49,8 +64,16 @@ export default function AdminFeedPage() {
         body: formData,
       });
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to add feed item");
+        let message = "Failed to add feed item"
+        try {
+          const errorData = await res.json()
+          message = errorData.error || message
+        } catch {
+          if (res.status === 413) {
+            message = "File is too large. Maximum size is 50MB for videos and 10MB for images."
+          }
+        }
+        throw new Error(message)
       }
       const newItem = await res.json();
       setFeed([newItem, ...feed]);
