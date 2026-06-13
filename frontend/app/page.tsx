@@ -38,7 +38,7 @@ export default function HomePage() {
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           className="pointer-events-none absolute inset-0 h-full max-h-full w-full max-w-full object-cover object-center"
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-black/70" />
