@@ -10,10 +10,18 @@ public class HealthController {
 
     @GetMapping("/api/health")
     public ResponseEntity<?> healthCheck() {
+        String commit = System.getenv("RAILWAY_GIT_COMMIT_SHA");
+        if (commit == null || commit.isBlank()) {
+            commit = "local";
+        } else if (commit.length() > 7) {
+            commit = commit.substring(0, 7);
+        }
+
         return ResponseEntity.ok(Map.of(
             "status", "healthy",
             "timestamp", System.currentTimeMillis(),
-            "service", "Pasticeri Amanda Backend"
+            "service", "Pasticeri Amanda Backend",
+            "commit", commit
         ));
     }
 } 
