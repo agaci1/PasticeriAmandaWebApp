@@ -211,14 +211,14 @@ public class OrderService {
         Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
         order.setStatus("completed");
         orderRepository.save(order);
-        // Optionally send email to client or admin
+        asyncEmailService.sendCompletionNotifications(order);
     }
 
     public void cancelOrder(Long id) {
         Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
         order.setStatus("canceled");
         orderRepository.save(order);
-        // Optionally send email to client or admin
+        asyncEmailService.sendCancellationNotifications(order);
     }
 
     public void cancelMyOrder(Long id, String userEmail) {
@@ -303,6 +303,7 @@ public class OrderService {
         for (Order order : pendingMenuOrders) {
             order.setStatus("completed");
             orderRepository.save(order);
+            asyncEmailService.sendCompletionNotifications(order);
             System.out.println("✅ Auto-completed menu order ID: " + order.getId());
         }
     }

@@ -70,4 +70,22 @@ public class AsyncEmailService {
             }
         });
     }
+
+    public void sendCompletionNotifications(Order order) {
+        executor.execute(() -> {
+            try {
+                emailService.sendOrderCompletedEmail(order.getCustomerEmail(), order);
+                System.out.println("✅ Completion email sent to: " + order.getCustomerEmail());
+            } catch (Exception e) {
+                System.err.println("⚠️ Failed to send completion email: " + e.getMessage());
+            }
+
+            try {
+                emailService.sendAdminNotification(ADMIN_EMAIL, order);
+                System.out.println("✅ Admin completion notification sent for order ID: " + order.getId());
+            } catch (Exception e) {
+                System.err.println("⚠️ Failed to send admin completion notification: " + e.getMessage());
+            }
+        });
+    }
 }

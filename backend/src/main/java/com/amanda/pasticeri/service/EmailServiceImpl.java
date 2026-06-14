@@ -72,6 +72,13 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    public void sendOrderCompletedEmail(String to, Order order) {
+        String subject = "✅ Order Complete - Pastiçeri Amanda";
+        String body = emailTemplateService.getOrderCompletedTemplate(order);
+        sendHtmlEmailWithLogo(to, subject, body, order);
+    }
+
+    @Override
     public void sendPasswordResetEmail(String to, String resetLink) {
         String subject = "🔐 Reset Your Password - Pastiçeri Amanda";
         String body = emailTemplateService.getPasswordResetTemplate(resetLink);

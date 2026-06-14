@@ -51,24 +51,34 @@ export function SiteHeader() {
     { name: t("contactUs"), href: "/contact", icon: Mail },
   ]
 
-  const externalLinks = [
-    { name: t("review"), href: "https://www.google.com/search?q=Pasticeri+Amanda+Saranda+Albania+reviews", external: true, icon: Star },
-    { name: t("findUs"), href: "https://www.google.com/maps/search/Pasticeri+Amanda+Saranda+Albania", external: true, icon: MapPin },
+  const loggedInUserLinks: { name: string; href: string; icon?: React.ComponentType<{ className?: string }>; external?: boolean }[] = [
+    { name: t("purchaseHistory"), href: "/order-history", icon: ListOrdered },
   ]
 
-  const adminNavLinks = [
+  const adminNavLinks: { name: string; href: string; icon?: React.ComponentType<{ className?: string }>; external?: boolean }[] = [
     { name: t("dashboard"), href: "/admin/dashboard", icon: Package2 },
     { name: t("newOrders"), href: "/admin/orders/new", icon: ClipboardList },
     { name: t("pendingOrders"), href: "/admin/orders/pending", icon: ClipboardList },
     { name: t("completedOrders"), href: "/admin/orders/completed", icon: ClipboardList },
     { name: t("canceledOrders"), href: "/admin/orders/canceled", icon: ClipboardList },
-    { name: t("manageCakes"), href: "/admin/menu-management/cakes", icon: Utensils },
-    { name: t("manageSweets"), href: "/admin/menu-management/sweets", icon: Utensils },
-    { name: t("manageOther"), href: "/admin/menu-management/other", icon: Utensils },
     { name: t("manageFeed"), href: "/admin/feed", icon: ListOrdered },
   ]
 
-  const navLinks = userIsAdmin ? adminNavLinks : userNavLinks
+  const getNavLinks = () => {
+    if (userIsAdmin) return adminNavLinks
+    if (!loggedIn) return userNavLinks
+    const customOrderIndex = userNavLinks.findIndex((link) => link.href === "/order")
+    const links = [...userNavLinks]
+    links.splice(customOrderIndex + 1, 0, ...loggedInUserLinks)
+    return links
+  }
+
+  const navLinks = getNavLinks()
+
+  const externalLinks = [
+    { name: t("review"), href: "https://www.google.com/search?q=Pasticeri+Amanda+Saranda+Albania+reviews", external: true, icon: Star },
+    { name: t("findUs"), href: "https://www.google.com/maps/search/Pasticeri+Amanda+Saranda+Albania", external: true, icon: MapPin },
+  ]
 
   const linkClass = (href: string) =>
     cn(

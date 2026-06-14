@@ -1,13 +1,19 @@
 "use client"
+
 import React, { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
-import { Separator } from "@/components/ui/separator"
-import { ChevronDownIcon } from "lucide-react"
 import API_BASE from "@/lib/api"
 import { useTranslation } from "@/contexts/TranslationContext"
+import { cn } from "@/lib/utils"
 
 interface Order {
   id: number
@@ -25,12 +31,15 @@ interface Order {
 
 type OrderSection = "active" | "previous"
 
+const heading = "var(--font-cormorant), Georgia, serif"
+const body = "var(--font-playfair), Georgia, serif"
+const script = "var(--font-dancing), cursive"
+
 export default function OrderHistoryPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [cancelOrderId, setCancelOrderId] = useState<number | null>(null)
   const [selectedSection, setSelectedSection] = useState<OrderSection>("active")
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isCanceling, setIsCanceling] = useState(false)
   const [showCannotCancelDialog, setShowCannotCancelDialog] = useState(false)
   const [cannotCancelReason, setCannotCancelReason] = useState("")
@@ -40,8 +49,8 @@ export default function OrderHistoryPage() {
   const fetchOrders = async () => {
     setLoading(true)
     try {
-      const res = await fetch(`${API_BASE}/api/client/orders`, { 
-        headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` } 
+      const res = await fetch(`${API_BASE}/api/client/orders`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
       })
       if (!res.ok) throw new Error("Failed to fetch orders")
       const data = await res.json()
@@ -63,81 +72,67 @@ export default function OrderHistoryPage() {
   }, [])
 
   const getOrderType = (order: Order) => {
-    // Check if this is a custom order
-    const isCustomOrder = (order.customNote && order.customNote.trim() !== "") || 
-                         (order.flavour && order.flavour.trim() !== "") ||
-                         (order.imageUrls && order.imageUrls.trim() !== "") ||
-                         order.status === "pending-quote" ||
-                         order.orderType === "custom";
-    return isCustomOrder ? "custom" : "menu";
-  };
+    const isCustomOrder =
+      (order.customNote && order.customNote.trim() !== "") ||
+      (order.flavour && order.flavour.trim() !== "") ||
+      (order.imageUrls && order.imageUrls.trim() !== "") ||
+      order.status === "pending-quote" ||
+      order.orderType === "custom"
+    return isCustomOrder ? "custom" : "menu"
+  }
 
   const canCancelOrder = (order: Order) => {
-    // Cannot cancel if already completed or canceled
     if (order.status === "completed" || order.status === "canceled") {
       return false
     }
-    
-    const orderType = getOrderType(order);
-    
+
+    const orderType = getOrderType(order)
+
     if (orderType === "custom") {
-      // ✅ Custom orders: 1 day before order date
-      const orderDateTime = new Date(order.orderDate).getTime();
-      const now = Date.now();
-      const oneDay = 24 * 60 * 60 * 1000;
-      return orderDateTime - now > oneDay;
-    } else {
-      // ✅ Menu orders: 5 hours before delivery time
-      if (order.deliveryDateTime) {
-        const deliveryDateTime = new Date(order.deliveryDateTime).getTime();
-        const now = Date.now();
-        const fiveHours = 5 * 60 * 60 * 1000;
-        return deliveryDateTime - now > fiveHours;
-      }
-      return false;
+      const orderDateTime = new Date(order.orderDate).getTime()
+      const now = Date.now()
+      const oneDay = 24 * 60 * 60 * 1000
+      return orderDateTime - now > oneDay
     }
+
+    if (order.deliveryDateTime) {
+      const deliveryDateTime = new Date(order.deliveryDateTime).getTime()
+      const now = Date.now()
+      const fiveHours = 5 * 60 * 60 * 1000
+      return deliveryDateTime - now > fiveHours
+    }
+    return false
   }
 
   const isActiveOrder = (order: Order) => {
-    if (order.status === "canceled") return false;
-    
-    const orderType = getOrderType(order);
-    
+    if (order.status === "canceled") return false
+
+    const orderType = getOrderType(order)
+
     if (orderType === "custom") {
-      // ✅ Custom orders: active until order date passes
-      const orderDateTime = new Date(order.orderDate).getTime();
-      const now = Date.now();
-      return orderDateTime > now;
-    } else {
-      // ✅ Menu orders: active until delivery time passes
-      if (order.deliveryDateTime) {
-        const deliveryDateTime = new Date(order.deliveryDateTime).getTime();
-        const now = Date.now();
-        return deliveryDateTime > now;
-      }
-      return false;
+      const orderDateTime = new Date(order.orderDate).getTime()
+      return orderDateTime > Date.now()
     }
+
+    if (order.deliveryDateTime) {
+      return new Date(order.deliveryDateTime).getTime() > Date.now()
+    }
+    return false
   }
 
   const isPreviousOrder = (order: Order) => {
-    if (order.status === "canceled") return true;
-    
-    const orderType = getOrderType(order);
-    
+    if (order.status === "canceled") return true
+
+    const orderType = getOrderType(order)
+
     if (orderType === "custom") {
-      // ✅ Custom orders: previous after order date passes
-      const orderDateTime = new Date(order.orderDate).getTime();
-      const now = Date.now();
-      return orderDateTime <= now;
-    } else {
-      // ✅ Menu orders: previous after delivery time passes
-      if (order.deliveryDateTime) {
-        const deliveryDateTime = new Date(order.deliveryDateTime).getTime();
-        const now = Date.now();
-        return deliveryDateTime <= now;
-      }
-      return false;
+      return new Date(order.orderDate).getTime() <= Date.now()
     }
+
+    if (order.deliveryDateTime) {
+      return new Date(order.deliveryDateTime).getTime() <= Date.now()
+    }
+    return false
   }
 
   const handleCancelOrder = async () => {
@@ -145,26 +140,25 @@ export default function OrderHistoryPage() {
 
     setIsCanceling(true)
     try {
-      const res = await fetch(`${API_BASE}/api/client/orders/${cancelOrderId}/cancel`, { 
-        method: "POST", 
-        headers: { 
+      const res = await fetch(`${API_BASE}/api/client/orders/${cancelOrderId}/cancel`, {
+        method: "POST",
+        headers: {
           Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-          "Content-Type": "application/json"
-        } 
+          "Content-Type": "application/json",
+        },
       })
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}))
         const errorMessage = errorData.message || "Unknown error"
-        
-        // Handle specific error cases with friendly messages
+
         if (errorMessage.includes("completed") || errorMessage.includes("Cannot cancel")) {
           setCannotCancelReason("This order has already been completed and cannot be cancelled.")
           setShowCannotCancelDialog(true)
           setCancelOrderId(null)
           return
         }
-        
+
         if (errorMessage.includes("1 day")) {
           setCannotCancelReason("Custom orders can only be cancelled at least 1 day before the due date.")
           setShowCannotCancelDialog(true)
@@ -177,14 +171,13 @@ export default function OrderHistoryPage() {
           setCancelOrderId(null)
           return
         }
-        
+
         throw new Error(errorMessage)
       }
 
-      // Update local state to reflect the cancellation
-      setOrders(orders => orders.map(o => 
-        o.id === cancelOrderId ? { ...o, status: "canceled" } : o
-      ))
+      setOrders((prev) =>
+        prev.map((o) => (o.id === cancelOrderId ? { ...o, status: "canceled" } : o))
+      )
 
       toast({
         title: "Order Cancelled",
@@ -205,264 +198,266 @@ export default function OrderHistoryPage() {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     })
   }
 
   const activeOrders = orders.filter(isActiveOrder)
   const previousOrders = orders.filter(isPreviousOrder)
+  const displayOrders = selectedSection === "active" ? activeOrders : previousOrders
 
-  const getSectionTitle = () => {
-    return selectedSection === "active" ? "Active Orders" : "Previous Orders"
-  }
-
-  const getDisplayOrders = () => {
-    return selectedSection === "active" ? activeOrders : previousOrders
-  }
-
-  const getOrderCardStyle = (order: Order) => {
-    const orderType = getOrderType(order);
-    
-    if (order.status === "canceled") {
-      return "border-red-200 bg-red-50";
-    }
-    
-    if (selectedSection === "active") {
-      if (orderType === "custom") {
-        return "border-purple-200 bg-purple-50"; // Purple for custom orders
-      } else {
-        return "border-blue-200 bg-blue-50"; // Blue for menu orders
-      }
-    } else {
-      if (orderType === "custom") {
-        return "border-purple-100 bg-purple-25"; // Light purple for completed custom orders
-      } else {
-        return "border-blue-100 bg-blue-25"; // Light blue for completed menu orders
-      }
-    }
-  }
-
-  if (loading) {
-    return (
-          <div className="container mx-auto py-8 px-2 min-h-[calc(100vh-4rem)]">
-      <h1 className="text-2xl font-bold mb-6 text-white" style={{
-        textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
-      }}>
-        {t("purchaseHistory")}
-      </h1>
-      <p>Loading...</p>
-    </div>
-    )
+  const statusStyle = (status: string) => {
+    if (status === "canceled") return "bg-red-50 text-red-700 border-red-200"
+    if (status === "completed") return "bg-emerald-50 text-emerald-800 border-emerald-200"
+    if (status === "pending-quote") return "bg-[#C9A961]/15 text-[#8B6914] border-[#C9A961]/40"
+    return "bg-[#1C1C1E]/5 text-[#1C1C1E] border-[#1C1C1E]/15"
   }
 
   return (
-    <div className="container mx-auto py-8 px-2 min-h-[calc(100vh-4rem)]">
-      <h1 className="text-2xl font-bold mb-6 text-white" style={{
-        textShadow: '0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6, 0 0 40px #8b5cf6'
-      }}>
-        {t("purchaseHistory")}
-      </h1>
-      
-      {orders.length === 0 ? (
-        <p className="text-royal-blue">No orders yet.</p>
-      ) : (
-        <div className="space-y-6">
-          {/* Section Selector */}
-          <div className="relative">
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center justify-between w-full px-4 py-3 text-xl font-semibold text-royal-blue bg-white border border-royal-blue rounded-lg hover:bg-royal-blue hover:text-white transition-colors"
-            >
-              <span>{getSectionTitle()}</span>
-              <ChevronDownIcon 
-                className={`w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} 
-              />
-            </button>
-            
-            {isDropdownOpen && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-royal-blue rounded-lg shadow-lg z-10">
-                <button
-                  onClick={() => {
-                    setSelectedSection("active")
-                    setIsDropdownOpen(false)
-                  }}
-                  className={`w-full px-4 py-3 text-left hover:bg-royal-blue hover:text-white transition-colors ${
-                    selectedSection === "active" ? "bg-royal-blue text-white" : ""
-                  }`}
-                >
-                  Active Orders
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedSection("previous")
-                    setIsDropdownOpen(false)
-                  }}
-                  className={`w-full px-4 py-3 text-left hover:bg-royal-blue hover:text-white transition-colors ${
-                    selectedSection === "previous" ? "bg-royal-blue text-white" : ""
-                  }`}
-                >
-                  Previous Orders
-                </button>
-              </div>
-            )}
-          </div>
+    <div className="relative min-h-[calc(100vh-4rem)] bg-[#F5F1EA]">
+      <div className="pointer-events-none absolute inset-0 vintage-paper opacity-60" />
 
-          {/* Orders Display */}
-          <div>
-            {getDisplayOrders().length === 0 ? (
-              <p className="text-gray-500 italic text-center py-8">
+      <div className="container relative z-10 mx-auto max-w-5xl px-4 py-12 md:px-6 md:py-16">
+        <header className="mb-10 text-center md:mb-12">
+          <p className="mb-2 text-lg text-[#C9A961]" style={{ fontFamily: script }}>
+            Pastiçeri Amanda
+          </p>
+          <h1
+            className="text-3xl font-light text-[#1C1C1E] sm:text-4xl md:text-5xl"
+            style={{ fontFamily: heading }}
+          >
+            {t("purchaseHistory")}
+          </h1>
+          <div className="mx-auto mt-6 h-px w-20 bg-gradient-to-r from-transparent via-[#C9A961] to-transparent" />
+        </header>
+
+        {loading ? (
+          <p className="text-center text-[#1C1C1E]/60" style={{ fontFamily: body }}>
+            Loading…
+          </p>
+        ) : orders.length === 0 ? (
+          <div className="luxury-panel mx-auto max-w-md p-10 text-center">
+            <p className="text-[#1C1C1E]/70" style={{ fontFamily: body }}>
+              No orders yet.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            <div className="flex justify-center gap-2">
+              {(["active", "previous"] as const).map((section) => (
+                <button
+                  key={section}
+                  type="button"
+                  onClick={() => setSelectedSection(section)}
+                  className={cn(
+                    "px-6 py-2.5 text-sm uppercase tracking-wider transition-all duration-300",
+                    selectedSection === section
+                      ? "bg-[#1C1C1E] text-[#F5F0E8]"
+                      : "border border-[#C9A961]/40 bg-transparent text-[#1C1C1E]/80 hover:border-[#C9A961]"
+                  )}
+                  style={{ fontFamily: body }}
+                >
+                  {section === "active" ? "Active Orders" : "Previous Orders"}
+                </button>
+              ))}
+            </div>
+
+            {displayOrders.length === 0 ? (
+              <p
+                className="py-12 text-center italic text-[#1C1C1E]/50"
+                style={{ fontFamily: body }}
+              >
                 No {selectedSection === "active" ? "active" : "previous"} orders.
               </p>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {getDisplayOrders().map(order => (
-                  <Card key={order.id} className={`p-2 text-sm ${getOrderCardStyle(order)}`}>
-                    <CardHeader>
-                      <CardTitle className="text-royal-purple text-base">Order #{order.id}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="text-sm font-medium text-gray-500">
-                          {getOrderType(order) === "custom" ? "🎂 Custom Order" : "🍰 Menu Order"}
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                {displayOrders.map((order) => {
+                  const orderType = getOrderType(order)
+                  return (
+                    <article key={order.id} className="luxury-panel p-5 sm:p-6">
+                      <div className="mb-4 flex items-start justify-between gap-3">
+                        <div>
+                          <p
+                            className="text-xs uppercase tracking-[0.2em] text-[#C9A961]"
+                            style={{ fontFamily: body }}
+                          >
+                            Order #{order.id}
+                          </p>
+                          <p className="mt-1 text-lg text-[#1C1C1E]" style={{ fontFamily: heading }}>
+                            {orderType === "custom" ? "Custom Order" : "Menu Order"}
+                          </p>
                         </div>
-                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          getOrderType(order) === "custom" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"
-                        }`}>
-                          {getOrderType(order) === "custom" ? "Custom" : "Menu"}
-                        </div>
+                        <span
+                          className={cn(
+                            "shrink-0 rounded-sm border px-2.5 py-1 text-xs font-medium capitalize",
+                            statusStyle(order.status)
+                          )}
+                          style={{ fontFamily: body }}
+                        >
+                          {order.status.replace("-", " ")}
+                        </span>
                       </div>
-                      <div>Status: <span className={`font-semibold ${
-                        order.status === "canceled" ? "text-red-600" : 
-                        selectedSection === "active" ? "text-green-600" : "text-gray-600"
-                      }`}>{order.status}</span></div>
-                      <div>Product(s): {order.productName}</div>
-                      <div>Quantity: {order.numberOfPersons}</div>
-                      {order.flavour && <div>Flavour: {order.flavour}</div>}
-                      <div>{t("currencySymbol")}{order.totalPrice}</div>
-                      {getOrderType(order) === "custom" ? (
-                        <div>Due Date: {formatDate(order.orderDate)}</div>
-                      ) : (
-                        order.deliveryDateTime && (
-                          <div className="text-blue-600 font-medium">
-                            🚚 Delivery: {new Date(order.deliveryDateTime).toLocaleDateString()} at {new Date(order.deliveryDateTime).toLocaleTimeString().slice(0, 5)}
+
+                      <dl
+                        className="space-y-2 text-sm text-[#1C1C1E]/80"
+                        style={{ fontFamily: body }}
+                      >
+                        <div className="flex justify-between gap-4 border-b border-[#C9A961]/15 pb-2">
+                          <dt>Product</dt>
+                          <dd className="text-right font-medium text-[#1C1C1E]">{order.productName}</dd>
+                        </div>
+                        <div className="flex justify-between gap-4 border-b border-[#C9A961]/15 pb-2">
+                          <dt>Quantity</dt>
+                          <dd>{order.numberOfPersons}</dd>
+                        </div>
+                        {order.flavour && (
+                          <div className="flex justify-between gap-4 border-b border-[#C9A961]/15 pb-2">
+                            <dt>Flavour</dt>
+                            <dd>{order.flavour}</dd>
                           </div>
-                        )
-                      )}
+                        )}
+                        {order.totalPrice > 0 && (
+                          <div className="flex justify-between gap-4 border-b border-[#C9A961]/15 pb-2">
+                            <dt>Price</dt>
+                            <dd>
+                              {t("currencySymbol")}
+                              {order.totalPrice}
+                            </dd>
+                          </div>
+                        )}
+                        {orderType === "custom" ? (
+                          <div className="flex justify-between gap-4">
+                            <dt>Due Date</dt>
+                            <dd>{formatDate(order.orderDate)}</dd>
+                          </div>
+                        ) : (
+                          order.deliveryDateTime && (
+                            <div className="flex justify-between gap-4">
+                              <dt>Delivery</dt>
+                              <dd className="text-right">
+                                {new Date(order.deliveryDateTime).toLocaleDateString()} at{" "}
+                                {new Date(order.deliveryDateTime).toLocaleTimeString().slice(0, 5)}
+                              </dd>
+                            </div>
+                          )
+                        )}
+                      </dl>
+
                       {selectedSection === "active" && canCancelOrder(order) && (
-                        <Button 
-                          onClick={() => setCancelOrderId(order.id)} 
-                          size="sm" 
-                          className="mt-2"
-                          variant="destructive"
+                        <Button
+                          type="button"
+                          onClick={() => setCancelOrderId(order.id)}
+                          variant="outline"
+                          className="mt-5 w-full rounded-none border-red-300 text-red-700 hover:bg-red-50 hover:text-red-800"
+                          style={{ fontFamily: body }}
                         >
                           Cancel Order
                         </Button>
                       )}
+
                       {order.status === "canceled" && (
-                        <div className="mt-2 text-red-600 font-semibold">Cancelled</div>
+                        <p className="mt-4 text-center text-sm font-medium text-red-600" style={{ fontFamily: body }}>
+                          Cancelled
+                        </p>
                       )}
                       {order.status === "completed" && (
-                        <div className="mt-2 text-green-600 font-semibold">✅ Completed</div>
+                        <p className="mt-4 text-center text-sm font-medium text-emerald-700" style={{ fontFamily: body }}>
+                          Completed
+                        </p>
                       )}
-                    </CardContent>
-                  </Card>
-                ))}
+                    </article>
+                  )
+                })}
               </div>
             )}
-          </div>
-        </div>
-      )}
 
-      {/* Notes Section */}
-      {orders.length > 0 && (
-        <div className="mt-8 p-6 bg-gradient-to-r from-royal-purple/5 to-royal-blue/5 rounded-lg border border-gold/20">
-          <h3 className="text-lg font-semibold text-royal-purple mb-4">📋 {t('importantNotes')}</h3>
-          <div className="space-y-3">
-            <div className="flex items-start gap-3">
-              <div className="w-3 h-3 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-              <div>
-                <p className="font-medium text-gray-800">{t('forCustomOrders')}</p>
-                <p className="text-sm text-gray-600">{t('customOrderCancelNote')}</p>
+            <div className="luxury-panel p-6 sm:p-8">
+              <h3
+                className="mb-5 text-xl text-[#1C1C1E]"
+                style={{ fontFamily: heading }}
+              >
+                {t("importantNotes")}
+              </h3>
+              <div className="space-y-4" style={{ fontFamily: body }}>
+                <div className="flex gap-3">
+                  <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#C9A961]" />
+                  <div>
+                    <p className="font-medium text-[#1C1C1E]">{t("forCustomOrders")}</p>
+                    <p className="mt-1 text-sm text-[#1C1C1E]/65">{t("customOrderCancelNote")}</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#1C1C1E]/40" />
+                  <div>
+                    <p className="font-medium text-[#1C1C1E]">{t("forMenuOrders")}</p>
+                    <p className="mt-1 text-sm text-[#1C1C1E]/65">{t("menuOrderCancelNote")}</p>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="flex items-start gap-3">
-              <div className="w-3 h-3 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-              <div>
-                <p className="font-medium text-gray-800">{t('forMenuOrders')}</p>
-                <p className="text-sm text-gray-600">{t('menuOrderCancelNote')}</p>
-              </div>
-            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Confirmation Dialog */}
       <Dialog open={!!cancelOrderId} onOpenChange={(open) => !open && setCancelOrderId(null)}>
-        <DialogContent>
+        <DialogContent className="luxury-panel border-[#C9A961]/30 bg-[#F5F1EA] sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Cancel Order</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-[#1C1C1E]" style={{ fontFamily: heading }}>
+              Cancel Order
+            </DialogTitle>
+            <DialogDescription className="text-[#1C1C1E]/70" style={{ fontFamily: body }}>
               Are you sure you want to cancel this order? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          <div className="flex gap-2 justify-end">
-            <Button 
-              variant="outline" 
+          <div className="flex gap-3 justify-end pt-2">
+            <Button
+              variant="outline"
               onClick={() => setCancelOrderId(null)}
               disabled={isCanceling}
+              className="rounded-none border-[#C9A961]/40"
+              style={{ fontFamily: body }}
             >
-              No, Keep Order
+              Keep Order
             </Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={handleCancelOrder}
               disabled={isCanceling}
+              className="rounded-none"
+              style={{ fontFamily: body }}
             >
-              {isCanceling ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Cancelling...
-                </>
-              ) : (
-                "Yes, Cancel Order"
-              )}
+              {isCanceling ? "Cancelling…" : "Yes, Cancel"}
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Cannot Cancel Dialog */}
       <Dialog open={showCannotCancelDialog} onOpenChange={(open) => !open && setShowCannotCancelDialog(false)}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="luxury-panel border-[#C9A961]/30 bg-[#F5F1EA] sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-royal-purple flex items-center gap-2">
-              <div className="text-2xl">⚠️</div>
+            <DialogTitle className="text-[#1C1C1E]" style={{ fontFamily: heading }}>
               Cannot Cancel Order
             </DialogTitle>
-            <DialogDescription className="text-gray-600">
+            <DialogDescription className="text-[#1C1C1E]/70" style={{ fontFamily: body }}>
               {cannotCancelReason}
             </DialogDescription>
           </DialogHeader>
-          <div className="bg-gradient-to-r from-royal-purple/10 to-royal-blue/10 p-4 rounded-lg border border-gold/20">
-            <h4 className="font-semibold text-royal-purple mb-2">Need Help?</h4>
-            <p className="text-sm text-gray-700 mb-3">
-              If you have any questions or concerns about your order, please don't hesitate to contact us.
+          <div className="border border-[#C9A961]/25 bg-[#F5F0E8] p-4 text-sm" style={{ fontFamily: body }}>
+            <p className="font-medium text-[#1C1C1E]">Need help?</p>
+            <p className="mt-2 text-[#1C1C1E]/70">
+              Phone: +355 69 352 0462 · pasticeriamanda@gmail.com
             </p>
-            <div className="space-y-1 text-sm text-gray-600">
-              <p>📞 <strong>Phone:</strong> +355 69 352 0462</p>
-              <p>📧 <strong>Email:</strong> pasticeriamanda@gmail.com</p>
-              <p>📍 <strong>Address:</strong> Rruga Lefter Talo</p>
-            </div>
           </div>
           <DialogFooter>
-            <Button 
+            <Button
               onClick={() => setShowCannotCancelDialog(false)}
-              className="bg-royal-purple text-white hover:bg-royal-blue"
+              className="btn-luxury rounded-none"
+              style={{ fontFamily: body }}
             >
-              Got it, thanks!
+              Got it
             </Button>
           </DialogFooter>
         </DialogContent>

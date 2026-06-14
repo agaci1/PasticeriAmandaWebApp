@@ -308,6 +308,50 @@ public class EmailTemplateService {
             </html>
         """, getClientHeader(), order.getProductName(), String.valueOf(order.getNumberOfPersons()), order.getCustomNote(), flavourSection, order.getOrderDate() != null ? order.getOrderDate().toString() : "Unknown", order.getTotalPrice() != null ? order.getTotalPrice().toString() : "Unknown", getImageSection(order), getClientFooter());
     }
+
+    public String getOrderCompletedTemplate(Order order) {
+        String flavourSection = order.getFlavour() != null && !order.getFlavour().trim().isEmpty()
+            ? String.format("<p><strong style=\"color: #1e40af;\">Flavor:</strong> %s</p>", order.getFlavour())
+            : "";
+
+        String priceSection = order.getTotalPrice() != null
+            ? String.format("<p><strong style=\"color: #1e40af;\">Total:</strong> ALL%s</p>", order.getTotalPrice())
+            : "";
+
+        return String.format("""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset=\"UTF-8\">
+                <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+                <title>Order Complete - Pastiçeri Amanda</title>
+            </head>
+            <body style=\"margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #fdf2f8 0%%, #fef3c7 50%%, #f3e8ff 100%%);\">
+                <div style=\"max-width: 600px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);\">
+                    %s
+                    <div style=\"padding: 40px 30px;\">
+                        <h1 style=\"color: #1e293b; margin: 0 0 20px 0; font-size: 28px; text-align: center;\">🎉 Your Order is Ready! 🎉</h1>
+                        <div style=\"background: linear-gradient(135deg, #ecfdf5 0%%, #fef3c7 50%%, #f3e8ff 100%%); background-color: #fff; padding: 25px; border-radius: 15px; margin: 20px 0;\">
+                            <h3 style=\"color: #059669; margin: 0 0 15px 0; font-size: 20px; font-weight: 700;\">📋 Order #%s</h3>
+                            <div style=\"color: #374151; line-height: 1.6;\">
+                                <p><strong style=\"color: #1e40af;\">Product:</strong> %s</p>
+                                <p><strong style=\"color: #1e40af;\">Quantity:</strong> %s</p>
+                                %s
+                                %s
+                                <p><strong style=\"color: #1e40af;\">Date:</strong> %s</p>
+                            </div>
+                        </div>
+                        <div style=\"background: #059669; color: white; padding: 25px; border-radius: 15px; margin: 25px 0; text-align: center;\">
+                            <h3 style=\"margin: 0 0 10px 0; font-size: 22px; font-weight: 700;\">✅ Order Completed</h3>
+                            <p style=\"margin: 0; font-size: 16px;\">Your order has been completed. Thank you for choosing Pastiçeri Amanda!</p>
+                        </div>
+                        %s
+                    </div>
+                </div>
+            </body>
+            </html>
+        """, getClientHeader(), order.getId() != null ? order.getId().toString() : "Unknown", order.getProductName(), String.valueOf(order.getNumberOfPersons()), flavourSection, priceSection, order.getOrderDate() != null ? order.getOrderDate().toString() : "Unknown", getClientFooter());
+    }
     
     public String getPasswordResetTemplate(String resetLink) {
         return """

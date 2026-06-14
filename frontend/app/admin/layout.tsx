@@ -7,7 +7,7 @@ import { isAdmin, isAuthenticated } from "@/lib/auth"
 import { usePathname, useRouter } from "next/navigation"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
-import { MenuIcon, Package2, Home, Utensils, ListOrdered, CheckCircle, ChevronRight, ChevronDown } from "lucide-react"
+import { MenuIcon, Package2, ListOrdered, ChevronRight, ChevronDown } from "lucide-react"
 import Link from "next/link"
 import { GradientText } from "@/components/ui/gradient-text"
 
@@ -20,7 +20,6 @@ export default function AdminLayout({
   const pathname = usePathname()
   const router = useRouter()
   const [ordersOpen, setOrdersOpen] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     if (!isAuthenticated() || !isAdmin()) {
@@ -40,11 +39,7 @@ export default function AdminLayout({
 
   // Determine current page title based on pathname
   let pageTitle = "Admin Panel"
-  if (pathname.startsWith("/admin/menu-management/cakes")) pageTitle = "Cakes"
-  else if (pathname.startsWith("/admin/menu-management/sweets")) pageTitle = "Sweets"
-  else if (pathname.startsWith("/admin/menu-management/other")) pageTitle = "Other"
-  else if (pathname.startsWith("/admin/menu-management")) pageTitle = "Menu Management"
-  else if (pathname.startsWith("/admin/orders/new")) pageTitle = "New Orders"
+  if (pathname.startsWith("/admin/orders/new")) pageTitle = "New Orders"
   else if (pathname.startsWith("/admin/orders/pending")) pageTitle = "Pending Orders"
   else if (pathname.startsWith("/admin/orders/completed")) pageTitle = "Completed Orders"
   else if (pathname.startsWith("/admin/orders")) pageTitle = "Orders"
@@ -102,37 +97,6 @@ export default function AdminLayout({
                       onClick={() => router.push("/admin/orders/canceled")}
                     >
                       Canceled Orders
-                    </button>
-                  </div>
-                )}
-                {/* Manage Menu Section */}
-                <button
-                  className="flex items-center w-full gap-2 px-2 py-2 rounded-lg hover:bg-gold/10 transition-colors text-royal-purple font-semibold mt-2"
-                  onClick={() => setMenuOpen((open) => !open)}
-                  aria-expanded={menuOpen}
-                >
-                  {menuOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                  Manage Menu
-                </button>
-                {menuOpen && (
-                  <div className="ml-6 flex flex-col gap-1">
-                    <button
-                      className={`text-left px-2 py-1 rounded hover:bg-gold/10 transition-colors ${pathname === "/admin/menu-management/cakes" ? "font-bold text-royal-blue" : "text-royal-purple"}`}
-                      onClick={() => router.push("/admin/menu-management/cakes")}
-                    >
-                      Cakes
-                    </button>
-                    <button
-                      className={`text-left px-2 py-1 rounded hover:bg-gold/10 transition-colors ${pathname === "/admin/menu-management/sweets" ? "font-bold text-royal-blue" : "text-royal-purple"}`}
-                      onClick={() => router.push("/admin/menu-management/sweets")}
-                    >
-                      Sweets
-                    </button>
-                    <button
-                      className={`text-left px-2 py-1 rounded hover:bg-gold/10 transition-colors ${pathname === "/admin/menu-management/other" ? "font-bold text-royal-blue" : "text-royal-purple"}`}
-                      onClick={() => router.push("/admin/menu-management/other")}
-                    >
-                      Other
                     </button>
                   </div>
                 )}
@@ -198,37 +162,6 @@ export default function AdminLayout({
                     onClick={() => router.push("/admin/orders/canceled")}
                   >
                     Canceled Orders
-                  </button>
-                </div>
-              )}
-              {/* Manage Menu Section */}
-              <button
-                className="flex items-center w-full gap-2 px-2 py-2 rounded-lg hover:bg-gold/10 transition-colors text-royal-purple font-semibold mt-2"
-                onClick={() => setMenuOpen((open) => !open)}
-                aria-expanded={menuOpen}
-              >
-                {menuOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                Manage Menu
-              </button>
-              {menuOpen && (
-                <div className="ml-6 flex flex-col gap-1">
-                  <button
-                    className={`text-left px-2 py-1 rounded hover:bg-gold/10 transition-colors ${pathname === "/admin/menu-management/cakes" ? "font-bold text-royal-blue" : "text-royal-purple"}`}
-                    onClick={() => router.push("/admin/menu-management/cakes")}
-                  >
-                    Cakes
-                  </button>
-                  <button
-                    className={`text-left px-2 py-1 rounded hover:bg-gold/10 transition-colors ${pathname === "/admin/menu-management/sweets" ? "font-bold text-royal-blue" : "text-royal-purple"}`}
-                    onClick={() => router.push("/admin/menu-management/sweets")}
-                  >
-                    Sweets
-                  </button>
-                  <button
-                    className={`text-left px-2 py-1 rounded hover:bg-gold/10 transition-colors ${pathname === "/admin/menu-management/other" ? "font-bold text-royal-blue" : "text-royal-purple"}`}
-                    onClick={() => router.push("/admin/menu-management/other")}
-                  >
-                    Other
                   </button>
                 </div>
               )}

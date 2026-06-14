@@ -192,9 +192,9 @@ export default function AdminDashboardPage() {
                 View All Orders
               </Button>
             </Link>
-            <Link href="/admin/menu-management">
+            <Link href="/admin/feed">
               <Button className="w-full bg-royal-purple text-white hover:bg-royal-blue transition-colors">
-                Manage Menu Items
+                Manage Feed
               </Button>
             </Link>
             <Button

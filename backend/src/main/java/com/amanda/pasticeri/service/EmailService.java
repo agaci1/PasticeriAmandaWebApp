@@ -7,6 +7,7 @@ public interface EmailService {
     void sendAdminNotification(String to, Order order);
     void sendOrderCancelledEmail(String to, Order order);
     void sendPriceSetEmail(String to, Order order);
+    void sendOrderCompletedEmail(String to, Order order);
     void sendPasswordResetEmail(String to, String resetLink);
 
     void sendOrderConfirmation(String to, String htmlContent);

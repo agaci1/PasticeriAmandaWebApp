@@ -4,7 +4,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { isAdmin, isAuthenticated } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
-import { Package2, ClipboardList, Utensils, ListOrdered } from "lucide-react"
+import { Package2, ClipboardList, ListOrdered } from "lucide-react"
 import Link from "next/link"
 import { GradientText } from "@/components/ui/gradient-text"
 
@@ -38,13 +38,6 @@ export default function AdminPage() {
       href: "/admin/orders/new",
       icon: ClipboardList,
       color: "bg-green-500"
-    },
-    {
-      title: "Menu Management",
-      description: "Manage products and categories",
-      href: "/admin/menu-management",
-      icon: Utensils,
-      color: "bg-purple-500"
     },
     {
       title: "Feed Management",
