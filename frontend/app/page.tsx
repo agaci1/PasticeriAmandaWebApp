@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useRef } from "react"
+import { useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { AmandaStoryVideo } from "@/app/components/AmandaStoryVideo"
 import { HomePromoReel } from "@/app/components/home/HomePromoReel"
@@ -13,6 +13,7 @@ import { HomeCustomOrder } from "@/app/components/home/HomeCustomOrder"
 import { HomeNews } from "@/app/components/home/HomeNews"
 import { useTranslation } from "@/contexts/TranslationContext"
 import { ScrollFadeIn } from "@/components/ScrollFadeIn"
+import { useAutoplayVideo } from "@/hooks/use-autoplay-video"
 import { media, offerItems } from "@/lib/media"
 import { ChevronDown } from "lucide-react"
 
@@ -21,15 +22,8 @@ export default function HomePage() {
   const heroVideoRef = useRef<HTMLVideoElement>(null)
   const heroMobileVideoRef = useRef<HTMLVideoElement>(null)
 
-  useEffect(() => {
-    const play = (video: HTMLVideoElement | null) => {
-      if (!video) return
-      video.muted = true
-      video.play().catch(() => {})
-    }
-    play(heroVideoRef.current)
-    play(heroMobileVideoRef.current)
-  }, [])
+  useAutoplayVideo(heroMobileVideoRef, [media.videos.heroMobile])
+  useAutoplayVideo(heroVideoRef, [media.videos.hero])
 
   return (
     <div className="relative w-full max-w-[100vw] bg-[#F5F1EA]">
@@ -41,7 +35,7 @@ export default function HomePage() {
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="auto"
           className="pointer-events-none absolute inset-0 h-full max-h-full w-full max-w-full object-cover object-center md:hidden"
         />
         <video
@@ -51,7 +45,7 @@ export default function HomePage() {
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="auto"
           className="pointer-events-none absolute inset-0 hidden h-full max-h-full w-full max-w-full object-cover object-center md:block"
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-black/70" />
