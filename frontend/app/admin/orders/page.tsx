@@ -2,7 +2,6 @@
 
 import type React from "react"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { useEffect, useState } from "react"
 import { authenticatedFetch } from "@/lib/auth"
 import { useToast } from "@/hooks/use-toast"
@@ -13,6 +12,7 @@ import {
   getOrderImageUrls,
   normalizeOrder,
 } from "@/lib/orders"
+import { OrderImageLightbox } from "@/components/admin/OrderImageLightbox"
 
 type Order = ReturnType<typeof normalizeOrder>
 
@@ -160,26 +160,7 @@ export default function AdminOrdersPage() {
         </div>
       )}
 
-      <Dialog open={!!enlargedImage} onOpenChange={(open) => !open && setEnlargedImage(null)}>
-        <DialogContent className="max-h-[90vh] max-w-4xl overflow-hidden border-[#C9A961]/30 bg-[#F5F1EA] p-0">
-          <div className="relative">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={enlargedImage || ""}
-              alt="Enlarged order"
-              className="max-h-[80vh] w-full object-contain"
-            />
-            <Button
-              type="button"
-              onClick={() => setEnlargedImage(null)}
-              className="absolute right-4 top-4 rounded-none bg-[#1C1C1E]/70 text-white hover:bg-[#1C1C1E]"
-              size="sm"
-            >
-              ✕
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <OrderImageLightbox src={enlargedImage} onClose={() => setEnlargedImage(null)} />
     </div>
   )
 }

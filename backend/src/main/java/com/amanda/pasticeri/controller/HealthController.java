@@ -14,6 +14,21 @@ public class HealthController {
     @Value("${app.build.version:unknown}")
     private String buildVersion;
 
+    @Value("${app.mail.enabled:true}")
+    private boolean mailEnabled;
+
+    @Value("${spring.mail.host:}")
+    private String mailHost;
+
+    @Value("${spring.mail.port:465}")
+    private int mailPort;
+
+    @Value("${spring.mail.username:}")
+    private String mailUsername;
+
+    @Value("${spring.mail.password:}")
+    private String mailPassword;
+
     @GetMapping("/")
     public ResponseEntity<Map<String, Object>> root() {
         Map<String, Object> body = new LinkedHashMap<>();
@@ -39,7 +54,24 @@ public class HealthController {
         body.put("commit", commit);
         body.put("service", "Pasticeri Amanda Backend");
         body.put("timestamp", System.currentTimeMillis());
+        body.put("mail", buildMailStatus());
 
         return ResponseEntity.ok(body);
+    }
+
+    private Map<String, Object> buildMailStatus() {
+        boolean hostSet = mailHost != null && !mailHost.isBlank() && !mailHost.contains("${");
+        boolean userSet = mailUsername != null && !mailUsername.isBlank();
+        boolean passSet = mailPassword != null && !mailPassword.isBlank();
+
+        Map<String, Object> mail = new LinkedHashMap<>();
+        mail.put("enabled", mailEnabled);
+        mail.put("host", hostSet ? mailHost : "missing");
+        mail.put("port", mailPort);
+        mail.put("username", userSet ? mailUsername : "missing");
+        mail.put("passwordSet", passSet);
+        mail.put("configured", mailEnabled && hostSet && userSet && passSet);
+        mail.put("recommendedPort", 465);
+        return mail;
     }
 }

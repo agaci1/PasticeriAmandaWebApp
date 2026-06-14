@@ -4,6 +4,7 @@ import { authenticatedFetch } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import API_BASE from "@/lib/api"
+import { OrderImageLightbox } from "@/components/admin/OrderImageLightbox"
 
 interface Order {
   id: number
@@ -231,25 +232,7 @@ export default function CanceledOrdersPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Image Enlargement Dialog */}
-      <Dialog open={!!enlargedImage} onOpenChange={open => !open && setEnlargedImage(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden">
-          <div className="relative">
-            <img
-              src={enlargedImage || ''}
-              alt="Enlarged Image"
-              className="w-full h-auto max-h-[80vh] object-contain"
-            />
-            <Button
-              onClick={() => setEnlargedImage(null)}
-              className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white"
-              size="sm"
-            >
-              ✕
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <OrderImageLightbox src={enlargedImage} onClose={() => setEnlargedImage(null)} />
     </div>
   )
 } 

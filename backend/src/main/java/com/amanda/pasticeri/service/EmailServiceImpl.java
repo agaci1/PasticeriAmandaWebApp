@@ -87,20 +87,24 @@ public class EmailServiceImpl implements EmailService {
 
     // Test method for debugging email issues
     public void sendTestEmail(String to) {
+        if (!isMailConfigured()) {
+            throw new IllegalStateException("SMTP is not configured. Set SMTP_HOST, SMTP_USERNAME, SMTP_PASSWORD and MAIL_ENABLED=true on Railway.");
+        }
+
         System.out.println("🧪 Sending test email to: " + to);
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(mailUsername);
             helper.setTo(to);
             helper.setSubject("🧪 Test Email - Pastiçeri Amanda");
             helper.setText("This is a test email to verify email functionality is working.", false);
-            
-            System.out.println("📧 Test email created, attempting to send...");
+
             mailSender.send(message);
             System.out.println("✅ Test email sent successfully!");
         } catch (Exception e) {
             System.err.println("❌ Test email failed: " + e.getMessage());
-            e.printStackTrace();
+            throw new RuntimeException("Failed to send test email: " + e.getMessage(), e);
         }
     }
 

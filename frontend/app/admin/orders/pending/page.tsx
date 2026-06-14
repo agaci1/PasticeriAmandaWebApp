@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { useTranslation } from "@/contexts/TranslationContext"
 import API_BASE from "@/lib/api"
+import { OrderImageLightbox } from "@/components/admin/OrderImageLightbox"
 
 interface Order {
   id: number
@@ -179,17 +180,18 @@ export default function AdminPendingOrdersPage() {
                     <h4 className="text-sm font-semibold text-royal-blue mb-2">📸 Images ({getImageUrls(order.imageUrls).length})</h4>
                     <div className="grid grid-cols-3 gap-2">
                       {getImageUrls(order.imageUrls).slice(0, 3).map((url, idx) => (
-                        <div key={idx} className="relative group">
+                        <button
+                          key={idx}
+                          type="button"
+                          className="relative overflow-hidden rounded-lg border border-gold/30"
+                          onClick={() => setEnlargedImage(getFullImageUrl(url))}
+                        >
                           <img
                             src={getFullImageUrl(url)}
                             alt={`Order Image ${idx + 1}`}
-                            className="w-full h-16 object-cover rounded-lg border border-gold/30 cursor-pointer hover:opacity-80 transition-opacity"
-                            onClick={() => setEnlargedImage(getFullImageUrl(url))}
+                            className="h-16 w-full object-cover transition-opacity hover:opacity-80"
                           />
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all rounded-lg flex items-center justify-center">
-                            <span className="text-white opacity-0 group-hover:opacity-100 text-xs font-medium">Click</span>
-                          </div>
-                        </div>
+                        </button>
                       ))}
                       {getImageUrls(order.imageUrls).length > 3 && (
                         <div className="w-full h-16 bg-gray-100 rounded-lg border border-gold/30 flex items-center justify-center">
@@ -352,25 +354,7 @@ export default function AdminPendingOrdersPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Image Enlargement Dialog */}
-      <Dialog open={!!enlargedImage} onOpenChange={open => !open && setEnlargedImage(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden">
-          <div className="relative">
-            <img
-              src={enlargedImage || ''}
-              alt="Enlarged Image"
-              className="w-full h-auto max-h-[80vh] object-contain"
-            />
-            <Button
-              onClick={() => setEnlargedImage(null)}
-              className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white"
-              size="sm"
-            >
-              ✕
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <OrderImageLightbox src={enlargedImage} onClose={() => setEnlargedImage(null)} />
     </div>
   )
 } 
