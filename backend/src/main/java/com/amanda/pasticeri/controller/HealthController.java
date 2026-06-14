@@ -14,6 +14,16 @@ public class HealthController {
     @Value("${app.build.version:unknown}")
     private String buildVersion;
 
+    @GetMapping("/")
+    public ResponseEntity<Map<String, Object>> root() {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("service", "Pasticeri Amanda API");
+        body.put("status", "online");
+        body.put("health", "/api/health");
+        body.put("version", buildVersion);
+        return ResponseEntity.ok(body);
+    }
+
     @GetMapping("/api/health")
     public ResponseEntity<?> healthCheck() {
         String commit = System.getenv("RAILWAY_GIT_COMMIT_SHA");
