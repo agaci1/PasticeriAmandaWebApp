@@ -18,6 +18,10 @@ import { useAuth } from "@/hooks/use-auth"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { useTranslation } from "@/contexts/TranslationContext"
 import API_BASE from "@/lib/api"
+import {
+  countPendingCustomOrders,
+  orderWasSavedDespiteError,
+} from "@/lib/order-submit"
 import { cn } from "@/lib/utils"
 
 const fieldClass = "luxury-input w-full"
@@ -175,26 +179,14 @@ export default function OrderPage() {
     formData.set("flavour", englishFlavour)
 
     const token = localStorage.getItem("auth_token")
+    if (!token) {
+      handleLoginRedirect()
+      return
+    }
 
-    try {
-      const res = await fetch(`${API_BASE}/api/orders/custom`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
-      })
+    const pendingBefore = await countPendingCustomOrders(token)
 
-      if (!res.ok) {
-        const errorData = await res.json()
-        throw new Error(errorData.message || `HTTP error! status: ${res.status}`)
-      }
-
-      const contentType = res.headers.get("content-type")
-      if (contentType && contentType.includes("application/json")) {
-        await res.json()
-      } else {
-        await res.text()
-      }
-
+    const showOrderSuccess = () => {
       toast({
         title: "Order Submitted!",
         description:
@@ -208,8 +200,44 @@ export default function OrderPage() {
       setFlavour(t("noPreference"))
       setCustomFlavour("")
       router.push("/order-history")
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/api/orders/custom`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      })
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}))
+        const message =
+          (errorData as { message?: string }).message || `HTTP error! status: ${res.status}`
+
+        if (await orderWasSavedDespiteError(token, pendingBefore)) {
+          showOrderSuccess()
+          return
+        }
+
+        throw new Error(message)
+      }
+
+      const contentType = res.headers.get("content-type")
+      if (contentType && contentType.includes("application/json")) {
+        await res.json()
+      } else {
+        await res.text()
+      }
+
+      showOrderSuccess()
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : t("orderErrorMessage")
+
+      if (await orderWasSavedDespiteError(token, pendingBefore)) {
+        showOrderSuccess()
+        return
+      }
+
       toast({
         title: t("orderError"),
         description: message,
