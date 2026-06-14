@@ -80,7 +80,7 @@ public class OrderService {
         save(order);
     }
 
-    public void placeCustomOrder(OrderRequestDto dto, String email) {
+    public Order placeCustomOrder(OrderRequestDto dto, String email) {
         Order order = new Order();
 
         // Required fields
@@ -120,8 +120,7 @@ public class OrderService {
         order.setStatus("pending-quote");
         order.setOrderType("custom");
 
-        // Save the order
-        save(order);
+        return save(order);
     }
 
     public void placeMenuOrder(MenuOrderDto dto) {

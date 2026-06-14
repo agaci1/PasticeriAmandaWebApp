@@ -57,10 +57,11 @@ public class OrderController {
         try {
             String token = tokenHeader.replace("Bearer ", "");
             String email = jwtTokenProvider.getEmailFromToken(token);
-            orderService.placeCustomOrder(orderDto, email);
+            Order saved = orderService.placeCustomOrder(orderDto, email);
             return ResponseEntity.ok(Map.of(
                 "success", true,
                 "message", "Custom order submitted successfully.",
+                "orderId", saved.getId(),
                 "timestamp", System.currentTimeMillis()
             ));
         } catch (Exception e) {

@@ -30,6 +30,9 @@ public class EmailServiceImpl implements EmailService {
     @Value("${spring.mail.password:}")
     private String mailPassword;
 
+    @Value("${app.mail.enabled:true}")
+    private boolean mailEnabled;
+
     @Override
     public void sendOrderConfirmation(String to, Order order) {
         String subject = "🍰 Your Pastiçeri Amanda Order Confirmation";
@@ -213,7 +216,8 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private boolean isMailConfigured() {
-        return mailHost != null && !mailHost.isBlank()
+        return mailEnabled
+            && mailHost != null && !mailHost.isBlank()
             && mailUsername != null && !mailUsername.isBlank()
             && mailPassword != null && !mailPassword.isBlank()
             && !mailHost.contains("${");
