@@ -34,14 +34,27 @@ public class OrderService {
     public Order save(Order order) {
         Order savedOrder = orderRepository.save(order);
 
-        // ✅ Add this log to confirm the order is saved
         System.out.println("✅ ORDER SAVED with ID: " + savedOrder.getId());
 
-        // Email logic
-        emailService.sendOrderConfirmation(order.getCustomerEmail(), savedOrder);
-        emailService.sendAdminNotification("pasticeriamanda@gmail.com", savedOrder);
+        sendOrderNotifications(savedOrder);
 
         return savedOrder;
+    }
+
+    private void sendOrderNotifications(Order order) {
+        try {
+            emailService.sendOrderConfirmation(order.getCustomerEmail(), order);
+            System.out.println("✅ Order confirmation email sent to: " + order.getCustomerEmail());
+        } catch (Exception e) {
+            System.err.println("⚠️ Failed to send order confirmation email: " + e.getMessage());
+        }
+
+        try {
+            emailService.sendAdminNotification("pasticeriamanda@gmail.com", order);
+            System.out.println("✅ Admin notification email sent");
+        } catch (Exception e) {
+            System.err.println("⚠️ Failed to send admin notification email: " + e.getMessage());
+        }
     }
 
     public List<Order> getAll() {
@@ -199,9 +212,17 @@ public class OrderService {
         }
         orderRepository.save(order);
 
-        // Use standardized templates for emails
-        emailService.sendOrderConfirmation(authenticatedEmail, order);
-        emailService.sendAdminNotification("pasticeriamanda@gmail.com", order);
+        try {
+            emailService.sendOrderConfirmation(authenticatedEmail, order);
+        } catch (Exception e) {
+            System.err.println("⚠️ Failed to send cart order confirmation email: " + e.getMessage());
+        }
+
+        try {
+            emailService.sendAdminNotification("pasticeriamanda@gmail.com", order);
+        } catch (Exception e) {
+            System.err.println("⚠️ Failed to send cart order admin notification: " + e.getMessage());
+        }
     }
 
     public void setOrderPrice(Long id, double price) {
@@ -209,8 +230,12 @@ public class OrderService {
         order.setTotalPrice(price);
         order.setStatus("pending");
         orderRepository.save(order);
-        // Send beautiful email to client with price
-        emailService.sendPriceSetEmail(order.getCustomerEmail(), order);
+
+        try {
+            emailService.sendPriceSetEmail(order.getCustomerEmail(), order);
+        } catch (Exception e) {
+            System.err.println("⚠️ Failed to send price set email: " + e.getMessage());
+        }
     }
 
     public void markOrderComplete(Long id) {

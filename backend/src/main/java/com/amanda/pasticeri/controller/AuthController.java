@@ -87,8 +87,12 @@ public class AuthController {
             );
             tokenRepository.save(resetToken);
 
-            String link = "https://pasticeriamanda.vercel.app/reset-password?token=" + token;
-            emailService.sendPasswordResetEmail(request.getEmail(), link);
+            String link = "https://pasticeriamanda.com/reset-password?token=" + token;
+            try {
+                emailService.sendPasswordResetEmail(request.getEmail(), link);
+            } catch (Exception e) {
+                System.err.println("⚠️ Failed to send password reset email: " + e.getMessage());
+            }
         }
 
         return ResponseEntity.ok("If an account exists, a reset link has been sent.");

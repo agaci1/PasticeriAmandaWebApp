@@ -4,6 +4,8 @@ import com.amanda.pasticeri.model.Order;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,15 @@ public class EmailServiceImpl implements EmailService {
 
     @Autowired
     private EmailTemplateService emailTemplateService;
+
+    @Value("${spring.mail.host:}")
+    private String mailHost;
+
+    @Value("${spring.mail.username:}")
+    private String mailUsername;
+
+    @Value("${spring.mail.password:}")
+    private String mailPassword;
 
     @Override
     public void sendOrderConfirmation(String to, Order order) {
@@ -101,12 +112,18 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private void sendHtmlEmailWithLogo(String to, String subject, String htmlBody, Order order) {
+        if (!isMailConfigured()) {
+            System.err.println("⚠️ SMTP not configured — skipping email to: " + to);
+            return;
+        }
+
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom(mailUsername);
             helper.setTo(to);
             helper.setSubject(subject);
-            helper.setText(htmlBody, true); // HTML enabled
+            helper.setText(htmlBody, true);
 
             // Add logo
             File logo = new File("src/main/resources/static/logoAmanda.jpg");
@@ -190,9 +207,15 @@ public class EmailServiceImpl implements EmailService {
 
             mailSender.send(message);
             System.out.println("✅ Email sent successfully to: " + to);
-        } catch (MessagingException e) {
-            System.err.println("❌ Email sending failed: " + e.getMessage());
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("❌ Email sending failed to " + to + ": " + e.getMessage());
         }
+    }
+
+    private boolean isMailConfigured() {
+        return mailHost != null && !mailHost.isBlank()
+            && mailUsername != null && !mailUsername.isBlank()
+            && mailPassword != null && !mailPassword.isBlank()
+            && !mailHost.contains("${");
     }
 }
