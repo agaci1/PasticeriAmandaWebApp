@@ -7,6 +7,8 @@ import com.amanda.pasticeri.model.Order;
 import com.amanda.pasticeri.model.Product;
 import com.amanda.pasticeri.repository.OrderRepository;
 import com.amanda.pasticeri.repository.ProductRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +20,8 @@ import java.util.List;
 
 @Service
 public class OrderService {
+
+    private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     @Autowired
     private OrderRepository orderRepository;
@@ -32,12 +36,15 @@ public class OrderService {
     private ImageUploadService imageUploadService;
 
     public Order save(Order order) {
+        logger.info("💾 Saving order: {}", order.getProductName());
         Order savedOrder = orderRepository.save(order);
 
-        System.out.println("✅ ORDER SAVED with ID: " + savedOrder.getId());
+        logger.info("✅ ORDER SAVED with ID: {}", savedOrder.getId());
+        logger.info("📧 Triggering asyncEmailService.sendOrderNotifications for order ID: {}", savedOrder.getId());
 
         asyncEmailService.sendOrderNotifications(savedOrder);
 
+        logger.info("✅ Email notification task queued for order ID: {}", savedOrder.getId());
         return savedOrder;
     }
 
@@ -50,6 +57,7 @@ public class OrderService {
     }
 
     public void placeCustomOrder(OrderRequestDto dto) {
+        logger.info("📝 placeCustomOrder called with product: {}", dto.getProductName());
         Order order = new Order();
         order.setCustomerName(dto.getCustomerName());
         order.setCustomerEmail(dto.getCustomerEmail());
@@ -81,6 +89,7 @@ public class OrderService {
     }
 
     public Order placeCustomOrder(OrderRequestDto dto, String email) {
+        logger.info("📝 placeCustomOrder called with email: {}, product: {}", email, dto.getProductName());
         Order order = new Order();
 
         // Required fields
@@ -109,7 +118,7 @@ public class OrderService {
                         if (urls.length() > 0) urls.append(",");
                         urls.append(imageUrl);
                     } catch (RuntimeException e) {
-                        System.err.println("❌ Failed to save image: " + e.getMessage());
+                        logger.error("❌ Failed to save image: {}", e.getMessage(), e);
                     }
                 }
             }
@@ -124,6 +133,7 @@ public class OrderService {
     }
 
     public void placeMenuOrder(MenuOrderDto dto) {
+        logger.info("📝 placeMenuOrder called");
         // Get product details to set product name and calculate total price
         Product product = productRepository.findById(dto.getProductId())
             .orElseThrow(() -> new RuntimeException("Product not found: " + dto.getProductId()));
@@ -147,7 +157,7 @@ public class OrderService {
                 LocalDateTime deliveryDateTime = LocalDateTime.parse(dto.getDeliveryDateTime());
                 order.setDeliveryDateTime(deliveryDateTime);
             } catch (Exception e) {
-                System.out.println("⚠️ Failed to parse delivery date/time: " + e.getMessage());
+                logger.warn("⚠️ Failed to parse delivery date/time: {}", e.getMessage());
             }
         }
 
@@ -155,6 +165,7 @@ public class OrderService {
     }
 
     public void placeCartOrder(CartOrderDto cartOrderDto, String authenticatedEmail) {
+        logger.info("📝 placeCartOrder called for email: {}", authenticatedEmail);
         // Calculate total and build product names
         double total = 0;
         int totalQuantity = 0;
@@ -190,51 +201,68 @@ public class OrderService {
                 LocalDateTime deliveryDateTime = LocalDateTime.parse(cartOrderDto.getDeliveryDateTime());
                 order.setDeliveryDateTime(deliveryDateTime);
             } catch (Exception e) {
-                System.out.println("⚠️ Failed to parse delivery date/time: " + e.getMessage());
+                logger.warn("⚠️ Failed to parse delivery date/time: {}", e.getMessage());
             }
         }
+        
+        logger.info("💾 Saving cart order to database");
         orderRepository.save(order);
 
+        logger.info("📧 Triggering asyncEmailService.sendOrderNotifications for cart order ID: {}", order.getId());
         asyncEmailService.sendOrderNotifications(order);
+        logger.info("✅ Email notification task queued for cart order ID: {}", order.getId());
     }
 
     public void setOrderPrice(Long id, double price) {
+        logger.info("💰 setOrderPrice called for order ID: {} with price: {}", id, price);
         Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
         order.setTotalPrice(price);
         order.setStatus("pending");
         orderRepository.save(order);
 
+        logger.info("📧 Triggering asyncEmailService.sendPriceSetNotification for order ID: {}", id);
         asyncEmailService.sendPriceSetNotification(order);
+        logger.info("✅ Price set email notification task queued for order ID: {}", id);
     }
 
     public void markOrderComplete(Long id) {
+        logger.info("✅ markOrderComplete called for order ID: {}", id);
         Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
         order.setStatus("completed");
         orderRepository.save(order);
+        
+        logger.info("📧 Triggering asyncEmailService.sendCompletionNotifications for order ID: {}", id);
         asyncEmailService.sendCompletionNotifications(order);
+        logger.info("✅ Completion email notification task queued for order ID: {}", id);
     }
 
     public void cancelOrder(Long id) {
+        logger.info("❌ cancelOrder called for order ID: {}", id);
         Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
         order.setStatus("canceled");
         orderRepository.save(order);
+        
+        logger.info("📧 Triggering asyncEmailService.sendCancellationNotifications for order ID: {}", id);
         asyncEmailService.sendCancellationNotifications(order);
+        logger.info("✅ Cancellation email notification task queued for order ID: {}", id);
     }
 
     public void cancelMyOrder(Long id, String userEmail) {
-        System.out.println("🔍 Starting cancelMyOrder for ID: " + id + ", User: " + userEmail);
+        logger.info("🔍 Starting cancelMyOrder for ID: {}, User: {}", id, userEmail);
         
         Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
-        System.out.println("📋 Found order: ID=" + order.getId() + ", Status=" + order.getStatus() + ", Email=" + order.getCustomerEmail());
-        System.out.println("📸 Image URLs: " + (order.getImageUrls() != null ? order.getImageUrls() : "null"));
+        logger.info("📋 Found order: ID={}, Status={}, Email={}", order.getId(), order.getStatus(), order.getCustomerEmail());
+        logger.info("📸 Image URLs: {}", (order.getImageUrls() != null ? order.getImageUrls() : "null"));
         
         // Verify the order belongs to the user
         if (!order.getCustomerEmail().equals(userEmail)) {
+            logger.error("❌ User {} attempted to cancel order belonging to {}", userEmail, order.getCustomerEmail());
             throw new RuntimeException("You can only cancel your own orders");
         }
         
         // Check if order is not already completed or canceled
         if ("completed".equals(order.getStatus()) || "canceled".equals(order.getStatus())) {
+            logger.warn("⚠️ Cannot cancel order {} - already in status: {}", id, order.getStatus());
             throw new RuntimeException("Cannot cancel this order");
         }
         
@@ -251,9 +279,10 @@ public class OrderService {
             long currentTime = System.currentTimeMillis();
             long oneDay = 24 * 60 * 60 * 1000;
             
-            System.out.println("⏰ Custom order time: " + orderTime + ", Current time: " + currentTime + ", Difference: " + (orderTime - currentTime));
+            logger.info("⏰ Custom order time: {}, Current time: {}, Difference: {}", orderTime, currentTime, (orderTime - currentTime));
             
             if (orderTime - currentTime <= oneDay) {
+                logger.error("❌ Custom order cancellation rejected - less than 1 day before order date");
                 throw new RuntimeException("Custom orders can only be cancelled at least 1 day before the due date");
             }
         } else {
@@ -263,48 +292,53 @@ public class OrderService {
                 long currentTime = System.currentTimeMillis();
                 long fiveHours = 5 * 60 * 60 * 1000;
                 
-                System.out.println("⏰ Menu order delivery time: " + deliveryTime + ", Current time: " + currentTime + ", Difference: " + (deliveryTime - currentTime));
+                logger.info("⏰ Menu order delivery time: {}, Current time: {}, Difference: {}", deliveryTime, currentTime, (deliveryTime - currentTime));
                 
                 if (deliveryTime - currentTime <= fiveHours) {
+                    logger.error("❌ Menu order cancellation rejected - less than 5 hours before delivery");
                     throw new RuntimeException("Menu orders can only be cancelled at least 5 hours before the delivery time");
                 }
             } else {
+                logger.error("❌ Menu order has no delivery date/time");
                 throw new RuntimeException("Menu order must have a delivery date/time to be cancelled");
             }
         }
         
-        System.out.println("✅ Order can be cancelled, updating status to 'canceled'");
+        logger.info("✅ Order can be cancelled, updating status to 'canceled'");
         
         // Update the status directly
         order.setStatus("canceled");
         
-        System.out.println("💾 Saving updated order...");
+        logger.info("💾 Saving updated order...");
         try {
             orderRepository.save(order);
-            System.out.println("✅ Order saved successfully");
+            logger.info("✅ Order saved successfully");
         } catch (Exception e) {
-            System.err.println("❌ Database save error: " + e.getMessage());
-            System.err.println("❌ Error type: " + e.getClass().getSimpleName());
-            e.printStackTrace();
+            logger.error("❌ Database save error: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to save order: " + e.getMessage());
         }
         
+        logger.info("📧 Triggering asyncEmailService.sendCancellationNotifications for order ID: {}", id);
         asyncEmailService.sendCancellationNotifications(order);
+        logger.info("✅ Cancellation email notification task queued for order ID: {}", id);
     }
     
     // ✅ Auto-complete menu orders when delivery time passes
     public void autoCompleteMenuOrders() {
+        logger.debug("⏰ autoCompleteMenuOrders scheduled task running");
         List<Order> pendingMenuOrders = orderRepository.findAll().stream()
             .filter(order -> "pending".equals(order.getStatus()) && 
                            order.getDeliveryDateTime() != null &&
                            order.getDeliveryDateTime().isBefore(LocalDateTime.now()))
             .toList();
         
+        logger.info("📋 Found {} pending menu orders to auto-complete", pendingMenuOrders.size());
+        
         for (Order order : pendingMenuOrders) {
+            logger.info("✅ Auto-completing menu order ID: {}", order.getId());
             order.setStatus("completed");
             orderRepository.save(order);
             asyncEmailService.sendCompletionNotifications(order);
-            System.out.println("✅ Auto-completed menu order ID: " + order.getId());
         }
     }
 }
