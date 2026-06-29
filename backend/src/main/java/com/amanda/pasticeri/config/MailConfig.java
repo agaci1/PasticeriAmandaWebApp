@@ -1,7 +1,6 @@
 package com.amanda.pasticeri.config;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -13,9 +12,8 @@ import java.util.Properties;
 public class MailConfig {
 
     @Bean
-    @ConditionalOnProperty(name = "spring.mail.host")
     public JavaMailSender javaMailSender(
-            @Value("${spring.mail.host}") String host,
+            @Value("${spring.mail.host:}") String host,
             @Value("${spring.mail.port:465}") int port,
             @Value("${spring.mail.username:}") String username,
             @Value("${spring.mail.password:}") String password,
@@ -23,10 +21,19 @@ public class MailConfig {
             @Value("${spring.mail.properties.mail.smtp.starttls.enable:false}") boolean startTlsEnabled
     ) {
         JavaMailSenderImpl sender = new JavaMailSenderImpl();
-        sender.setHost(host);
+        
+        // Only set values if they're not empty (allow nullability)
+        if (host != null && !host.isBlank()) {
+            sender.setHost(host);
+        }
+        if (username != null && !username.isBlank()) {
+            sender.setUsername(username);
+        }
+        if (password != null && !password.isBlank()) {
+            sender.setPassword(password);
+        }
+        
         sender.setPort(port);
-        sender.setUsername(username);
-        sender.setPassword(password);
 
         Properties props = sender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
