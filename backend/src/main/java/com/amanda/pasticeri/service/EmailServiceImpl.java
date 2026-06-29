@@ -13,6 +13,12 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -39,6 +45,12 @@ public class EmailServiceImpl implements EmailService {
 
     @Value("${app.mail.enabled:true}")
     private boolean mailEnabled;
+
+    @Value("${app.mail.resend-api-key:}")
+    private String resendApiKey;
+
+    @Value("${app.mail.resend-from:Pasticeri Amanda <onboarding@resend.dev>}")
+    private String resendFrom;
 
     @Override
     public void sendOrderConfirmation(String to, Order order) {
@@ -121,6 +133,11 @@ public class EmailServiceImpl implements EmailService {
             logger.warn("⚠️ EMAIL SERVICE DISABLED - Set app.mail.enabled=true to enable emails");
             logger.info("═══════════════════════════════════════════════════════════");
             throw new IllegalStateException("Email service is disabled. Set MAIL_ENABLED=true.");
+        }
+
+        if (isResendConfigured()) {
+            sendWithResend(to, subject, htmlBody);
+            return;
         }
 
         // Then check if SMTP is configured
@@ -261,5 +278,78 @@ public class EmailServiceImpl implements EmailService {
         
         logger.debug("Mail configuration check: {}", isConfigured ? "✅ CONFIGURED" : "❌ NOT CONFIGURED");
         return isConfigured;
+    }
+
+    private boolean isResendConfigured() {
+        return resendApiKey != null && !resendApiKey.isBlank() && !resendApiKey.contains("${");
+    }
+
+    private void sendWithResend(String to, String subject, String htmlBody) {
+        logger.info("📨 Sending email via Resend HTTPS API");
+        logger.info("   From: {}", resendFrom);
+        logger.info("   To: {}", to);
+
+        String payload = """
+            {
+              "from": "%s",
+              "to": ["%s"],
+              "subject": "%s",
+              "html": "%s"
+            }
+            """.formatted(
+                escapeJson(resendFrom),
+                escapeJson(to),
+                escapeJson(subject),
+                escapeJson(prepareHtmlForResend(htmlBody))
+            );
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("https://api.resend.com/emails"))
+            .timeout(Duration.ofSeconds(20))
+            .header("Authorization", "Bearer " + resendApiKey)
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(payload))
+            .build();
+
+        try {
+            HttpResponse<String> response = HttpClient.newHttpClient()
+                .send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                logger.error("❌ Resend email failed with status {}: {}", response.statusCode(), response.body());
+                throw new RuntimeException("Resend email failed with status " + response.statusCode());
+            }
+
+            logger.info("✅✅✅ EMAIL SENT SUCCESSFULLY VIA RESEND! ✅✅✅");
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to send email through Resend", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Email sending through Resend was interrupted", e);
+        }
+    }
+
+    private String prepareHtmlForResend(String htmlBody) {
+        return htmlBody.replaceAll("<img[^>]+src=\\\"cid:[^\\\"]+\\\"[^>]*>", "");
+    }
+
+    private String escapeJson(String value) {
+        if (value == null) {
+            return "";
+        }
+
+        StringBuilder escaped = new StringBuilder();
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            switch (c) {
+                case '\\' -> escaped.append("\\\\");
+                case '"' -> escaped.append("\\\"");
+                case '\n' -> escaped.append("\\n");
+                case '\r' -> escaped.append("\\r");
+                case '\t' -> escaped.append("\\t");
+                default -> escaped.append(c);
+            }
+        }
+        return escaped.toString();
     }
 }
