@@ -1,6 +1,8 @@
 package com.amanda.pasticeri.service;
 
 import com.amanda.pasticeri.model.Order;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +12,7 @@ import java.util.concurrent.Executors;
 @Service
 public class AsyncEmailService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AsyncEmailService.class);
     private static final String ADMIN_EMAIL = "pasticeriamanda@gmail.com";
 
     private final EmailService emailService;
@@ -25,79 +28,90 @@ public class AsyncEmailService {
     }
 
     public void sendOrderNotifications(Order order) {
+        logger.info("🔔 sendOrderNotifications triggered for order ID: {} to customer: {}", order.getId(), order.getCustomerEmail());
         executor.execute(() -> {
             if (hasCustomerEmail(order)) {
                 try {
+                    logger.info("📧 Attempting to send order confirmation to: {}", order.getCustomerEmail());
                     emailService.sendOrderConfirmation(order.getCustomerEmail(), order);
-                    System.out.println("✅ Order confirmation email sent to: " + order.getCustomerEmail());
+                    logger.info("✅ Order confirmation email sent to: {}", order.getCustomerEmail());
                 } catch (Exception e) {
-                    System.err.println("⚠️ Failed to send order confirmation email: " + e.getMessage());
+                    logger.error("⚠️ Failed to send order confirmation email: {}", e.getMessage(), e);
                 }
             } else {
-                System.err.println("⚠️ Skipping customer email — no customer email on order #" + order.getId());
+                logger.warn("⚠️ Skipping customer email — no customer email on order #" + order.getId());
             }
 
             try {
+                logger.info("📧 Attempting to send admin notification for order ID: {}", order.getId());
                 emailService.sendAdminNotification(ADMIN_EMAIL, order);
-                System.out.println("✅ Admin notification email sent for order ID: " + order.getId());
+                logger.info("✅ Admin notification email sent for order ID: {}", order.getId());
             } catch (Exception e) {
-                System.err.println("⚠️ Failed to send admin notification email: " + e.getMessage());
+                logger.error("⚠️ Failed to send admin notification email: {}", e.getMessage(), e);
             }
         });
     }
 
     public void sendPriceSetNotification(Order order) {
+        logger.info("💰 sendPriceSetNotification triggered for order ID: {}", order.getId());
         executor.execute(() -> {
             if (!hasCustomerEmail(order)) {
-                System.err.println("⚠️ Skipping price email — no customer email on order #" + order.getId());
+                logger.warn("⚠️ Skipping price email — no customer email on order #" + order.getId());
                 return;
             }
 
             try {
+                logger.info("📧 Attempting to send price set email to: {}", order.getCustomerEmail());
                 emailService.sendPriceSetEmail(order.getCustomerEmail(), order);
-                System.out.println("✅ Price set email sent to: " + order.getCustomerEmail());
+                logger.info("✅ Price set email sent to: {}", order.getCustomerEmail());
             } catch (Exception e) {
-                System.err.println("⚠️ Failed to send price set email: " + e.getMessage());
+                logger.error("⚠️ Failed to send price set email: {}", e.getMessage(), e);
             }
         });
     }
 
     public void sendCancellationNotifications(Order order) {
+        logger.info("❌ sendCancellationNotifications triggered for order ID: {}", order.getId());
         executor.execute(() -> {
             if (hasCustomerEmail(order)) {
                 try {
+                    logger.info("📧 Attempting to send cancellation email to customer: {}", order.getCustomerEmail());
                     emailService.sendOrderCancelledEmail(order.getCustomerEmail(), order);
-                    System.out.println("✅ Cancellation email sent to customer");
+                    logger.info("✅ Cancellation email sent to customer");
                 } catch (Exception e) {
-                    System.err.println("⚠️ Failed to send cancellation email to customer: " + e.getMessage());
+                    logger.error("⚠️ Failed to send cancellation email to customer: {}", e.getMessage(), e);
                 }
             }
 
             try {
+                logger.info("📧 Attempting to send admin cancellation notification");
                 emailService.sendAdminNotification(ADMIN_EMAIL, order);
-                System.out.println("✅ Admin cancellation notification sent");
+                logger.info("✅ Admin cancellation notification sent");
             } catch (Exception e) {
-                System.err.println("⚠️ Failed to send admin cancellation notification: " + e.getMessage());
+                logger.error("⚠️ Failed to send admin cancellation notification: {}", e.getMessage(), e);
             }
         });
     }
 
     public void sendCompletionNotifications(Order order) {
+        logger.info("✅ sendCompletionNotifications triggered for order ID: {}", order.getId());
         executor.execute(() -> {
             if (hasCustomerEmail(order)) {
                 try {
+                    logger.info("📧 Attempting to send completion email to: {}", order.getCustomerEmail());
                     emailService.sendOrderCompletedEmail(order.getCustomerEmail(), order);
-                    System.out.println("✅ Completion email sent to: " + order.getCustomerEmail());
+                    logger.info("✅ Completion email sent to: {}", order.getCustomerEmail());
                 } catch (Exception e) {
-                    System.err.println("⚠️ Failed to send completion email: " + e.getMessage());
+                    logger.error("⚠️ Failed to send completion email: {}", e.getMessage(), e);
                 }
             }
 
             try {
+                logger.info("📧 Attempting to send admin completion notification");
                 emailService.sendAdminNotification(ADMIN_EMAIL, order);
-                System.out.println("✅ Admin completion notification sent for order ID: " + order.getId());
+                logger.info("✅ Admin completion notification sent for order ID: {}", order.getId());
             } catch (Exception e) {
-                System.err.println("⚠️ Failed to send admin completion notification: " + e.getMessage());
+                logger.error("⚠️ Failed to send admin completion notification: {}", e.getMessage(), e);
             }
         });
     }
