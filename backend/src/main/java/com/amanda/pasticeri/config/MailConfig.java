@@ -14,11 +14,14 @@ public class MailConfig {
     @Bean
     public JavaMailSender javaMailSender(
             @Value("${spring.mail.host:}") String host,
-            @Value("${spring.mail.port:587}") int port,
+            @Value("${spring.mail.port:465}") int port,
             @Value("${spring.mail.username:}") String username,
             @Value("${spring.mail.password:}") String password,
-            @Value("${spring.mail.properties.mail.smtp.ssl.enable:false}") boolean sslEnabled,
-            @Value("${spring.mail.properties.mail.smtp.starttls.enable:true}") boolean startTlsEnabled
+            @Value("${spring.mail.properties.mail.smtp.ssl.enable:true}") boolean sslEnabled,
+            @Value("${spring.mail.properties.mail.smtp.starttls.enable:false}") boolean startTlsEnabled,
+            @Value("${spring.mail.properties.mail.smtp.connectiontimeout:15000}") int connectionTimeout,
+            @Value("${spring.mail.properties.mail.smtp.timeout:15000}") int timeout,
+            @Value("${spring.mail.properties.mail.smtp.writetimeout:15000}") int writeTimeout
     ) {
         JavaMailSenderImpl sender = new JavaMailSenderImpl();
         
@@ -38,9 +41,9 @@ public class MailConfig {
         Properties props = sender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.connectiontimeout", "120000");
-        props.put("mail.smtp.timeout", "120000");
-        props.put("mail.smtp.writetimeout", "120000");
+        props.put("mail.smtp.connectiontimeout", String.valueOf(connectionTimeout));
+        props.put("mail.smtp.timeout", String.valueOf(timeout));
+        props.put("mail.smtp.writetimeout", String.valueOf(writeTimeout));
 
         // Port 587 (STARTTLS) configuration — better for Railway
         if (port == 587) {

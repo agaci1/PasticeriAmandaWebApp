@@ -28,7 +28,7 @@ public class EmailServiceImpl implements EmailService {
     @Value("${spring.mail.host:}")
     private String mailHost;
 
-    @Value("${spring.mail.port:587}")
+    @Value("${spring.mail.port:465}")
     private int mailPort;
 
     @Value("${spring.mail.username:}")
@@ -92,6 +92,19 @@ public class EmailServiceImpl implements EmailService {
         sendHtmlEmailWithLogo(to, subject, body);
     }
 
+    public void sendTestEmail(String to) {
+        String subject = "🧪 Test Email - Pastiçeri Amanda";
+        String body = """
+            <html>
+              <body>
+                <h2>Pastiçeri Amanda email test</h2>
+                <p>If you received this email, SMTP is configured correctly.</p>
+              </body>
+            </html>
+            """;
+        sendHtmlEmailWithLogo(to, subject, body);
+    }
+
     private void sendHtmlEmailWithLogo(String to, String subject, String htmlBody) {
         sendHtmlEmailWithLogo(to, subject, htmlBody, null);
     }
@@ -107,7 +120,7 @@ public class EmailServiceImpl implements EmailService {
         if (!mailEnabled) {
             logger.warn("⚠️ EMAIL SERVICE DISABLED - Set app.mail.enabled=true to enable emails");
             logger.info("═══════════════════════════════════════════════════════════");
-            return;
+            throw new IllegalStateException("Email service is disabled. Set MAIL_ENABLED=true.");
         }
 
         // Then check if SMTP is configured
@@ -121,12 +134,12 @@ public class EmailServiceImpl implements EmailService {
             logger.error("   SMTP Password: {}", mailPassword == null || mailPassword.isBlank() ? "NOT SET" : "SET");
             logger.error("   Required environment variables on Railway:");
             logger.error("     - SMTP_HOST=smtp.gmail.com");
-            logger.error("     - SMTP_PORT=587");
+            logger.error("     - SMTP_PORT=465");
             logger.error("     - SMTP_USERNAME=your-email@gmail.com");
             logger.error("     - SMTP_PASSWORD=your-app-password");
             logger.error("     - MAIL_ENABLED=true");
             logger.error("═══════════════════════════════════════════════════════════");
-            return;
+            throw new IllegalStateException("SMTP is not configured. Set SMTP_HOST, SMTP_USERNAME, SMTP_PASSWORD and MAIL_ENABLED=true.");
         }
 
         try {
@@ -222,18 +235,21 @@ public class EmailServiceImpl implements EmailService {
             logger.error("   This usually means SMTP credentials are invalid or server is unreachable");
             logger.error("   Stack trace:");
             logger.error("═══════════════════════════════════════════════════════════", e);
+            throw new RuntimeException("Failed to send email to " + to, e);
         } catch (MessagingException e) {
             logger.error("═══════════════════════════════════════════════════════════");
             logger.error("❌ MESSAGING EXCEPTION - Email sending FAILED to {}", to);
             logger.error("   Error: {}", e.getMessage());
             logger.error("   Stack trace:");
             logger.error("═══════════════════════════════════════════════════════════", e);
+            throw new RuntimeException("Failed to prepare email to " + to, e);
         } catch (Exception e) {
             logger.error("═══════════════════════════════════════════════════════════");
             logger.error("❌ UNEXPECTED ERROR - Email sending FAILED to {}", to);
             logger.error("   Error: {}", e.getMessage());
             logger.error("   Stack trace:");
             logger.error("═══════════════════════════════════════════════════════════", e);
+            throw new RuntimeException("Failed to send email to " + to, e);
         }
     }
 
