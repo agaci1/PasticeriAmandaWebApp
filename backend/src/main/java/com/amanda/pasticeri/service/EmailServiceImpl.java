@@ -3,6 +3,8 @@ package com.amanda.pasticeri.service;
 import com.amanda.pasticeri.model.Order;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
@@ -14,6 +16,8 @@ import java.io.File;
 
 @Service
 public class EmailServiceImpl implements EmailService {
+
+    private static final Logger logger = LoggerFactory.getLogger(EmailServiceImpl.class);
 
     @Autowired
     private JavaMailSender mailSender;
@@ -91,7 +95,7 @@ public class EmailServiceImpl implements EmailService {
             throw new IllegalStateException("SMTP is not configured. Set SMTP_HOST, SMTP_USERNAME, SMTP_PASSWORD and MAIL_ENABLED=true on Railway.");
         }
 
-        System.out.println("🧪 Sending test email to: " + to);
+        logger.info("🧪 Sending test email to: {}", to);
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -101,9 +105,9 @@ public class EmailServiceImpl implements EmailService {
             helper.setText("This is a test email to verify email functionality is working.", false);
 
             mailSender.send(message);
-            System.out.println("✅ Test email sent successfully!");
+            logger.info("✅ Test email sent successfully!");
         } catch (Exception e) {
-            System.err.println("❌ Test email failed: " + e.getMessage());
+            logger.error("❌ Test email failed: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to send test email: " + e.getMessage(), e);
         }
     }
@@ -117,7 +121,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setText(body);
             mailSender.send(message);
         } catch (MessagingException e) {
-            e.printStackTrace(); // In production, use a logger
+            logger.error("❌ Email sending failed to {}: {}", to, e.getMessage(), e);
         }
     }
 
@@ -126,8 +130,24 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private void sendHtmlEmailWithLogo(String to, String subject, String htmlBody, Order order) {
+        // First check if mail is enabled globally
+        if (!mailEnabled) {
+            logger.warn("⚠️ EMAIL SERVICE DISABLED - Set app.mail.enabled=true to enable emails");
+            return;
+        }
+
+        // Then check if SMTP is configured
         if (!isMailConfigured()) {
-            System.err.println("⚠️ SMTP not configured — skipping email to: " + to);
+            logger.error("❌ CRITICAL: SMTP NOT CONFIGURED");
+            logger.error("   Missing configuration for email to: {}", to);
+            logger.error("   SMTP Host: {}", mailHost == null || mailHost.isBlank() ? "NOT SET" : "SET");
+            logger.error("   SMTP Username: {}", mailUsername == null || mailUsername.isBlank() ? "NOT SET" : "SET");
+            logger.error("   SMTP Password: {}", mailPassword == null || mailPassword.isBlank() ? "NOT SET" : "SET");
+            logger.error("   Required environment variables on Railway:");
+            logger.error("     - SMTP_HOST=smtp.gmail.com");
+            logger.error("     - SMTP_USERNAME=your-email@gmail.com");
+            logger.error("     - SMTP_PASSWORD=your-app-password");
+            logger.error("     - MAIL_ENABLED=true");
             return;
         }
 
@@ -143,20 +163,20 @@ public class EmailServiceImpl implements EmailService {
             File logo = new File("src/main/resources/static/logoAmanda.jpg");
             if (logo.exists()) {
                 helper.addInline("logoAmanda", logo);
-                System.out.println("✅ Logo added to email: " + logo.getAbsolutePath());
+                logger.debug("✅ Logo added to email: {}", logo.getAbsolutePath());
             } else {
-                System.out.println("⚠️ Logo file not found: " + logo.getAbsolutePath());
+                logger.warn("⚠️ Logo file not found: {}", logo.getAbsolutePath());
             }
 
             // Add order images if available
             if (order != null && order.getImageUrls() != null && !order.getImageUrls().trim().isEmpty()) {
-                System.out.println("📸 Processing order images: " + order.getImageUrls());
+                logger.debug("📸 Processing order images: {}", order.getImageUrls());
                 String[] imageUrls = order.getImageUrls().split(",");
                 int imageIndex = 1;
                 for (String imageUrl : imageUrls) {
                     if (imageUrl != null && !imageUrl.trim().isEmpty()) {
                         String trimmed = imageUrl.trim();
-                        System.out.println("📸 Processing image URL: " + trimmed);
+                        logger.debug("📸 Processing image URL: {}", trimmed);
                         
                         if (trimmed.startsWith("/uploads/")) {
                             // Try multiple possible paths
@@ -173,10 +193,10 @@ public class EmailServiceImpl implements EmailService {
                             File imageFile = null;
                             for (String path : possiblePaths) {
                                 File testFile = new File(path);
-                                System.out.println("🔍 Testing path: " + testFile.getAbsolutePath());
+                                logger.debug("🔍 Testing path: {}", testFile.getAbsolutePath());
                                 if (testFile.exists() && testFile.isFile()) {
                                     imageFile = testFile;
-                                    System.out.println("✅ Found image at: " + testFile.getAbsolutePath());
+                                    logger.debug("✅ Found image at: {}", testFile.getAbsolutePath());
                                     break;
                                 }
                             }
@@ -184,53 +204,59 @@ public class EmailServiceImpl implements EmailService {
                             if (imageFile != null && imageFile.exists()) {
                                 try {
                                     helper.addInline("orderImage" + imageIndex, imageFile);
-                                    System.out.println("✅ Order image " + imageIndex + " added to email: " + imageFile.getAbsolutePath());
+                                    logger.debug("✅ Order image {} added to email: {}", imageIndex, imageFile.getAbsolutePath());
                                     imageIndex++;
                                 } catch (Exception e) {
-                                    System.err.println("❌ Failed to add image " + imageIndex + " to email: " + e.getMessage());
-                                    e.printStackTrace();
+                                    logger.error("❌ Failed to add image {} to email: {}", imageIndex, e.getMessage(), e);
                                 }
                             } else {
-                                System.err.println("❌ Order image file not found for URL: " + trimmed);
-                                System.err.println("❌ Tried paths: " + String.join(", ", possiblePaths));
+                                logger.error("❌ Order image file not found for URL: {}", trimmed);
+                                logger.error("❌ Tried paths: {}", String.join(", ", possiblePaths));
                                 // Try to list files in uploads directory for debugging
                                 try {
                                     File uploadsDir = new File(currentDir + "/uploads");
                                     if (uploadsDir.exists() && uploadsDir.isDirectory()) {
-                                        System.out.println("📁 Files in uploads directory:");
+                                        logger.info("📁 Files in uploads directory:");
                                         File[] files = uploadsDir.listFiles();
                                         if (files != null) {
                                             for (File file : files) {
-                                                System.out.println("  - " + file.getName() + " (" + file.length() + " bytes)");
+                                                logger.info("  - {} ({} bytes)", file.getName(), file.length());
                                             }
                                         }
                                     }
                                 } catch (Exception e) {
-                                    System.err.println("❌ Error listing uploads directory: " + e.getMessage());
+                                    logger.error("❌ Error listing uploads directory: {}", e.getMessage(), e);
                                 }
                             }
                         } else {
-                            System.out.println("⚠️ Skipping non-upload image: " + trimmed);
+                            logger.warn("⚠️ Skipping non-upload image: {}", trimmed);
                         }
                     }
                 }
-                System.out.println("📸 Total images processed for email: " + (imageIndex - 1));
+                logger.debug("📸 Total images processed for email: {}", (imageIndex - 1));
             } else {
-                System.out.println("📸 No images to process for email");
+                logger.debug("📸 No images to process for email");
             }
 
             mailSender.send(message);
-            System.out.println("✅ Email sent successfully to: " + to);
+            logger.info("✅ Email sent successfully to: {}", to);
+        } catch (MailException e) {
+            logger.error("❌ MAIL EXCEPTION - Email sending failed to {}: {}", to, e.getMessage(), e);
+            logger.error("   This usually means SMTP credentials are invalid or server is unreachable");
+        } catch (MessagingException e) {
+            logger.error("❌ MESSAGING EXCEPTION - Email sending failed to {}: {}", to, e.getMessage(), e);
         } catch (Exception e) {
-            System.err.println("❌ Email sending failed to " + to + ": " + e.getMessage());
+            logger.error("❌ UNEXPECTED ERROR - Email sending failed to {}: {}", to, e.getMessage(), e);
         }
     }
 
     private boolean isMailConfigured() {
-        return mailEnabled
-            && mailHost != null && !mailHost.isBlank()
+        boolean isConfigured = mailHost != null && !mailHost.isBlank()
             && mailUsername != null && !mailUsername.isBlank()
             && mailPassword != null && !mailPassword.isBlank()
             && !mailHost.contains("${");
+        
+        logger.debug("Mail configuration check: {}", isConfigured ? "✅ CONFIGURED" : "❌ NOT CONFIGURED");
+        return isConfigured;
     }
 }
