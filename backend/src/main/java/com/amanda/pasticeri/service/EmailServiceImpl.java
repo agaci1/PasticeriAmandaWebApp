@@ -28,6 +28,9 @@ public class EmailServiceImpl implements EmailService {
     @Value("${spring.mail.host:}")
     private String mailHost;
 
+    @Value("${spring.mail.port:587}")
+    private int mailPort;
+
     @Value("${spring.mail.username:}")
     private String mailUsername;
 
@@ -89,71 +92,49 @@ public class EmailServiceImpl implements EmailService {
         sendHtmlEmailWithLogo(to, subject, body);
     }
 
-    // Test method for debugging email issues
-    public void sendTestEmail(String to) {
-        if (!isMailConfigured()) {
-            throw new IllegalStateException("SMTP is not configured. Set SMTP_HOST, SMTP_USERNAME, SMTP_PASSWORD and MAIL_ENABLED=true on Railway.");
-        }
-
-        logger.info("🧪 Sending test email to: {}", to);
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setFrom(mailUsername);
-            helper.setTo(to);
-            helper.setSubject("🧪 Test Email - Pastiçeri Amanda");
-            helper.setText("This is a test email to verify email functionality is working.", false);
-
-            mailSender.send(message);
-            logger.info("✅ Test email sent successfully!");
-        } catch (Exception e) {
-            logger.error("❌ Test email failed: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to send test email: " + e.getMessage(), e);
-        }
-    }
-
-    private void sendEmail(String to, String subject, String body) {
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(body);
-            mailSender.send(message);
-        } catch (MessagingException e) {
-            logger.error("❌ Email sending failed to {}: {}", to, e.getMessage(), e);
-        }
-    }
-
     private void sendHtmlEmailWithLogo(String to, String subject, String htmlBody) {
         sendHtmlEmailWithLogo(to, subject, htmlBody, null);
     }
 
     private void sendHtmlEmailWithLogo(String to, String subject, String htmlBody, Order order) {
+        logger.info("═══════════════════════════════════════════════════════════");
+        logger.info("🚀 STARTING EMAIL SEND PROCESS");
+        logger.info("   To: {}", to);
+        logger.info("   Subject: {}", subject);
+        logger.info("═══════════════════════════════════════════════════════════");
+
         // First check if mail is enabled globally
         if (!mailEnabled) {
             logger.warn("⚠️ EMAIL SERVICE DISABLED - Set app.mail.enabled=true to enable emails");
+            logger.info("═══════════════════════════════════════════════════════════");
             return;
         }
 
         // Then check if SMTP is configured
         if (!isMailConfigured()) {
+            logger.error("═══════════════════════════════════════════════════════════");
             logger.error("❌ CRITICAL: SMTP NOT CONFIGURED");
             logger.error("   Missing configuration for email to: {}", to);
             logger.error("   SMTP Host: {}", mailHost == null || mailHost.isBlank() ? "NOT SET" : "SET");
+            logger.error("   SMTP Port: {}", mailPort);
             logger.error("   SMTP Username: {}", mailUsername == null || mailUsername.isBlank() ? "NOT SET" : "SET");
             logger.error("   SMTP Password: {}", mailPassword == null || mailPassword.isBlank() ? "NOT SET" : "SET");
             logger.error("   Required environment variables on Railway:");
             logger.error("     - SMTP_HOST=smtp.gmail.com");
+            logger.error("     - SMTP_PORT=587");
             logger.error("     - SMTP_USERNAME=your-email@gmail.com");
             logger.error("     - SMTP_PASSWORD=your-app-password");
             logger.error("     - MAIL_ENABLED=true");
+            logger.error("═══════════════════════════════════════════════════════════");
             return;
         }
 
         try {
+            logger.info("📬 Creating MIME message...");
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            
+            logger.info("📮 Setting email fields...");
             helper.setFrom(mailUsername);
             helper.setTo(to);
             helper.setSubject(subject);
@@ -179,15 +160,14 @@ public class EmailServiceImpl implements EmailService {
                         logger.debug("📸 Processing image URL: {}", trimmed);
                         
                         if (trimmed.startsWith("/uploads/")) {
-                            // Try multiple possible paths
                             String currentDir = System.getProperty("user.dir");
                             String[] possiblePaths = {
                                 currentDir + trimmed,
                                 currentDir + "/backend" + trimmed,
-                                currentDir + "/uploads" + trimmed.substring(8), // Remove /uploads/ prefix
-                                "uploads" + trimmed.substring(8), // Relative path
-                                currentDir + "/backend/uploads" + trimmed.substring(8), // Backend uploads
-                                currentDir + "/uploads" + trimmed.substring(8) // Direct uploads
+                                currentDir + "/uploads" + trimmed.substring(8),
+                                "uploads" + trimmed.substring(8),
+                                currentDir + "/backend/uploads" + trimmed.substring(8),
+                                currentDir + "/uploads" + trimmed.substring(8)
                             };
                             
                             File imageFile = null;
@@ -211,22 +191,6 @@ public class EmailServiceImpl implements EmailService {
                                 }
                             } else {
                                 logger.error("❌ Order image file not found for URL: {}", trimmed);
-                                logger.error("❌ Tried paths: {}", String.join(", ", possiblePaths));
-                                // Try to list files in uploads directory for debugging
-                                try {
-                                    File uploadsDir = new File(currentDir + "/uploads");
-                                    if (uploadsDir.exists() && uploadsDir.isDirectory()) {
-                                        logger.info("📁 Files in uploads directory:");
-                                        File[] files = uploadsDir.listFiles();
-                                        if (files != null) {
-                                            for (File file : files) {
-                                                logger.info("  - {} ({} bytes)", file.getName(), file.length());
-                                            }
-                                        }
-                                    }
-                                } catch (Exception e) {
-                                    logger.error("❌ Error listing uploads directory: {}", e.getMessage(), e);
-                                }
                             }
                         } else {
                             logger.warn("⚠️ Skipping non-upload image: {}", trimmed);
@@ -238,15 +202,38 @@ public class EmailServiceImpl implements EmailService {
                 logger.debug("📸 No images to process for email");
             }
 
+            logger.info("🔄 Attempting to send email via JavaMailSender...");
+            logger.info("   Host: {}:{}", mailHost, mailPort);
+            logger.info("   From: {}", mailUsername);
+            logger.info("   To: {}", to);
+            
             mailSender.send(message);
-            logger.info("✅ Email sent successfully to: {}", to);
+            
+            logger.info("═══════════════════════════════════════════════════════════");
+            logger.info("✅✅✅ EMAIL SENT SUCCESSFULLY! ✅✅✅");
+            logger.info("   Recipient: {}", to);
+            logger.info("   Subject: {}", subject);
+            logger.info("═══════════════════════════════════════════════════════════");
+            
         } catch (MailException e) {
-            logger.error("❌ MAIL EXCEPTION - Email sending failed to {}: {}", to, e.getMessage(), e);
+            logger.error("═══════════════════════════════════════════════════════════");
+            logger.error("❌ MAIL EXCEPTION - Email sending FAILED to {}", to);
+            logger.error("   Error: {}", e.getMessage());
             logger.error("   This usually means SMTP credentials are invalid or server is unreachable");
+            logger.error("   Stack trace:");
+            logger.error("═══════════════════════════════════════════════════════════", e);
         } catch (MessagingException e) {
-            logger.error("❌ MESSAGING EXCEPTION - Email sending failed to {}: {}", to, e.getMessage(), e);
+            logger.error("═══════════════════════════════════════════════════════════");
+            logger.error("❌ MESSAGING EXCEPTION - Email sending FAILED to {}", to);
+            logger.error("   Error: {}", e.getMessage());
+            logger.error("   Stack trace:");
+            logger.error("═══════════════════════════════════════════════════════════", e);
         } catch (Exception e) {
-            logger.error("❌ UNEXPECTED ERROR - Email sending failed to {}: {}", to, e.getMessage(), e);
+            logger.error("═══════════════════════════════════════════════════════════");
+            logger.error("❌ UNEXPECTED ERROR - Email sending FAILED to {}", to);
+            logger.error("   Error: {}", e.getMessage());
+            logger.error("   Stack trace:");
+            logger.error("═══════════════════════════════════════════════════════════", e);
         }
     }
 
