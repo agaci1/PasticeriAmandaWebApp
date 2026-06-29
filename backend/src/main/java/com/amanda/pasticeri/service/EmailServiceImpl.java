@@ -18,7 +18,11 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -136,7 +140,7 @@ public class EmailServiceImpl implements EmailService {
         }
 
         if (isResendConfigured()) {
-            sendWithResend(to, subject, htmlBody);
+            sendWithResend(to, subject, htmlBody, order);
             return;
         }
 
@@ -284,23 +288,25 @@ public class EmailServiceImpl implements EmailService {
         return resendApiKey != null && !resendApiKey.isBlank() && !resendApiKey.contains("${");
     }
 
-    private void sendWithResend(String to, String subject, String htmlBody) {
+    private void sendWithResend(String to, String subject, String htmlBody, Order order) {
         logger.info("📨 Sending email via Resend HTTPS API");
         logger.info("   From: {}", resendFrom);
         logger.info("   To: {}", to);
 
+        String attachmentsJson = buildResendAttachmentsJson(order);
         String payload = """
             {
               "from": "%s",
               "to": ["%s"],
               "subject": "%s",
-              "html": "%s"
+              "html": "%s"%s
             }
             """.formatted(
                 escapeJson(resendFrom),
                 escapeJson(to),
                 escapeJson(subject),
-                escapeJson(prepareHtmlForResend(htmlBody))
+                escapeJson(htmlBody),
+                attachmentsJson
             );
 
         HttpRequest request = HttpRequest.newBuilder()
@@ -331,6 +337,84 @@ public class EmailServiceImpl implements EmailService {
 
     private String prepareHtmlForResend(String htmlBody) {
         return htmlBody.replaceAll("<img[^>]+src=\\\"cid:[^\\\"]+\\\"[^>]*>", "");
+    }
+
+    private String buildResendAttachmentsJson(Order order) {
+        if (order == null || order.getImageUrls() == null || order.getImageUrls().isBlank()) {
+            return "";
+        }
+
+        List<String> attachments = new ArrayList<>();
+        String[] imageUrls = order.getImageUrls().split(",");
+        int imageIndex = 1;
+        for (String imageUrl : imageUrls) {
+            if (imageUrl == null || imageUrl.isBlank()) {
+                continue;
+            }
+
+            File imageFile = findUploadFile(imageUrl.trim());
+            if (imageFile == null) {
+                logger.warn("⚠️ Resend attachment skipped; file not found for {}", imageUrl.trim());
+                continue;
+            }
+
+            try {
+                String base64Content = Base64.getEncoder().encodeToString(Files.readAllBytes(imageFile.toPath()));
+                String contentType = Files.probeContentType(imageFile.toPath());
+                if (contentType == null || contentType.isBlank()) {
+                    contentType = "application/octet-stream";
+                }
+
+                attachments.add("""
+                    {
+                      "filename": "%s",
+                      "content": "%s",
+                      "content_type": "%s",
+                      "content_id": "orderImage%d"
+                    }
+                    """.formatted(
+                        escapeJson(imageFile.getName()),
+                        base64Content,
+                        escapeJson(contentType),
+                        imageIndex
+                    ));
+                imageIndex++;
+            } catch (IOException e) {
+                logger.warn("⚠️ Failed to read image attachment {}: {}", imageFile.getAbsolutePath(), e.getMessage());
+            }
+        }
+
+        if (attachments.isEmpty()) {
+            return "";
+        }
+
+        logger.info("📎 Adding {} order image attachment(s) to Resend email", attachments.size());
+        return ",\n  \"attachments\": [" + String.join(",", attachments) + "\n  ]";
+    }
+
+    private File findUploadFile(String imageUrl) {
+        if (!imageUrl.startsWith("/uploads/")) {
+            return null;
+        }
+
+        String currentDir = System.getProperty("user.dir");
+        String fileName = imageUrl.substring(9);
+        String[] possiblePaths = {
+            currentDir + imageUrl,
+            currentDir + "/backend" + imageUrl,
+            currentDir + "/uploads/" + fileName,
+            "uploads/" + fileName,
+            currentDir + "/backend/uploads/" + fileName
+        };
+
+        for (String path : possiblePaths) {
+            File testFile = new File(path);
+            if (testFile.exists() && testFile.isFile()) {
+                return testFile;
+            }
+        }
+
+        return null;
     }
 
     private String escapeJson(String value) {

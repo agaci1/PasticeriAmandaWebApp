@@ -3,445 +3,282 @@ package com.amanda.pasticeri.service;
 import com.amanda.pasticeri.model.Order;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class EmailTemplateService {
 
-    private static final String LOGO_URL = "https://pasticeriamanda.com/logo.png"; // Replace with actual logo URL
-    // For local testing, use http://192.168.0.195:8080 as the base URL for images
-    private static final String BASE_IMAGE_URL = "http://192.168.0.195:8080";
-    
-    private static String escapePercent(String input) {
-        return input == null ? "" : input.replace("%", "%%");
-    }
-
-    // Helper for client email header
-    private String getClientHeader() {
-        return """
-            <div style=\"background: transparent; padding: 0; text-align: center;\">
-                <img src=\"cid:logoAmanda\" alt=\"Pastiçeri Amanda\" style=\"width: 100%%; height: auto; display: block; margin: 0 auto;\">
-            </div>
-        """;
-    }
-    // Helper for client email footer
-    private String getClientFooter() {
-        return """
-            <div style=\"background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%); color: white; padding: 25px; border-radius: 15px; text-align: center;\">
-                <h3 style=\"margin: 0 0 15px 0; font-size: 18px;\">📍 Visit Us</h3>
-                <p style=\"margin: 5px 0; font-size: 16px;\"><strong>Rruga Lefter Talo</strong></p>
-                <p style=\"margin: 5px 0; font-size: 16px;\">📞 <strong>+355 69 352 0462</strong></p>
-                <p style=\"margin: 5px 0; font-size: 16px;\">📧 <strong>pasticeriamanda@gmail.com</strong></p>
-                <p style=\"margin: 15px 0 0 0; font-size: 14px; opacity: 0.9;\">Open every day: 8:00 AM - 11:00 PM</p>
-            </div>
-            <div style=\"text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #f3f4f6;\">
-                <p style=\"color: #6b7280; font-size: 14px; margin: 0;\">With love,<br><strong style=\"color: #ec4899; font-size: 16px;\">Pastiçeri Amanda ❤️</strong></p>
-            </div>
-        """;
-    }
-    // Helper for admin email header
-    private String getAdminHeader() {
-        return """
-            <div style=\"background: transparent; padding: 0; text-align: center;\">
-                <img src=\"cid:logoAmanda\" alt=\"Pastiçeri Amanda\" style=\"width: 100%%; height: auto; display: block; margin: 0 auto;\">
-            </div>
-        """;
-    }
-    // Helper for admin email footer
-    private String getAdminFooter() {
-        return """
-            <div style=\"text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #f3f4f6;\">
-                <p style=\"color: #6b7280; font-size: 14px; margin: 0;\"><strong style=\"color: #dc2626; font-size: 16px;\">Pastiçeri Amanda Admin Panel</strong></p>
-            </div>
-        """;
-    }
-
     public String getOrderConfirmationTemplate(Order order) {
-        String customerName = escapePercent(order.getCustomerName());
-        String productName = escapePercent(order.getProductName());
-        String numberOfPersons = String.valueOf(order.getNumberOfPersons());
-        String customNote = escapePercent(order.getCustomNote());
-        String flavour = escapePercent(order.getFlavour());
-        String orderDate = order.getOrderDate() != null ? order.getOrderDate().toString() : "Unknown";
-        String totalPrice = order.getTotalPrice() != null ? order.getTotalPrice().toString() : "To be confirmed";
-        String imageSection = getImageSection(order);
-        
-        // ✅ Add delivery date/time for menu orders
-        String deliverySection = "";
-        if (order.getDeliveryDateTime() != null) {
-            String deliveryDate = order.getDeliveryDateTime().toLocalDate().toString();
-            String deliveryTime = order.getDeliveryDateTime().toLocalTime().toString().substring(0, 5); // HH:mm format
-            deliverySection = String.format("<p><strong style=\"color: #059669;\">🚚 Delivery Date:</strong> %s</p><p><strong style=\"color: #059669;\">⏰ Delivery Time:</strong> %s</p>", deliveryDate, deliveryTime);
-        }
-        
-        // Check if this is a custom order (has custom note, flavour, or images)
-        boolean isCustomOrder = (order.getCustomNote() != null && !order.getCustomNote().trim().isEmpty()) || 
-                               (order.getFlavour() != null && !order.getFlavour().trim().isEmpty()) ||
-                               (order.getImageUrls() != null && !order.getImageUrls().trim().isEmpty()) ||
-                               "pending-quote".equals(order.getStatus());
-        
-        String flavourSection = isCustomOrder && flavour != null && !flavour.trim().isEmpty() 
-            ? String.format("<p><strong style=\"color: #1e40af;\">Flavor:</strong> %s</p>", flavour)
-            : "";
-        
-        // ✅ Different notes for menu vs custom orders
-        String noteSection = "";
-        if (isCustomOrder) {
-            noteSection = """
-                <div style=\"background: #f3f4f6; padding: 20px; border-radius: 12px; margin: 25px 0; border-left: 4px solid #f59e0b;\">
-                    <p style=\"margin: 0; color: #374151; font-size: 14px;\"><strong>ℹ️ Note:</strong> We'll review your order and send you the final price confirmation shortly. We don't offer regular delivery service, but you can contact us for more information about delivery options if you're unable to come and pick up your order. For any questions, feel free to contact us!</p>
-                </div>
-            """;
-        } else {
-            noteSection = """
-                <div style=\"background: #f3f4f6; padding: 20px; border-radius: 12px; margin: 25px 0; border-left: 4px solid #059669;\">
-                    <p style=\"margin: 0; color: #374151; font-size: 14px;\"><strong>ℹ️ Note:</strong> We don't offer regular delivery service, but you can contact us for more information about delivery options if you're unable to come and pick up your order. For any questions, feel free to contact us!</p>
-                </div>
-            """;
-        }
-        
-        return String.format("""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset=\"UTF-8\">
-                <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-                <title>Order Confirmation - Pastiçeri Amanda</title>
-            </head>
-            <body style=\"margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #fdf2f8 0%%, #fef3c7 50%%, #f3e8ff 100%%);\">
-                <div style=\"max-width: 600px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);\">
-                    %s
-                    <div style=\"padding: 40px 30px;\">
-                        <h1 style=\"color: #1e293b; margin: 0 0 20px 0; font-size: 28px; text-align: center;\">🎉 Thank you, %s! 🎉</h1>
-                        <div style=\"background: linear-gradient(135deg, #fdf2f8 0%%, #fef3c7 50%%, #f3e8ff 100%%); background-color: #fff; padding: 25px; border-radius: 15px; margin: 20px 0;\">
-                            <h3 style=\"color: #000; margin: 0 0 15px 0; font-size: 20px; font-weight: 700; text-shadow: 0 1px 0 #fff;\">📋 Order Details</h3>
-                            <div style=\"color: #374151; line-height: 1.6;\">
-                                <p><strong style=\"color: #1e40af;\">Product:</strong> %s</p>
-                                <p><strong style=\"color: #1e40af;\">Quantity:</strong> %s</p>
-                                <p><strong style=\"color: #1e40af;\">Description:</strong> %s</p>
-                                %s
-                                <p><strong style=\"color: #1e40af;\">Date:</strong> %s</p>
-                                %s
-                                <p><strong style=\"color: #dc2626;\">Total Price:</strong> ALL%s</p>
-                            </div>
-                        </div>
-                        %s
-                        %s
-                        %s
-                    </div>
-                </div>
-            </body>
-            </html>
-        """, getClientHeader(), customerName, productName, numberOfPersons, customNote, flavourSection, orderDate, deliverySection, totalPrice, imageSection, noteSection, getClientFooter());
+        String intro = isCustomOrder(order)
+            ? "We received your custom request and our team will review every detail before confirming the final price."
+            : "Your order has been received and reserved for the selected time.";
+
+        return layout(
+            "Order received",
+            "Thank you, " + esc(order.getCustomerName()),
+            intro,
+            orderDetails(order, true)
+                + imageSection(order)
+                + note("Next step", isCustomOrder(order)
+                    ? "We will contact you shortly with the final price confirmation."
+                    : "If pickup or delivery details need attention, we will contact you directly."),
+            "With love, Pasticeri Amanda"
+        );
     }
-    
+
     public String getNewOrderNotificationTemplate(Order order) {
-        // Check if this is a custom order (has custom note, flavour, or images, or is pending-quote)
-        boolean isCustomOrder = (order.getCustomNote() != null && !order.getCustomNote().trim().isEmpty()) || 
-                               (order.getFlavour() != null && !order.getFlavour().trim().isEmpty()) ||
-                               (order.getImageUrls() != null && !order.getImageUrls().trim().isEmpty()) ||
-                               "pending-quote".equals(order.getStatus()) ||
-                               "custom".equals(order.getOrderType());
-        
-        String flavourSection = isCustomOrder && order.getFlavour() != null && !order.getFlavour().trim().isEmpty() 
-            ? String.format("<p><strong style=\"color: #1e40af;\">Flavor:</strong> %s</p>", order.getFlavour())
-            : "";
-        
-        // ✅ Add delivery date/time for menu orders
-        String deliverySection = "";
-        if (order.getDeliveryDateTime() != null) {
-            String deliveryDate = order.getDeliveryDateTime().toLocalDate().toString();
-            String deliveryTime = order.getDeliveryDateTime().toLocalTime().toString().substring(0, 5); // HH:mm format
-            deliverySection = String.format("<p><strong style=\"color: #059669;\">🚚 Delivery Date:</strong> %s</p><p><strong style=\"color: #059669;\">⏰ Delivery Time:</strong> %s</p>", deliveryDate, deliveryTime);
-        }
-        
-        // ✅ Different admin notes for menu vs custom orders
-        String adminNoteSection = "";
-        if (isCustomOrder) {
-            adminNoteSection = """
-                <div style=\"background: #dc2626; color: white; padding: 20px; border-radius: 12px; margin: 25px 0; text-align: center;\">
-                    <p style=\"margin: 0; font-size: 16px; font-weight: 600;\">⚡ Please review this order and set the price as soon as possible!</p>
-                </div>
-            """;
-        } else {
-            adminNoteSection = """
-                <div style=\"background: #059669; color: white; padding: 20px; border-radius: 12px; margin: 25px 0; text-align: center;\">
-                    <p style=\"margin: 0; font-size: 16px; font-weight: 600;\">✅ Menu order ready for pickup at scheduled time!</p>
-                </div>
-            """;
-        }
-        
-        return String.format("""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset=\"UTF-8\">
-                <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-                <title>New Order Received - Pastiçeri Amanda</title>
-            </head>
-            <body style=\"margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #fdf2f8 0%%, #fef3c7 50%%, #f3e8ff 100%%);\">
-                <div style=\"max-width: 600px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);\">
-                    %s
-                    <div style=\"padding: 40px 30px;\">
-                        <h1 style=\"color: #1e293b; margin: 0 0 20px 0; font-size: 28px; text-align: center;\">🎉 New Order Received! 🎉</h1>
-                        <div style=\"background: linear-gradient(135deg, #fef2f2 0%%, #fef3c7 50%%, #f3e8ff 100%%); background-color: #fff; padding: 25px; border-radius: 15px; margin: 20px 0;\">
-                            <h3 style=\"color: #dc2626; margin: 0 0 15px 0; font-size: 20px; font-weight: 700; text-shadow: 0 1px 0 #fff;\">👤 Customer Information</h3>
-                            <div style=\"color: #374151; line-height: 1.6;\">
-                                <p><strong style=\"color: #1e40af;\">Name:</strong> %s</p>
-                                <p><strong style=\"color: #1e40af;\">Email:</strong> %s</p>
-                                <p><strong style=\"color: #1e40af;\">Phone:</strong> %s</p>
-                            </div>
-                        </div>
-                        <div style=\"background: linear-gradient(135deg, #fdf2f8 0%%, #fef3c7 50%%, #f3e8ff 100%%); background-color: #fff; padding: 25px; border-radius: 15px; margin: 20px 0;\">
-                            <h3 style=\"color: #7c3aed; margin: 0 0 15px 0; font-size: 20px; font-weight: 700; text-shadow: 0 1px 0 #fff;\">📋 Order Details</h3>
-                            <div style=\"color: #374151; line-height: 1.6;\">
-                                <p><strong style=\"color: #1e40af;\">Product:</strong> %s</p>
-                                <p><strong style=\"color: #1e40af;\">Quantity:</strong> %s</p>
-                                <p><strong style=\"color: #1e40af;\">Description:</strong> %s</p>
-                                %s
-                                <p><strong style=\"color: #1e40af;\">Date:</strong> %s</p>
-                                %s
-                                <p><strong style=\"color: #dc2626;\">Total Price:</strong> ALL%s</p>
-                            </div>
-                        </div>
-                        %s
-                        %s
-                        %s
-                    </div>
-                </div>
-            </body>
-            </html>
-        """, getAdminHeader(), order.getCustomerName(), order.getCustomerEmail(), order.getCustomerPhone(), order.getProductName(), String.valueOf(order.getNumberOfPersons()), order.getCustomNote(), flavourSection, order.getOrderDate() != null ? order.getOrderDate().toString() : "Unknown", deliverySection, order.getTotalPrice() != null ? order.getTotalPrice().toString() : "To be confirmed", getImageSection(order), adminNoteSection, getAdminFooter());
+        return layout(
+            "Admin notice",
+            "New order received",
+            "A customer order needs attention in the admin panel.",
+            customerDetails(order)
+                + orderDetails(order, true)
+                + imageSection(order)
+                + note(isCustomOrder(order) ? "Action needed" : "Menu order",
+                    isCustomOrder(order)
+                        ? "Review the design, flavour, date, and set the final price."
+                        : "Prepare this order for the scheduled pickup or delivery time."),
+            "Pasticeri Amanda Admin"
+        );
     }
-    
+
     public String getOrderCancelledTemplate(Order order) {
-        // Check if this is a custom order (has custom note, flavour, or images)
-        boolean isCustomOrder = (order.getCustomNote() != null && !order.getCustomNote().trim().isEmpty()) || 
-                               (order.getFlavour() != null && !order.getFlavour().trim().isEmpty()) ||
-                               (order.getImageUrls() != null && !order.getImageUrls().trim().isEmpty()) ||
-                               "pending-quote".equals(order.getStatus());
-        
-        String flavourSection = isCustomOrder && order.getFlavour() != null && !order.getFlavour().trim().isEmpty() 
-            ? String.format("<p><strong style=\"color: #1e40af;\">Flavor:</strong> %s</p>", order.getFlavour())
-            : "";
-        
-        return String.format("""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset=\"UTF-8\">
-                <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-                <title>Order Cancelled - Pastiçeri Amanda</title>
-            </head>
-            <body style=\"margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #fdf2f8 0%%, #fef3c7 50%%, #f3e8ff 100%%);\">
-                <div style=\"max-width: 600px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);\">
-                    %s
-                    <div style=\"padding: 40px 30px;\">
-                        <h1 style=\"color: #1e293b; margin: 0 0 20px 0; font-size: 28px; text-align: center;\">Order Cancellation Notice</h1>
-                        <div style=\"background: linear-gradient(135deg, #f3f4f6 0%%, #e5e7eb 50%%, #d1d5db 100%%); background-color: #fff; padding: 25px; border-radius: 15px; margin: 20px 0;\">
-                            <h3 style=\"color: #374151; margin: 0 0 15px 0; font-size: 20px; font-weight: 700; text-shadow: 0 1px 0 #fff;\">📋 Cancelled Order Details</h3>
-                            <div style=\"color: #374151; line-height: 1.6;\">
-                                <p><strong style=\"color: #1e40af;\">Order ID:</strong> #%s</p>
-                                <p><strong style=\"color: #1e40af;\">Product:</strong> %s</p>
-                                <p><strong style=\"color: #1e40af;\">Quantity:</strong> %s</p>
-                                %s
-                                <p><strong style=\"color: #1e40af;\">Date:</strong> %s</p>
-                            </div>
-                        </div>
-                        <div style=\"background: #fef2f2; border: 2px solid #fecaca; padding: 20px; border-radius: 12px; margin: 25px 0; text-align: center;\">
-                            <p style=\"margin: 0; color: #dc2626; font-size: 16px; font-weight: 600;\">🚫 This order has been cancelled</p>
-                        </div>
-                        %s
-                    </div>
-                </div>
-            </body>
-            </html>
-        """, getClientHeader(), order.getId() != null ? order.getId().toString() : "Unknown", order.getProductName(), String.valueOf(order.getNumberOfPersons()), flavourSection, order.getOrderDate() != null ? order.getOrderDate().toString() : "Unknown", getClientFooter());
+        return layout(
+            "Order update",
+            "Your order was cancelled",
+            "This is a confirmation that the order below is no longer active.",
+            orderDetails(order, false)
+                + note("Cancelled", "If this was a mistake, please contact us and we will help you place a new order."),
+            "Pasticeri Amanda"
+        );
     }
-    
+
     public String getPriceSetTemplate(Order order) {
-        // Check if this is a custom order (has custom note, flavour, or images)
-        boolean isCustomOrder = (order.getCustomNote() != null && !order.getCustomNote().trim().isEmpty()) || 
-                               (order.getFlavour() != null && !order.getFlavour().trim().isEmpty()) ||
-                               (order.getImageUrls() != null && !order.getImageUrls().trim().isEmpty()) ||
-                               "pending-quote".equals(order.getStatus());
-        
-        String flavourSection = isCustomOrder && order.getFlavour() != null && !order.getFlavour().trim().isEmpty() 
-            ? String.format("<p><strong style=\"color: #1e40af;\">Flavor:</strong> %s</p>", order.getFlavour())
-            : "";
-        
-        return String.format("""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset=\"UTF-8\">
-                <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-                <title>Price Set - Pastiçeri Amanda</title>
-            </head>
-            <body style=\"margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #fdf2f8 0%%, #fef3c7 50%%, #f3e8ff 100%%);\">
-                <div style=\"max-width: 600px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);\">
-                    %s
-                    <div style=\"padding: 40px 30px;\">
-                        <h1 style=\"color: #1e293b; margin: 0 0 20px 0; font-size: 28px; text-align: center;\">🎉 Your Order Price is Ready! 🎉</h1>
-                        <div style=\"background: linear-gradient(135deg, #ecfdf5 0%%, #fef3c7 50%%, #f3e8ff 100%%); background-color: #fff; padding: 25px; border-radius: 15px; margin: 20px 0;\">
-                            <h3 style=\"color: #059669; margin: 0 0 15px 0; font-size: 20px; font-weight: 700; text-shadow: 0 1px 0 #fff;\">📋 Order Details</h3>
-                            <div style=\"color: #374151; line-height: 1.6;\">
-                                <p><strong style=\"color: #1e40af;\">Product:</strong> %s</p>
-                                <p><strong style=\"color: #1e40af;\">Quantity:</strong> %s</p>
-                                <p><strong style=\"color: #1e40af;\">Description:</strong> %s</p>
-                                %s
-                                <p><strong style=\"color: #1e40af;\">Date:</strong> %s</p>
-                            </div>
-                        </div>
-                        <div style=\"background: #059669; color: white; padding: 25px; border-radius: 15px; margin: 25px 0; text-align: center;\">
-                            <h3 style=\"margin: 0 0 10px 0; font-size: 22px; font-weight: 700; text-shadow: 0 1px 0 #fff;\">💰 Final Price</h3>
-                            <p style=\"margin: 0; font-size: 32px; font-weight: 700;\">ALL%s</p>
-                        </div>
-                        %s
-                        <div style=\"background: #f3f4f6; padding: 20px; border-radius: 12px; margin: 25px 0; border-left: 4px solid #059669;\">
-                            <p style=\"margin: 0; color: #374151; font-size: 14px;\"><strong>✅ Your order is now ready for production!</strong><br>We'll contact you if we need any additional information.</p>
-                        </div>
-                        %s
-                    </div>
-                </div>
-            </body>
-            </html>
-        """, getClientHeader(), order.getProductName(), String.valueOf(order.getNumberOfPersons()), order.getCustomNote(), flavourSection, order.getOrderDate() != null ? order.getOrderDate().toString() : "Unknown", order.getTotalPrice() != null ? order.getTotalPrice().toString() : "Unknown", getImageSection(order), getClientFooter());
+        return layout(
+            "Price confirmation",
+            "Your final price is ready",
+            "We reviewed your custom request and prepared the confirmed price.",
+            orderDetails(order, true)
+                + pricePanel(order)
+                + imageSection(order)
+                + note("Confirmed", "Your order is now ready for production. We will contact you if any extra detail is needed."),
+            "With love, Pasticeri Amanda"
+        );
     }
 
     public String getOrderCompletedTemplate(Order order) {
-        String flavourSection = order.getFlavour() != null && !order.getFlavour().trim().isEmpty()
-            ? String.format("<p><strong style=\"color: #1e40af;\">Flavor:</strong> %s</p>", order.getFlavour())
-            : "";
-
-        String priceSection = order.getTotalPrice() != null
-            ? String.format("<p><strong style=\"color: #1e40af;\">Total:</strong> ALL%s</p>", order.getTotalPrice())
-            : "";
-
-        return String.format("""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset=\"UTF-8\">
-                <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-                <title>Order Complete - Pastiçeri Amanda</title>
-            </head>
-            <body style=\"margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #fdf2f8 0%%, #fef3c7 50%%, #f3e8ff 100%%);\">
-                <div style=\"max-width: 600px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);\">
-                    %s
-                    <div style=\"padding: 40px 30px;\">
-                        <h1 style=\"color: #1e293b; margin: 0 0 20px 0; font-size: 28px; text-align: center;\">🎉 Your Order is Ready! 🎉</h1>
-                        <div style=\"background: linear-gradient(135deg, #ecfdf5 0%%, #fef3c7 50%%, #f3e8ff 100%%); background-color: #fff; padding: 25px; border-radius: 15px; margin: 20px 0;\">
-                            <h3 style=\"color: #059669; margin: 0 0 15px 0; font-size: 20px; font-weight: 700;\">📋 Order #%s</h3>
-                            <div style=\"color: #374151; line-height: 1.6;\">
-                                <p><strong style=\"color: #1e40af;\">Product:</strong> %s</p>
-                                <p><strong style=\"color: #1e40af;\">Quantity:</strong> %s</p>
-                                %s
-                                %s
-                                <p><strong style=\"color: #1e40af;\">Date:</strong> %s</p>
-                            </div>
-                        </div>
-                        <div style=\"background: #059669; color: white; padding: 25px; border-radius: 15px; margin: 25px 0; text-align: center;\">
-                            <h3 style=\"margin: 0 0 10px 0; font-size: 22px; font-weight: 700;\">✅ Order Completed</h3>
-                            <p style=\"margin: 0; font-size: 16px;\">Your order has been completed. Thank you for choosing Pastiçeri Amanda!</p>
-                        </div>
-                        %s
-                    </div>
-                </div>
-            </body>
-            </html>
-        """, getClientHeader(), order.getId() != null ? order.getId().toString() : "Unknown", order.getProductName(), String.valueOf(order.getNumberOfPersons()), flavourSection, priceSection, order.getOrderDate() != null ? order.getOrderDate().toString() : "Unknown", getClientFooter());
+        return layout(
+            "Order complete",
+            "Your order is ready",
+            "Thank you for choosing Pasticeri Amanda. Your order has been completed.",
+            orderDetails(order, true)
+                + pricePanel(order)
+                + note("Thank you", "We hope your celebration feels as beautiful as it tastes."),
+            "With love, Pasticeri Amanda"
+        );
     }
-    
+
     public String getPasswordResetTemplate(String resetLink) {
+        return layout(
+            "Account security",
+            "Reset your password",
+            "We received a request to reset your Pasticeri Amanda account password.",
+            """
+                <div style="text-align:center; margin: 28px 0;">
+                  <a href="%s" style="background:#b88a2c; color:#fffdf7; text-decoration:none; padding:14px 26px; border-radius:999px; font-weight:700; letter-spacing:.04em; display:inline-block;">Reset password</a>
+                </div>
+                """.formatted(esc(resetLink))
+                + note("Security note", "This link is intended only for you. If you did not request it, you can ignore this email."),
+            "Pasticeri Amanda"
+        );
+    }
+
+    private String layout(String eyebrow, String title, String intro, String content, String signoff) {
         return """
             <!DOCTYPE html>
             <html>
             <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Password Reset - Pastiçeri Amanda</title>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Pasticeri Amanda</title>
             </head>
-            <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #fdf2f8 0%, #fef3c7 50%, #f3e8ff 100%);">
-                <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                    <!-- Header with Logo -->
-                    <div style="background: linear-gradient(135deg, #1e40af 0%, #f59e0b 50%, #8b5cf6 100%); padding: 40px 20px; text-align: center;">
-                        <img src="cid:logoAmanda" alt="Pastiçeri Amanda" style="width: 200px; height: auto; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
-                        <h1 style="color: white; margin: 20px 0 0 0; font-size: 28px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-                            🔐 Password Reset
-                        </h1>
-                    </div>
-                    <!-- Content -->
-                    <div style="padding: 40px 30px;">
-                        <h2 style="color: #1e40af; margin: 0 0 20px 0; font-size: 24px; text-align: center;">
-                            Reset Your Password
-                        </h2>
-                        <div style="background: linear-gradient(135deg, #fdf2f8 0%, #fef3c7 50%, #f3e8ff 100%); background-color: #fff; padding: 25px; border-radius: 15px; margin: 20px 0;">
-                            <p style="color: #374151; line-height: 1.6; margin: 0 0 20px 0;">
-                                We received a request to reset your password for your Pastiçeri Amanda account.
-                            </p>
-                            <div style="text-align: center; margin: 25px 0;">
-                                <a href="%s" style="background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: 600; display: inline-block; box-shadow: 0 4px 15px rgba(30, 64, 175, 0.3);">
-                                    🔐 Reset Password
-                                </a>
-                            </div>
-                            <p style="color: #6b7280; font-size: 14px; margin: 20px 0 0 0;">
-                                If you didn't request this password reset, please ignore this email. Your password will remain unchanged.
-                            </p>
-                        </div>
-                        <div style="background: #f3f4f6; padding: 20px; border-radius: 12px; margin: 25px 0; border-left: 4px solid #f59e0b;">
-                            <p style="margin: 0; color: #374151; font-size: 14px;">
-                                <strong>🔒 Security Note:</strong> This link will expire in 24 hours for your security.
-                            </p>
-                        </div>
-                        <!-- Contact Info -->
-                        <div style="background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%); color: white; padding: 25px; border-radius: 15px; text-align: center;">
-                            <h3 style="margin: 0 0 15px 0; font-size: 18px; font-weight: 700; text-shadow: 0 1px 0 #fff;">📍 Visit Us</h3>
-                            <p style="margin: 5px 0; font-size: 16px;"><strong>Rruga Lefter Talo</strong></p>
-                            <p style="margin: 5px 0; font-size: 16px;">📞 <strong>+355 69 352 0462</strong></p>
-                            <p style="margin: 5px 0; font-size: 16px;">📧 <strong>pasticeriamanda@gmail.com</strong></p>
-                        </div>
-                        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #f3f4f6;">
-                            <p style="color: #6b7280; font-size: 14px; margin: 0;">
-                                With love,<br>
-                                <strong style="color: #ec4899; font-size: 16px;">Pastiçeri Amanda ❤️</strong>
-                            </p>
-                        </div>
-                    </div>
-                </div>
+            <body style="margin:0; padding:0; background:#f7f0e4; font-family: Georgia, 'Times New Roman', serif; color:#2d2419;">
+              <div style="display:none; max-height:0; overflow:hidden;">%s - %s</div>
+              <table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="background:#f7f0e4; padding:28px 12px;">
+                <tr>
+                  <td align="center">
+                    <table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="max-width:640px; background:#fffdf7; border:1px solid #e6d5b3; box-shadow:0 18px 48px rgba(79,53,22,.13);">
+                      <tr>
+                        <td style="padding:34px 28px 26px; text-align:center; background:#fffaf0; border-bottom:1px solid #ead9b7;">
+                          <div style="font-size:26px; color:#b88a2c; line-height:1;">♛</div>
+                          <div style="font-size:28px; letter-spacing:.14em; text-transform:uppercase; color:#2d2419; font-weight:700; margin-top:8px;">Pasticeri Amanda</div>
+                          <div style="font-size:11px; letter-spacing:.38em; text-transform:uppercase; color:#9c7a38; margin-top:8px;">Est. 2019</div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:34px 34px 18px;">
+                          <div style="font-family:Arial, sans-serif; font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:#b88a2c; font-weight:700;">%s</div>
+                          <h1 style="margin:12px 0 12px; font-size:31px; line-height:1.18; color:#2d2419; font-weight:700;">%s</h1>
+                          <p style="margin:0; font-family:Arial, sans-serif; font-size:15px; line-height:1.7; color:#6b5a44;">%s</p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:8px 34px 34px;">
+                          %s
+                          <div style="margin-top:30px; padding-top:22px; border-top:1px solid #ead9b7; text-align:center; font-family:Arial, sans-serif; color:#7b6a53;">
+                            <div style="font-family:Georgia, 'Times New Roman', serif; color:#2d2419; font-size:18px;">%s</div>
+                            <div style="margin-top:12px; font-size:13px; line-height:1.7;">Rruga Lefter Talo<br>+355 69 352 0462<br>pasticeriamanda@gmail.com</div>
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
             </body>
             </html>
-        """.formatted(resetLink);
+            """.formatted(esc(eyebrow), esc(title), esc(eyebrow), esc(title), esc(intro), content, esc(signoff));
     }
-    
-    private String getImageSection(Order order) {
-        if (order.getImageUrls() == null || order.getImageUrls().isEmpty()) {
+
+    private String customerDetails(Order order) {
+        return card("Customer", rows(
+            row("Name", order.getCustomerName()),
+            row("Email", order.getCustomerEmail()),
+            row("Phone", order.getCustomerPhone())
+        ));
+    }
+
+    private String orderDetails(Order order, boolean includePrice) {
+        String price = includePrice ? row("Price", money(order)) : "";
+        return card("Order details", rows(
+            row("Order", order.getId() == null ? "" : "#" + order.getId()),
+            row("Product", order.getProductName()),
+            row("Quantity", String.valueOf(order.getNumberOfPersons())),
+            row("Flavour", order.getFlavour()),
+            row("Description", order.getCustomNote()),
+            row("Order date", order.getOrderDate() == null ? "" : order.getOrderDate().toString()),
+            deliveryRows(order),
+            price
+        ));
+    }
+
+    private String pricePanel(Order order) {
+        if (order.getTotalPrice() == null) {
             return "";
         }
-        StringBuilder imageHtml = new StringBuilder();
-        imageHtml.append("""
-            <div style=\"background: linear-gradient(135deg, #fdf2f8 0%%, #fef3c7 50%%, #f3e8ff 100%%); background-color: #fff; padding: 25px; border-radius: 15px; margin: 20px 0; color: #000; font-weight: 700; text-shadow: 0 1px 0 #fff;\">
-                <h3 style=\"color: #000; margin: 0 0 15px 0; font-size: 20px; font-weight: 700; text-shadow: 0 1px 0 #fff;\">📸 Your Design Images</h3>
-                <div style=\"display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;\">
-        """);
+
+        return """
+            <div style="margin:18px 0; padding:24px; background:#2d2419; color:#fffdf7; text-align:center; border:1px solid #b88a2c;">
+              <div style="font-family:Arial, sans-serif; font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:#e6c778;">Final price</div>
+              <div style="font-size:32px; margin-top:8px; font-weight:700;">ALL %s</div>
+            </div>
+            """.formatted(esc(order.getTotalPrice().toString()));
+    }
+
+    private String imageSection(Order order) {
+        if (order.getImageUrls() == null || order.getImageUrls().isBlank()) {
+            return "";
+        }
+
+        StringBuilder images = new StringBuilder();
         String[] imageUrls = order.getImageUrls().split(",");
         int imageIndex = 1;
         for (String imageUrl : imageUrls) {
-            if (imageUrl != null && !imageUrl.trim().isEmpty()) {
-                String trimmed = imageUrl.trim();
-                if (trimmed.startsWith("/uploads/")) {
-                    // Use inline image reference instead of URL
-                    imageHtml.append(String.format("""
-                        <img src=\"cid:orderImage%d\" alt=\"Order Design\" style=\"max-width: 150px; max-height: 150px; object-fit: cover; border-radius: 10px; border: 3px solid #f59e0b; box-shadow: 0 4px 8px rgba(0,0,0,0.1); background: #fff;\">
-                    """, imageIndex));
-                    imageIndex++;
-                }
+            if (imageUrl != null && imageUrl.trim().startsWith("/uploads/")) {
+                images.append("""
+                    <img src="cid:orderImage%d" alt="Order design" style="width:150px; max-width:100%%; height:auto; border:1px solid #d7bd7a; margin:6px; display:inline-block;">
+                    """.formatted(imageIndex));
+                imageIndex++;
             }
         }
-        imageHtml.append("""
-                </div>
+
+        if (images.length() == 0) {
+            return "";
+        }
+
+        return """
+            <div style="margin:18px 0; padding:22px; background:#fffaf0; border:1px solid #ead9b7;">
+              <div style="font-family:Arial, sans-serif; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:#b88a2c; font-weight:700; margin-bottom:14px;">Design images</div>
+              <div style="text-align:center;">%s</div>
+              <p style="font-family:Arial, sans-serif; font-size:12px; color:#7b6a53; line-height:1.6; margin:14px 0 0;">If the preview is hidden by your email app, the uploaded design is included as an attachment.</p>
             </div>
-        """);
-        return imageHtml.toString();
+            """.formatted(images.toString());
     }
-} 
+
+    private String note(String title, String body) {
+        return """
+            <div style="margin:18px 0; padding:20px; background:#fbf6ec; border-left:4px solid #b88a2c; font-family:Arial, sans-serif;">
+              <div style="font-size:13px; font-weight:700; color:#2d2419; margin-bottom:6px;">%s</div>
+              <div style="font-size:14px; line-height:1.7; color:#6b5a44;">%s</div>
+            </div>
+            """.formatted(esc(title), esc(body));
+    }
+
+    private String card(String title, String rows) {
+        if (rows == null || rows.isBlank()) {
+            return "";
+        }
+
+        return """
+            <div style="margin:18px 0; padding:22px; background:#fffaf0; border:1px solid #ead9b7;">
+              <div style="font-family:Arial, sans-serif; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:#b88a2c; font-weight:700; margin-bottom:12px;">%s</div>
+              <table role="presentation" width="100%%" cellspacing="0" cellpadding="0" style="font-family:Arial, sans-serif;">%s</table>
+            </div>
+            """.formatted(esc(title), rows);
+    }
+
+    private String rows(String... rows) {
+        StringBuilder builder = new StringBuilder();
+        for (String row : rows) {
+            if (row != null && !row.isBlank()) {
+                builder.append(row);
+            }
+        }
+        return builder.toString();
+    }
+
+    private String row(String label, String value) {
+        if (value == null || value.isBlank()) {
+            return "";
+        }
+
+        return """
+            <tr>
+              <td style="padding:8px 0; color:#8a765b; font-size:13px; width:34%%; vertical-align:top;">%s</td>
+              <td style="padding:8px 0; color:#2d2419; font-size:14px; line-height:1.55; font-weight:600;">%s</td>
+            </tr>
+            """.formatted(esc(label), esc(value));
+    }
+
+    private String deliveryRows(Order order) {
+        if (order.getDeliveryDateTime() == null) {
+            return "";
+        }
+
+        return row("Delivery date", order.getDeliveryDateTime().toLocalDate().toString())
+            + row("Delivery time", order.getDeliveryDateTime().toLocalTime().toString().substring(0, 5));
+    }
+
+    private String money(Order order) {
+        return order.getTotalPrice() == null ? "To be confirmed" : "ALL " + order.getTotalPrice();
+    }
+
+    private boolean isCustomOrder(Order order) {
+        return (order.getCustomNote() != null && !order.getCustomNote().isBlank())
+            || (order.getFlavour() != null && !order.getFlavour().isBlank())
+            || (order.getImageUrls() != null && !order.getImageUrls().isBlank())
+            || "pending-quote".equals(order.getStatus())
+            || "custom".equals(order.getOrderType());
+    }
+
+    private String esc(String value) {
+        if (value == null) {
+            return "";
+        }
+
+        return value
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\"", "&quot;")
+            .replace("'", "&#39;");
+    }
+}

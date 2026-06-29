@@ -55,17 +55,24 @@ public class AsyncEmailService {
     public void sendPriceSetNotification(Order order) {
         logger.info("💰 sendPriceSetNotification triggered for order ID: {}", order.getId());
         executor.execute(() -> {
-            if (!hasCustomerEmail(order)) {
+            if (hasCustomerEmail(order)) {
+                try {
+                    logger.info("📧 Attempting to send price set email to: {}", order.getCustomerEmail());
+                    emailService.sendPriceSetEmail(order.getCustomerEmail(), order);
+                    logger.info("✅ Price set email sent to: {}", order.getCustomerEmail());
+                } catch (Exception e) {
+                    logger.error("⚠️ Failed to send price set email: {}", e.getMessage(), e);
+                }
+            } else {
                 logger.warn("⚠️ Skipping price email — no customer email on order #" + order.getId());
-                return;
             }
 
             try {
-                logger.info("📧 Attempting to send price set email to: {}", order.getCustomerEmail());
-                emailService.sendPriceSetEmail(order.getCustomerEmail(), order);
-                logger.info("✅ Price set email sent to: {}", order.getCustomerEmail());
+                logger.info("📧 Attempting to send admin price-set notification for order ID: {}", order.getId());
+                emailService.sendAdminNotification(ADMIN_EMAIL, order);
+                logger.info("✅ Admin price-set notification sent for order ID: {}", order.getId());
             } catch (Exception e) {
-                logger.error("⚠️ Failed to send price set email: {}", e.getMessage(), e);
+                logger.error("⚠️ Failed to send admin price-set notification: {}", e.getMessage(), e);
             }
         });
     }
