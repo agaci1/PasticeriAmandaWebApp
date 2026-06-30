@@ -21,6 +21,11 @@ const nextConfig = {
         hostname: 'striking-commitment-production.up.railway.app',
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'api.pasticeriamanda.com',
+        pathname: '/uploads/**',
+      },
     ],
   },
   transpilePackages: ['framer-motion'],

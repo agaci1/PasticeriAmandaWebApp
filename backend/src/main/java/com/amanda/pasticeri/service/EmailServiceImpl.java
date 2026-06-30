@@ -1,6 +1,7 @@
 package com.amanda.pasticeri.service;
 
 import com.amanda.pasticeri.model.Order;
+import com.amanda.pasticeri.util.UploadPathResolver;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -214,41 +216,17 @@ public class EmailServiceImpl implements EmailService {
                         String trimmed = imageUrl.trim();
                         logger.debug("📸 Processing image URL: {}", trimmed);
                         
-                        if (trimmed.startsWith("/uploads/")) {
-                            String currentDir = System.getProperty("user.dir");
-                            String[] possiblePaths = {
-                                currentDir + trimmed,
-                                currentDir + "/backend" + trimmed,
-                                currentDir + "/uploads" + trimmed.substring(8),
-                                "uploads" + trimmed.substring(8),
-                                currentDir + "/backend/uploads" + trimmed.substring(8),
-                                currentDir + "/uploads" + trimmed.substring(8)
-                            };
-                            
-                            File imageFile = null;
-                            for (String path : possiblePaths) {
-                                File testFile = new File(path);
-                                logger.debug("🔍 Testing path: {}", testFile.getAbsolutePath());
-                                if (testFile.exists() && testFile.isFile()) {
-                                    imageFile = testFile;
-                                    logger.debug("✅ Found image at: {}", testFile.getAbsolutePath());
-                                    break;
-                                }
-                            }
-                            
-                            if (imageFile != null && imageFile.exists()) {
-                                try {
-                                    helper.addInline("orderImage" + imageIndex, imageFile);
-                                    logger.debug("✅ Order image {} added to email: {}", imageIndex, imageFile.getAbsolutePath());
-                                    imageIndex++;
-                                } catch (Exception e) {
-                                    logger.error("❌ Failed to add image {} to email: {}", imageIndex, e.getMessage(), e);
-                                }
-                            } else {
-                                logger.error("❌ Order image file not found for URL: {}", trimmed);
+                        File imageFile = findUploadFile(trimmed);
+                        if (imageFile != null && imageFile.exists()) {
+                            try {
+                                helper.addInline("orderImage" + imageIndex, imageFile);
+                                logger.debug("✅ Order image {} added to email: {}", imageIndex, imageFile.getAbsolutePath());
+                                imageIndex++;
+                            } catch (Exception e) {
+                                logger.error("❌ Failed to add image {} to email: {}", imageIndex, e.getMessage(), e);
                             }
                         } else {
-                            logger.warn("⚠️ Skipping non-upload image: {}", trimmed);
+                            logger.error("❌ Order image file not found for URL: {}", trimmed);
                         }
                     }
                 }
@@ -414,23 +392,28 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private File findUploadFile(String imageUrl) {
-        if (!imageUrl.startsWith("/uploads/")) {
+        if (imageUrl == null || !imageUrl.startsWith("/uploads/")) {
+            logger.warn("⚠️ Skipping non-upload image: {}", imageUrl);
             return null;
         }
 
         String currentDir = System.getProperty("user.dir");
         String fileName = imageUrl.substring(9);
-        String[] possiblePaths = {
+        String uploadDir = UploadPathResolver.resolveUploadDirectory();
+        List<String> possiblePaths = List.of(
+            Path.of(uploadDir).resolve(fileName).toString(),
             currentDir + imageUrl,
             currentDir + "/backend" + imageUrl,
             currentDir + "/uploads/" + fileName,
             "uploads/" + fileName,
             currentDir + "/backend/uploads/" + fileName
-        };
+        );
 
         for (String path : possiblePaths) {
             File testFile = new File(path);
+            logger.debug("🔍 Testing upload path: {}", testFile.getAbsolutePath());
             if (testFile.exists() && testFile.isFile()) {
+                logger.debug("✅ Found upload file at: {}", testFile.getAbsolutePath());
                 return testFile;
             }
         }
