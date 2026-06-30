@@ -40,6 +40,46 @@ public class EmailTemplateService {
         );
     }
 
+    public String getAdminPriceSetTemplate(Order order) {
+        return layout(
+            "Admin confirmation",
+            "Price was set",
+            "The customer has been sent the confirmed price for this order.",
+            customerDetails(order)
+                + orderDetails(order, true)
+                + pricePanel(order)
+                + imageSection(order)
+                + note("Admin status", "The order is now marked pending and ready for production follow-up."),
+            "Pasticeri Amanda Admin"
+        );
+    }
+
+    public String getAdminOrderCancelledTemplate(Order order) {
+        return layout(
+            "Admin alert",
+            "Order cancelled",
+            "This order has been cancelled and should no longer be prepared.",
+            customerDetails(order)
+                + orderDetails(order, true)
+                + imageSection(order)
+                + statusPanel("Cancelled", "#7f1d1d", "No further production action is needed unless the customer contacts the shop."),
+            "Pasticeri Amanda Admin"
+        );
+    }
+
+    public String getAdminOrderCompletedTemplate(Order order) {
+        return layout(
+            "Admin confirmation",
+            "Order completed",
+            "The order has been marked complete and the customer has been notified.",
+            customerDetails(order)
+                + orderDetails(order, true)
+                + pricePanel(order)
+                + statusPanel("Completed", "#1f5135", "This order can be archived with completed orders."),
+            "Pasticeri Amanda Admin"
+        );
+    }
+
     public String getOrderCancelledTemplate(Order order) {
         return layout(
             "Order update",
@@ -171,6 +211,15 @@ public class EmailTemplateService {
               <div style="font-size:32px; margin-top:8px; font-weight:700;">ALL %s</div>
             </div>
             """.formatted(esc(order.getTotalPrice().toString()));
+    }
+
+    private String statusPanel(String title, String backgroundColor, String body) {
+        return """
+            <div style="margin:18px 0; padding:24px; background:%s; color:#fffdf7; text-align:center; border:1px solid #b88a2c;">
+              <div style="font-family:Arial, sans-serif; font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:#e6c778;">%s</div>
+              <div style="font-family:Arial, sans-serif; font-size:14px; line-height:1.7; margin-top:10px;">%s</div>
+            </div>
+            """.formatted(backgroundColor, esc(title), esc(body));
     }
 
     private String imageSection(Order order) {

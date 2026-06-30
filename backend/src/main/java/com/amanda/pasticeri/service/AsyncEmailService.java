@@ -69,7 +69,7 @@ public class AsyncEmailService {
 
             try {
                 logger.info("📧 Attempting to send admin price-set notification for order ID: {}", order.getId());
-                emailService.sendAdminNotification(ADMIN_EMAIL, order);
+                emailService.sendAdminPriceSetNotification(ADMIN_EMAIL, order);
                 logger.info("✅ Admin price-set notification sent for order ID: {}", order.getId());
             } catch (Exception e) {
                 logger.error("⚠️ Failed to send admin price-set notification: {}", e.getMessage(), e);
@@ -92,7 +92,7 @@ public class AsyncEmailService {
 
             try {
                 logger.info("📧 Attempting to send admin cancellation notification");
-                emailService.sendAdminNotification(ADMIN_EMAIL, order);
+                emailService.sendAdminCancellationNotification(ADMIN_EMAIL, order);
                 logger.info("✅ Admin cancellation notification sent");
             } catch (Exception e) {
                 logger.error("⚠️ Failed to send admin cancellation notification: {}", e.getMessage(), e);
@@ -115,7 +115,7 @@ public class AsyncEmailService {
 
             try {
                 logger.info("📧 Attempting to send admin completion notification");
-                emailService.sendAdminNotification(ADMIN_EMAIL, order);
+                emailService.sendAdminCompletionNotification(ADMIN_EMAIL, order);
                 logger.info("✅ Admin completion notification sent for order ID: {}", order.getId());
             } catch (Exception e) {
                 logger.error("⚠️ Failed to send admin completion notification: {}", e.getMessage(), e);

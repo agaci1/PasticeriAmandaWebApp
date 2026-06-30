@@ -76,6 +76,27 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    public void sendAdminPriceSetNotification(String to, Order order) {
+        String subject = "💰 Price Set - Order #" + order.getId();
+        String body = emailTemplateService.getAdminPriceSetTemplate(order);
+        sendHtmlEmailWithLogo(to, subject, body, order);
+    }
+
+    @Override
+    public void sendAdminCancellationNotification(String to, Order order) {
+        String subject = "❌ Order Cancelled - Order #" + order.getId();
+        String body = emailTemplateService.getAdminOrderCancelledTemplate(order);
+        sendHtmlEmailWithLogo(to, subject, body, order);
+    }
+
+    @Override
+    public void sendAdminCompletionNotification(String to, Order order) {
+        String subject = "✅ Order Completed - Order #" + order.getId();
+        String body = emailTemplateService.getAdminOrderCompletedTemplate(order);
+        sendHtmlEmailWithLogo(to, subject, body, order);
+    }
+
+    @Override
     public void sendAdminNotification(String to, String htmlContent) {
         sendHtmlEmailWithLogo(to, "Pastiçeri Amanda - New Order", htmlContent);
     }

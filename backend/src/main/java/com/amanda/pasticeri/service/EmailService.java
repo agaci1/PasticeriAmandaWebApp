@@ -5,6 +5,9 @@ import com.amanda.pasticeri.model.Order;
 public interface EmailService {
     void sendOrderConfirmation(String to, Order order);
     void sendAdminNotification(String to, Order order);
+    void sendAdminPriceSetNotification(String to, Order order);
+    void sendAdminCancellationNotification(String to, Order order);
+    void sendAdminCompletionNotification(String to, Order order);
     void sendOrderCancelledEmail(String to, Order order);
     void sendPriceSetEmail(String to, Order order);
     void sendOrderCompletedEmail(String to, Order order);
